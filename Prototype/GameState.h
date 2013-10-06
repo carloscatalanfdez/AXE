@@ -5,7 +5,7 @@ using namespace Polycode;
 
 class Game;
 
-class GameState : public Screen {
+class GameState : public Screen  {
 public:
 	Game *game;
 

@@ -8,6 +8,8 @@ class GameState;
 
 class Game : public EventHandler {
 public:
+	Core *core;
+
     Game(PolycodeView *view, int w, int h);
     virtual ~Game();
     
@@ -21,7 +23,6 @@ public:
 	int getHeight() { return height; }
 
 protected:
-	Core *core;
 	GameState *currentWorld;
 	int width, height;
 
