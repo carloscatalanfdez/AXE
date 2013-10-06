@@ -1,13 +1,14 @@
 #include "MenuState.h"
 #include "Game.h" 
+#include "Player.h"
 
 MenuState::MenuState() {
 	label = new ScreenLabel("PRODUCT FROM THE BADLADNS", 30);
+
 	addChild(label);
 }
 
 MenuState::~MenuState() {
-	delete label;
 }
 
 void MenuState::init() {

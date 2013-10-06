@@ -11,7 +11,11 @@
     <ClCompile Include="AxeGame.cpp">
       <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="MenuState.cpp" />
+    <ClCompile Include="MenuState.cpp">
+      <Filter>Game\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="GameEntity.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -23,7 +27,11 @@
     <ClInclude Include="AxeGame.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="MenuState.h" />
+    <ClInclude Include="MenuState.h">
+      <Filter>Game\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="GameEntity.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
