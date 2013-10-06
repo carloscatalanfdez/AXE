@@ -16,6 +16,6 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 			TranslateMessage(&Msg);
 			DispatchMessage(&Msg);
 		}
-	} while(game->Update());
+	} while(game->update());
 	return Msg.wParam;
 }

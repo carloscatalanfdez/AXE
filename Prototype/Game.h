@@ -3,13 +3,10 @@
 
 using namespace Polycode;
 
-class Game {
+class Game : public Win32Core {
 public:
     Game(PolycodeView *view);
     ~Game();
     
-    bool Update();
-    
-private:
-    Core *core;
+    bool update();
 };
