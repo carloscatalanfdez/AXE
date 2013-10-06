@@ -1,49 +1,49 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Game.cpp">
+    <ClCompile Include="../src/GameState.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="GameState.cpp">
+    <ClCompile Include="../src/GameEntity.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="AxeGame.cpp">
-      <Filter>Game</Filter>
+    <ClCompile Include="../src/Game.cpp">
+      <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="MenuState.cpp">
+    <ClCompile Include="../src/MenuState.cpp">
       <Filter>Game\Menu</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
+    <ClCompile Include="../src/LevelState.cpp">
       <Filter>Game\Game</Filter>
     </ClCompile>
-    <ClCompile Include="GameEntity.cpp">
-      <Filter>Engine</Filter>
+    <ClCompile Include="../src/AxeGame.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="LevelState.cpp">
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="../src/Player.cpp">
       <Filter>Game\Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Game.h">
+    <ClInclude Include="../src/GameState.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="GameState.h">
+    <ClInclude Include="../src/GameEntity.h">
       <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="AxeGame.h">
-      <Filter>Game</Filter>
+    <ClInclude Include="../src/Game.h">
+      <Filter>Engine</Filter>
     </ClInclude>
-    <ClInclude Include="MenuState.h">
+    <ClInclude Include="../src/MenuState.h">
       <Filter>Game\Menu</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
+    <ClInclude Include="../src/LevelState.h">
       <Filter>Game\Game</Filter>
     </ClInclude>
-    <ClInclude Include="GameEntity.h">
-      <Filter>Engine</Filter>
+    <ClInclude Include="../src/AxeGame.h">
+      <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="LevelState.h">
+    <ClInclude Include="../src/Player.h">
       <Filter>Game\Game</Filter>
     </ClInclude>
   </ItemGroup>
