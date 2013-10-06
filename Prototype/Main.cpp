@@ -1,14 +1,13 @@
 #include <Polycode.h>
-#include "Game.h"
+#include "AxeGame.h"
 #include "PolycodeView.h"
 #include "windows.h"
 
 using namespace Polycode;
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-{
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	PolycodeView *view = new PolycodeView(hInstance, nCmdShow, L"Polycode Template");
-	Game *game = new Game(view);
+	AxeGame *game = new AxeGame(view);
 
 	MSG Msg;
 	do {
