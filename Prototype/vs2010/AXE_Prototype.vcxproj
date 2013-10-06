@@ -61,6 +61,14 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(PolycodeLibsDebug);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>if not exist "$(OutDir)Assets" md "$(OutDir)Assets"
+xcopy /d /s "$(SolutionDir)..\Assets\*.*" "$(OutDir)Assets"</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy assets folder</Message>
+    </PreBuildEvent>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -77,6 +85,13 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>$(PolycodeLibsRelease);%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>if not exist "$(OutDir)Assets" md "$(OutDir)Assets"
+xcopy /d /s "$(SolutionDir)..\Assets\*.*" "$(OutDir)Assets"</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Copy assets folder</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="../src/AxeGame.cpp" />
