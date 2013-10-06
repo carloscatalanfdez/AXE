@@ -19,7 +19,7 @@ Game::~Game() {
 }
 
 void Game::init() {
-	currentWorld = createFirstWorld();
+	setWorld(createFirstWorld());
 }
 
 bool Game::update() {
@@ -36,8 +36,14 @@ void Game::changeWorld(GameState *world) {
 		delete currentWorld;
 	}
 
-	currentWorld = world;
-	currentWorld->enabled = true;
-	currentWorld->game = this;
-	currentWorld->init();
+	setWorld(world);
+}
+
+void Game::setWorld(GameState *world) {
+	if (world) {
+		currentWorld = world;
+		currentWorld->enabled = true;
+		currentWorld->game = this;
+		currentWorld->init();
+	}
 }

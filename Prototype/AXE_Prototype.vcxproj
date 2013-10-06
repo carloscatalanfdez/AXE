@@ -79,6 +79,7 @@
     <ClCompile Include="AxeGame.cpp" />
     <ClCompile Include="GameEntity.cpp" />
     <ClCompile Include="GameState.cpp" />
+    <ClCompile Include="LevelState.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="MenuState.cpp" />
@@ -89,6 +90,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameEntity.h" />
     <ClInclude Include="GameState.h" />
+    <ClInclude Include="LevelState.h" />
     <ClInclude Include="MenuState.h" />
     <ClInclude Include="Player.h" />
   </ItemGroup>

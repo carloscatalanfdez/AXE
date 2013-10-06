@@ -13,5 +13,6 @@ public:
 	virtual ~GameState();
 
 	virtual void init() {}
+	virtual void updsddate() {}
 };
 

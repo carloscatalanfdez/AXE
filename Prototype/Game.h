@@ -26,4 +26,5 @@ protected:
 	int width, height;
 
 	virtual GameState *createFirstWorld();
+	void setWorld(GameState *world);
 };

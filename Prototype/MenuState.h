@@ -11,6 +11,7 @@ public:
 	~MenuState();
 
 	void init();
+	void Update();
 
 protected:
 	ScreenLabel *label;

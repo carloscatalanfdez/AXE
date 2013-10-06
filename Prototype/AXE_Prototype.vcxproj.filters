@@ -14,8 +14,15 @@
     <ClCompile Include="MenuState.cpp">
       <Filter>Game\Menu</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="GameEntity.cpp" />
+    <ClCompile Include="Player.cpp">
+      <Filter>Game\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="GameEntity.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="LevelState.cpp">
+      <Filter>Game\Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -30,8 +37,15 @@
     <ClInclude Include="MenuState.h">
       <Filter>Game\Menu</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="GameEntity.h" />
+    <ClInclude Include="Player.h">
+      <Filter>Game\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="GameEntity.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelState.h">
+      <Filter>Game\Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -43,7 +57,7 @@
     <Filter Include="Game\Menu">
       <UniqueIdentifier>{dcab71e0-6637-474a-963d-0f662ba5e8ff}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\Levels">
+    <Filter Include="Game\Game">
       <UniqueIdentifier>{45c78742-7e0e-4f21-8a15-9d3e23425970}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

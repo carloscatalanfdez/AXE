@@ -14,3 +14,8 @@ MenuState::~MenuState() {
 void MenuState::init() {
 	label->setPosition(game->getWidth()/2.f - label->getWidth()/2.f, game->getHeight()/2.f - label->getHeight()/2.f);
 }
+
+void MenuState::Update() {
+
+	GameState::Update();
+}
