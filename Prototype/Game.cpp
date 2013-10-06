@@ -7,8 +7,12 @@ Game::Game(PolycodeView *view, int w, int h) {
 	CoreServices::getInstance()->getResourceManager()->addArchive("default.pak");
 	CoreServices::getInstance()->getResourceManager()->addDirResource("default", false);
 
+	CoreServices::getInstance()->getRenderer()->setTextureFilteringMode(Renderer::TEX_FILTERING_NEAREST);
+
 	width = w, height = h;
 	currentWorld = NULL;
+
+	keepRunning = true;
 }
 
 Game::~Game() {
@@ -22,8 +26,16 @@ void Game::init() {
 	setWorld(createFirstWorld());
 }
 
+void Game::end()
+{
+	keepRunning = false;
+}
+
 bool Game::update() {
-	return core->updateAndRender();
+	if (!keepRunning)
+		return false;
+	else
+		return core->updateAndRender();
 }
 
 GameState *Game::createFirstWorld() {

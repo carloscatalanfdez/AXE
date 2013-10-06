@@ -16,6 +16,8 @@ public:
 	virtual void init();
     virtual bool update();
 
+	void end();
+
 	void changeWorld(GameState *world);
 	GameState *getWorld();
 
@@ -25,6 +27,8 @@ public:
 protected:
 	GameState *currentWorld;
 	int width, height;
+
+	bool keepRunning;
 
 	virtual GameState *createFirstWorld();
 	void setWorld(GameState *world);

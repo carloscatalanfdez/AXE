@@ -6,7 +6,7 @@
 using namespace Polycode;
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-	PolycodeView *view = new PolycodeView(hInstance, nCmdShow, L"Polycode Template");
+	PolycodeView *view = new PolycodeView(hInstance, nCmdShow, L"AXE");
 	AxeGame *game = new AxeGame(view);
 	game->init();
 
