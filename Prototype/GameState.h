@@ -3,9 +3,15 @@
 
 using namespace Polycode;
 
+class Game;
+
 class GameState : public Screen {
 public:
-	GameState(void);
-	virtual ~GameState(void);
+	Game *game;
+
+	GameState();
+	virtual ~GameState();
+
+	virtual void init() {}
 };
 

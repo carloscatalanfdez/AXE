@@ -16,6 +16,9 @@ public:
 	void changeWorld(GameState *world);
 	GameState *getWorld();
 
+	int getWidth() { return width; }
+	int getHeight() { return height; }
+
 protected:
 	Core *core;
 	GameState *currentWorld;

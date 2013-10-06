@@ -3,7 +3,7 @@
 #include "GameState.h"
 
 Game::Game(PolycodeView *view, int w, int h) { 
-	core = new POLYCODE_CORE(view, w, h, false, false, 0, 0,60);
+	core = new POLYCODE_CORE(view, w, h, false, false, 0, 0, 60);
 
 	CoreServices::getInstance()->getResourceManager()->addArchive("default.pak");
 	CoreServices::getInstance()->getResourceManager()->addDirResource("default", false);
@@ -17,6 +17,7 @@ Game::~Game() {
 	if (currentWorld) {
 		delete currentWorld;
 	}
+	delete core;
 }
 
 bool Game::update() {
@@ -35,4 +36,6 @@ void Game::changeWorld(GameState *world) {
 
 	currentWorld = world;
 	currentWorld->enabled = true;
+	currentWorld->game = this;
+	currentWorld->init();
 }
