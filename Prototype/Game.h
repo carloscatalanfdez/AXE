@@ -11,6 +11,7 @@ public:
     Game(PolycodeView *view, int w, int h);
     virtual ~Game();
     
+	virtual void init();
     virtual bool update();
 
 	void changeWorld(GameState *world);
@@ -24,5 +25,5 @@ protected:
 	GameState *currentWorld;
 	int width, height;
 
-	virtual GameState *initFirstWorld();
+	virtual GameState *createFirstWorld();
 };

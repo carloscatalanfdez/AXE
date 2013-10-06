@@ -4,13 +4,11 @@
 
 Game::Game(PolycodeView *view, int w, int h) { 
 	core = new POLYCODE_CORE(view, w, h, false, false, 0, 0, 60);
-
 	CoreServices::getInstance()->getResourceManager()->addArchive("default.pak");
 	CoreServices::getInstance()->getResourceManager()->addDirResource("default", false);
 
 	width = w, height = h;
-
-	currentWorld = initFirstWorld();
+	currentWorld = NULL;
 }
 
 Game::~Game() {
@@ -20,11 +18,15 @@ Game::~Game() {
 	delete core;
 }
 
+void Game::init() {
+	currentWorld = createFirstWorld();
+}
+
 bool Game::update() {
 	return core->updateAndRender();
 }
 
-GameState *Game::initFirstWorld() {
+GameState *Game::createFirstWorld() {
 	return NULL;
 }
 

@@ -6,7 +6,10 @@ public:
 	AxeGame(PolycodeView* view);
 	~AxeGame();
 
+	void init();
+	bool update();
+
 protected:
-	GameState *initFirstWorld();
+	GameState *createFirstWorld();
 };
 
