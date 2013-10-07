@@ -31,6 +31,8 @@ THE SOFTWARE.
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
 	app = new AxeGame(mainView);
+    app->init();
+    
 	timer = [NSTimer timerWithTimeInterval:(1.0f/60.0f)
 		target:self
 		selector:@selector(animationTimer:)

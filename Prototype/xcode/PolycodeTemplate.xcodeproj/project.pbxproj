@@ -28,6 +28,7 @@
 		F262FACD18023736008D0205 /* LevelState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F262FAC318023736008D0205 /* LevelState.cpp */; };
 		F262FACE18023736008D0205 /* MenuState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F262FAC518023736008D0205 /* MenuState.cpp */; };
 		F262FACF18023736008D0205 /* Player.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F262FAC718023736008D0205 /* Player.cpp */; };
+		F262FAD718023E72008D0205 /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = F262FAD618023E72008D0205 /* Assets */; };
 		F270EDDD1802369600602266 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F270EDD61802369600602266 /* main.m */; };
 		F270EDDE1802369600602266 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = F270EDD71802369600602266 /* MainMenu.xib */; };
 		F270EDDF1802369600602266 /* PolycodeTemplate-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F270EDD81802369600602266 /* PolycodeTemplate-Info.plist */; };
@@ -68,6 +69,7 @@
 		F262FAC618023736008D0205 /* MenuState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MenuState.h; path = ../src/MenuState.h; sourceTree = "<group>"; };
 		F262FAC718023736008D0205 /* Player.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Player.cpp; path = ../src/Player.cpp; sourceTree = "<group>"; };
 		F262FAC818023736008D0205 /* Player.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Player.h; path = ../src/Player.h; sourceTree = "<group>"; };
+		F262FAD618023E72008D0205 /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Assets; path = ../Assets; sourceTree = "<group>"; };
 		F270EDD61802369600602266 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; };
 		F270EDD71802369600602266 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = SOURCE_ROOT; };
 		F270EDD81802369600602266 /* PolycodeTemplate-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "PolycodeTemplate-Info.plist"; sourceTree = SOURCE_ROOT; };
@@ -102,6 +104,7 @@
 		6D2800AC13760D3E00BD8D0D = {
 			isa = PBXGroup;
 			children = (
+				F262FAD618023E72008D0205 /* Assets */,
 				F262FABA18023724008D0205 /* Game */,
 				6D2800C213760D3E00BD8D0D /* Supporting Files */,
 				6D2800BA13760D3E00BD8D0D /* Frameworks */,
@@ -167,14 +170,9 @@
 		F262FABA18023724008D0205 /* Game */ = {
 			isa = PBXGroup;
 			children = (
+				F262FAD118023D13008D0205 /* Engine */,
 				F262FABB18023736008D0205 /* AxeGame.cpp */,
 				F262FABC18023736008D0205 /* AxeGame.h */,
-				F262FABD18023736008D0205 /* Game.cpp */,
-				F262FABE18023736008D0205 /* Game.h */,
-				F262FABF18023736008D0205 /* GameEntity.cpp */,
-				F262FAC018023736008D0205 /* GameEntity.h */,
-				F262FAC118023736008D0205 /* GameState.cpp */,
-				F262FAC218023736008D0205 /* GameState.h */,
 				F262FAC318023736008D0205 /* LevelState.cpp */,
 				F262FAC418023736008D0205 /* LevelState.h */,
 				F262FAC518023736008D0205 /* MenuState.cpp */,
@@ -183,6 +181,19 @@
 				F262FAC818023736008D0205 /* Player.h */,
 			);
 			name = Game;
+			sourceTree = "<group>";
+		};
+		F262FAD118023D13008D0205 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				F262FABD18023736008D0205 /* Game.cpp */,
+				F262FABE18023736008D0205 /* Game.h */,
+				F262FABF18023736008D0205 /* GameEntity.cpp */,
+				F262FAC018023736008D0205 /* GameEntity.h */,
+				F262FAC118023736008D0205 /* GameState.cpp */,
+				F262FAC218023736008D0205 /* GameState.h */,
+			);
+			name = Engine;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -235,9 +246,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F270EDDE1802369600602266 /* MainMenu.xib in Resources */,
+				F262FAD718023E72008D0205 /* Assets in Resources */,
 				F270EDDF1802369600602266 /* PolycodeTemplate-Info.plist in Resources */,
 				F262FAB6180236C5008D0205 /* default.pak in Resources */,
-				F270EDDE1802369600602266 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
