@@ -13,8 +13,6 @@ public:
 	void init();
 	void Update();
 
-	void handleEvent(Event *e);
-
 protected:
 	ScreenLabel *label;
 };

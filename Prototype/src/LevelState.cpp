@@ -1,30 +1,27 @@
 #include "LevelState.h"
-#include "Game.h" 
+#include "Player.h"
+#include "Game.h"
 
 using namespace Polycode;
 
 LevelState::LevelState() {
-	image = new ScreenImage("Assets/knights.png");
-	addChild(image);
+	player = new Player();
+	addChild(player);
 }
 
 LevelState::~LevelState() {
-	delete image;
 }
 
 void LevelState::init() {
-	image->setPosition(game->getWidth()/2.f - image->getWidth()/2.f, game->getHeight()/2.f - image->getHeight()/2.f);
+	player->setPosition(game->getWidth()/2.f - player->getWidth()/2.f, game->getHeight()/2.f - player->getHeight()/2.f);
+
+	GameState::init();
 }
 
 void LevelState::Update() {
 	Polycode::CoreInput *input = game->core->getInput();
 	if (input->getKeyState(Polycode::KEY_ESCAPE))
 		game->end();
-	else if (input->getKeyState(Polycode::KEY_LEFT))
-		image->setRotation(image->getRotation() - 60*game->core->getElapsed());
-	else if (input->getKeyState(Polycode::KEY_RIGHT))
-		image->setRotation(image->getRotation() + 60*game->core->getElapsed());
-}
 
-void LevelState::handleEvent(Event* e) {
+	GameState::Update();
 }

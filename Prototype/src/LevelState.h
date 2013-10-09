@@ -2,6 +2,8 @@
 #include "GameState.h"
 #include "Polycode.h"
 
+class Player;
+
 class LevelState : public GameState 
 {
 public:
@@ -11,9 +13,7 @@ public:
 	void init();
 	void Update();
 
-	void handleEvent(Event *e);
-
 protected:
-	Polycode::ScreenImage *image;
+	Player *player;
 };
 

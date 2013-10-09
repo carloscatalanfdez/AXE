@@ -9,38 +9,22 @@ MenuState::MenuState() {
 }
 
 MenuState::~MenuState() {
-	// game->core->getInput()->removeEventListener(this, InputEvent::EVENT_KEYDOWN);	
 }
 
 void MenuState::init() {
 	label->setPosition(game->getWidth()/2.f - label->getWidth()/2.f, game->getHeight()/2.f - label->getHeight()/2.f);
 
-	// game->core->getInput()->addEventListener(this, InputEvent::EVENT_KEYDOWN);
+	GameState::init();
 }
 
 void MenuState::Update() {
 	Polycode::CoreInput *input = game->core->getInput();
-	if (input->getKeyState(Polycode::KEY_ESCAPE))
+	if (input->getKeyState(Polycode::KEY_ESCAPE)) {
 		game->end();
-	else if (input->getKeyState(Polycode::KEY_RETURN))
+	} else if (input->getKeyState(Polycode::KEY_RETURN)) {
 		game->changeWorld(new LevelState());
-}
+		return;
+	}
 
-void MenuState::handleEvent(Event *e) {
- 	/*(e->getDispatcher() == game->core->getInput()) {
-		InputEvent *inputEvent = (InputEvent*)e;
-		
-		switch(e->getEventCode()) {
-			case InputEvent::EVENT_KEYDOWN:
-				switch (inputEvent->keyCode()) {
-				case KEY_RETURN:
-						game->changeWorld(new LevelState());
-					break;
-					case KEY_RIGHT:
-					
-					break;
-				}
-			break;		
-		}
-	}*/
+	GameState::Update();
 }
