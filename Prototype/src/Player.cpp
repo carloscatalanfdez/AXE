@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Game.h"
+#include "LeveLState.h"
 
 // Input is a bitmask
 #define LEFT_BIT 1
@@ -77,6 +78,13 @@ void Player::Update() {
 	}
 
 	GameEntity::Update();
+
+	if (input->getKeyState(Polycode::KEY_f)) {
+		LevelState *level = dynamic_cast<LevelState*>(world);
+		if (level) {
+			level->completeLevel();
+		}
+	}
 }
 
 void Player::Render() {

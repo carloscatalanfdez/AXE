@@ -1,10 +1,14 @@
 #include "AxeGame.h"
 #include "MenuState.h"
+#include "LevelState.h"
+#include "Player.h"
 
 AxeGame::AxeGame(PolycodeView *view) : Game(view, 640, 480) {
 }
 
 AxeGame::~AxeGame() {
+	delete players[0];
+	delete players[1];
 }
 
 void AxeGame::init() {
@@ -19,4 +23,18 @@ bool AxeGame::update() {
 
 GameState *AxeGame::createFirstWorld() {
 	return new MenuState();
+}
+
+void AxeGame::startFirstLevel() {
+	LevelState *firstLevel = new LevelState();
+	// Hardcoded, these should be set up in the menu screen
+	players[0] = new Player();
+	players[1] = NULL;
+	// Pass references to level for commodity
+	firstLevel->playerOne = new Player();
+	firstLevel->playerTwo = NULL;
+	// Harcoding first level id
+	firstLevel->loadLevel(1);
+
+	changeWorld(firstLevel);
 }

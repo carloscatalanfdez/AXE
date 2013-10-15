@@ -1,5 +1,5 @@
 #include "MenuState.h"
-#include "Game.h" 
+#include "AxeGame.h" 
 #include "Player.h"
 #include "LevelState.h"
 
@@ -22,7 +22,10 @@ void MenuState::Update() {
 	if (input->getKeyState(Polycode::KEY_ESCAPE)) {
 		game->end();
 	} else if (input->getKeyState(Polycode::KEY_RETURN)) {
-		game->changeWorld(new LevelState());
+		AxeGame *axeGame = dynamic_cast<AxeGame*>(game);
+		if (axeGame) {
+			axeGame->startFirstLevel();
+		}
 		return;
 	}
 
