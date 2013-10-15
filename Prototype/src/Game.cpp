@@ -26,8 +26,7 @@ void Game::init() {
 	setWorld(createFirstWorld());
 }
 
-void Game::end()
-{
+void Game::end() {
 	keepRunning = false;
 }
 

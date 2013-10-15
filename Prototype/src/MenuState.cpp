@@ -4,7 +4,7 @@
 #include "LevelState.h"
 
 MenuState::MenuState() {
-	label = new ScreenLabel("PRODUCT FROM THE BADLADNS", 32);
+	label = new ScreenLabel("THIS IS A MENU", 32);
 	addChild(label);
 }
 
@@ -24,7 +24,7 @@ void MenuState::Update() {
 	} else if (input->getKeyState(Polycode::KEY_RETURN)) {
 		AxeGame *axeGame = dynamic_cast<AxeGame*>(game);
 		if (axeGame) {
-			axeGame->startFirstLevel();
+			axeGame->launchFirstLevel();
 		}
 		return;
 	}

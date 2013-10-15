@@ -11,7 +11,8 @@ public:
 	void init();
 	bool update();
 	
-	void startFirstLevel();
+	void launchMenu();
+	void launchFirstLevel();
 
 protected:
 	Player *players[2];
