@@ -27,14 +27,18 @@ void GameState::init() {
 		if (gameEntity) {
 			gameEntity->game = game;
 			gameEntity->world = this;
+			gameEntity->init();
 		}
 	}
 }
 
 void GameState::addChild(GameEntity *entity) {
 	// Fill entity's parameters
-	if (game) entity->game = game;
 	entity->world = this;
+	if (game) {
+		entity->game = game;
+		entity->init();
+	}
 
 	Screen::addChild(entity);
 }

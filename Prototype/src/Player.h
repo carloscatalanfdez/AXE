@@ -1,6 +1,6 @@
 #pragma once
 #include "GameEntity.h"
-#include "PolyScreenImage.h"
+#include "PolyScreenSprite.h"
 
 class Player : public GameEntity {
 public:
@@ -14,6 +14,8 @@ public:
 	virtual void Update();
 	virtual void Render();
 
+	virtual void init();
+
 	void setDir(Dir dir);
 
 protected:
@@ -22,5 +24,5 @@ protected:
 	float baseAcceleration;
 	float baseDeceleration;
 
-	ScreenImage *graphic;
+	ScreenSprite *graphic;
 };

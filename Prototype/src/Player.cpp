@@ -13,6 +13,15 @@
 #define UP_MASK UP_BIT
 #define DOWN_MASK DOWN_BIT
 
+#define SPRITE_W 34
+#define SPRITE_H 52
+
+#define WALK_ANIM_NAME "walk"
+#define WALK_ANIM_FRAMES "0,1,0,2"
+
+#define IDLE_ANIM_NAME "idle"
+#define IDLE_ANIM_FRAMES "0"
+
 Player::Player() {
 	isPersistent = true;
 
@@ -26,12 +35,18 @@ Player::Player() {
 	speed = 0;
 	dir = Player::RIGHT;
 
-	graphic = new ScreenImage("Assets/knight.png");
+	graphic = new ScreenSprite("Assets/knight.png", SPRITE_W, SPRITE_H);
+	graphic->addAnimation(WALK_ANIM_NAME,WALK_ANIM_FRAMES, 0.1);
+	graphic->addAnimation(IDLE_ANIM_NAME,IDLE_ANIM_FRAMES, 0.1);
 	addChild(graphic);
 }
 
 Player::~Player() {
 	// Parent deletes children hierarchy
+}
+
+void Player::init() {
+	graphic->playAnimation(IDLE_ANIM_NAME, 0, false);
 }
 
 void Player::Update() {
@@ -71,10 +86,16 @@ void Player::Update() {
 	setPosition(pos.x + speed, pos.y);
 
 	// Adjust entity direction and position depending on were he's looking at
-	if (speed > 0) {
-		setDir(RIGHT);
-	} else if (speed < 0) {
-		setDir(LEFT);
+	if (speed == 0) {
+		graphic->playAnimation(IDLE_ANIM_NAME, 0, false);
+	} else {
+		if (speed > 0) {
+			setDir(RIGHT);
+			graphic->playAnimation(WALK_ANIM_NAME, 0, false);
+		} else if (speed < 0) {
+			setDir(LEFT);
+		}
+		graphic->playAnimation(WALK_ANIM_NAME, 0, false);
 	}
 
 	GameEntity::Update();
@@ -98,7 +119,5 @@ void Player::setDir(Dir dir) {
 		// Hack: scale by -1 to mirror to the left (origin is now top right, we need to translate the entity)
 		int inc = dir == RIGHT ? 1 : -1;
 		setScaleX(inc);
-		position.x -= inc*graphic->width;
-
 	}
 }
