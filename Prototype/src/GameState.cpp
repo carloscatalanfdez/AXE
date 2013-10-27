@@ -1,6 +1,8 @@
 #include "GameState.h"
 #include "GameEntity.h"
 
+#include <Polycode.h>
+
 GameState::GameState() {
 	// Disabled by default until it's activated inside a Game
 	// This way we prevent it from entering the rendering pipeline
@@ -18,3 +20,9 @@ GameState::~GameState() {
 		}
 	}
 }
+
+/*void GameState::Render() {
+	Polycode::ScreenImage* image = new Polycode::ScreenImage(CoreServices::getInstance()->getRenderer()->renderScreenToImage());
+	image->Render();
+	Screen::Render();
+}*/

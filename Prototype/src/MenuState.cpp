@@ -4,7 +4,7 @@
 #include "LevelState.h"
 
 MenuState::MenuState() {
-	label = new ScreenLabel("PRODUCT FROM THE BADLADNS", 32);
+	label = new ScreenLabel("PRODUCT FROM THE BADLADNS", 8, "GameFont");
 	addChild(label);
 }
 

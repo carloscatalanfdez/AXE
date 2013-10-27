@@ -10,6 +10,8 @@ AxeGame::~AxeGame() {
 void AxeGame::init() {
 	// Parent's init must be the first call in this method
 	Game::init();
+
+	CoreServices::getInstance()->getFontManager()->registerFont("GameFont", "Assets/prstart.ttf");
 }
 
 bool AxeGame::update() {

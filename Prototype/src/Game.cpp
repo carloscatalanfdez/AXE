@@ -4,8 +4,11 @@
 
 Game::Game(PolycodeView *view, int w, int h) { 
 	core = new POLYCODE_CORE(view, w, h, false, false, 0, 0, 60);
+	
 	CoreServices::getInstance()->getResourceManager()->addArchive("default.pak");
 	CoreServices::getInstance()->getResourceManager()->addDirResource("default", false);
+
+	Polycode::String pwd = core->getDefaultWorkingDirectory();
 
 	CoreServices::getInstance()->getRenderer()->setTextureFilteringMode(Renderer::TEX_FILTERING_NEAREST);
 
@@ -34,8 +37,8 @@ void Game::end()
 bool Game::update() {
 	if (!keepRunning)
 		return false;
-	else
-		return core->updateAndRender();
+	
+	return core->updateAndRender();
 }
 
 GameState *Game::createFirstWorld() {
