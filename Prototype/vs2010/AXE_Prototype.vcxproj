@@ -101,6 +101,7 @@ xcopy /d /s "$(SolutionDir)..\Assets\*.*" "$(OutDir)Assets"</Command>
     <ClCompile Include="../src/GameEntity.cpp" />
     <ClCompile Include="../src/GameState.cpp" />
     <ClCompile Include="../src/LevelState.cpp" />
+    <ClCompile Include="..\src\LogoState.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="../src/Game.cpp" />
     <ClCompile Include="../src/MenuState.cpp" />
@@ -114,6 +115,7 @@ xcopy /d /s "$(SolutionDir)..\Assets\*.*" "$(OutDir)Assets"</Command>
     <ClInclude Include="../src/LevelState.h" />
     <ClInclude Include="../src/MenuState.h" />
     <ClInclude Include="../src/Player.h" />
+    <ClInclude Include="..\src\LogoState.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

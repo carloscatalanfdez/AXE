@@ -23,6 +23,9 @@
     <ClCompile Include="../src/Player.cpp">
       <Filter>Game\Game</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\LogoState.cpp">
+      <Filter>Game\Menu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="../src/GameState.h">
@@ -45,6 +48,9 @@
     </ClInclude>
     <ClInclude Include="../src/Player.h">
       <Filter>Game\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\LogoState.h">
+      <Filter>Game\Menu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

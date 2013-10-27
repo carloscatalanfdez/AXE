@@ -21,8 +21,30 @@ GameState::~GameState() {
 	}
 }
 
-/*void GameState::Render() {
-	Polycode::ScreenImage* image = new Polycode::ScreenImage(CoreServices::getInstance()->getRenderer()->renderScreenToImage());
-	image->Render();
-	Screen::Render();
-}*/
+void GameState::init() {
+	// Fill in world entities' parameters
+	for (int i = 0; i < rootEntity.getNumChildren(); i++) {
+		Entity *entity = rootEntity.getChildAtIndex(i);
+		GameEntity *gameEntity = dynamic_cast<GameEntity*>(entity);
+		if (gameEntity) {
+			gameEntity->game = game;
+			gameEntity->world = this;
+			gameEntity->init();
+		}
+	}
+}
+
+void GameState::addChild(GameEntity *entity) {
+	// Fill entity's parameters
+	entity->world = this;
+	if (game) {
+		entity->game = game;
+		entity->init();
+	}
+
+	Screen::addChild(entity);
+}
+
+void GameState::addChild(ScreenEntity *entity) {
+	Screen::addChild(entity);
+}
