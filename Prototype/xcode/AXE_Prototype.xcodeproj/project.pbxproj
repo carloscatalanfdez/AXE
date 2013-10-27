@@ -19,6 +19,7 @@
 		6DE4C7F913E24B92009A9862 /* libphysfs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DE4C7F213E24B92009A9862 /* libphysfs.a */; };
 		6DE4C7FA13E24B92009A9862 /* libpng15.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DE4C7F313E24B92009A9862 /* libpng15.a */; };
 		6DE4C7FB13E24B92009A9862 /* libz.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DE4C7F413E24B92009A9862 /* libz.a */; };
+		F230B3C3181D9DAF004408FF /* LogoState.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F230B3C1181D9DAF004408FF /* LogoState.cpp */; };
 		F262FAB6180236C5008D0205 /* default.pak in Resources */ = {isa = PBXBuildFile; fileRef = F262FAB5180236C5008D0205 /* default.pak */; };
 		F262FAB9180236DA008D0205 /* PolycodeView.mm in Sources */ = {isa = PBXBuildFile; fileRef = F262FAB8180236DA008D0205 /* PolycodeView.mm */; };
 		F262FAC918023736008D0205 /* AxeGame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F262FABB18023736008D0205 /* AxeGame.cpp */; };
@@ -31,12 +32,12 @@
 		F262FAD718023E72008D0205 /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = F262FAD618023E72008D0205 /* Assets */; };
 		F270EDDD1802369600602266 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F270EDD61802369600602266 /* main.m */; };
 		F270EDDE1802369600602266 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = F270EDD71802369600602266 /* MainMenu.xib */; };
-		F270EDDF1802369600602266 /* PolycodeTemplate-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F270EDD81802369600602266 /* PolycodeTemplate-Info.plist */; };
+		F270EDDF1802369600602266 /* AXE_Prototype-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F270EDD81802369600602266 /* AXE_Prototype-Info.plist */; };
 		F270EDE01802369600602266 /* PolycodeTemplateAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = F270EDDB1802369600602266 /* PolycodeTemplateAppDelegate.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		6D2800B713760D3E00BD8D0D /* PolycodeTemplate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PolycodeTemplate.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6D2800B713760D3E00BD8D0D /* AXE_Prototype.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AXE_Prototype.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D2800BB13760D3E00BD8D0D /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		6D2800BE13760D3E00BD8D0D /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		6D2800BF13760D3E00BD8D0D /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -52,6 +53,8 @@
 		6DE4C7F213E24B92009A9862 /* libphysfs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphysfs.a; path = ../Polycode/Core/Dependencies/lib/libphysfs.a; sourceTree = "<group>"; };
 		6DE4C7F313E24B92009A9862 /* libpng15.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpng15.a; path = ../Polycode/Core/Dependencies/lib/libpng15.a; sourceTree = "<group>"; };
 		6DE4C7F413E24B92009A9862 /* libz.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libz.a; path = ../Polycode/Core/Dependencies/lib/libz.a; sourceTree = "<group>"; };
+		F230B3C1181D9DAF004408FF /* LogoState.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = LogoState.cpp; path = ../src/LogoState.cpp; sourceTree = "<group>"; };
+		F230B3C2181D9DAF004408FF /* LogoState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LogoState.h; path = ../src/LogoState.h; sourceTree = "<group>"; };
 		F262FAB5180236C5008D0205 /* default.pak */ = {isa = PBXFileReference; lastKnownFileType = file; name = default.pak; path = ../../Polycode/Core/Assets/default.pak; sourceTree = "<group>"; };
 		F262FAB7180236DA008D0205 /* PolycodeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PolycodeView.h; path = ../../Polycode/Core/PolycodeView/PolycodeView.h; sourceTree = "<group>"; };
 		F262FAB8180236DA008D0205 /* PolycodeView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = PolycodeView.mm; path = ../../Polycode/Core/PolycodeView/PolycodeView.mm; sourceTree = "<group>"; };
@@ -72,8 +75,8 @@
 		F262FAD618023E72008D0205 /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Assets; path = ../Assets; sourceTree = "<group>"; };
 		F270EDD61802369600602266 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; };
 		F270EDD71802369600602266 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = SOURCE_ROOT; };
-		F270EDD81802369600602266 /* PolycodeTemplate-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "PolycodeTemplate-Info.plist"; sourceTree = SOURCE_ROOT; };
-		F270EDD91802369600602266 /* PolycodeTemplate-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "PolycodeTemplate-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		F270EDD81802369600602266 /* AXE_Prototype-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "AXE_Prototype-Info.plist"; sourceTree = SOURCE_ROOT; };
+		F270EDD91802369600602266 /* AXE_Prototype-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "AXE_Prototype-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		F270EDDA1802369600602266 /* PolycodeTemplateAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PolycodeTemplateAppDelegate.h; sourceTree = SOURCE_ROOT; };
 		F270EDDB1802369600602266 /* PolycodeTemplateAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PolycodeTemplateAppDelegate.mm; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -107,7 +110,6 @@
 				F262FAD618023E72008D0205 /* Assets */,
 				F262FABA18023724008D0205 /* Game */,
 				6D2800C213760D3E00BD8D0D /* Supporting Files */,
-				6D2800BA13760D3E00BD8D0D /* Frameworks */,
 				6D2800B813760D3E00BD8D0D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -115,7 +117,7 @@
 		6D2800B813760D3E00BD8D0D /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6D2800B713760D3E00BD8D0D /* PolycodeTemplate.app */,
+				6D2800B713760D3E00BD8D0D /* AXE_Prototype.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -138,6 +140,7 @@
 				6D2800BD13760D3E00BD8D0D /* Other Frameworks */,
 			);
 			name = Frameworks;
+			path = ..;
 			sourceTree = "<group>";
 		};
 		6D2800BD13760D3E00BD8D0D /* Other Frameworks */ = {
@@ -153,13 +156,14 @@
 		6D2800C213760D3E00BD8D0D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				6D2800BA13760D3E00BD8D0D /* Frameworks */,
 				F262FAB7180236DA008D0205 /* PolycodeView.h */,
 				F262FAB8180236DA008D0205 /* PolycodeView.mm */,
 				F262FAB5180236C5008D0205 /* default.pak */,
 				F270EDD61802369600602266 /* main.m */,
 				F270EDD71802369600602266 /* MainMenu.xib */,
-				F270EDD81802369600602266 /* PolycodeTemplate-Info.plist */,
-				F270EDD91802369600602266 /* PolycodeTemplate-Prefix.pch */,
+				F270EDD81802369600602266 /* AXE_Prototype-Info.plist */,
+				F270EDD91802369600602266 /* AXE_Prototype-Prefix.pch */,
 				F270EDDA1802369600602266 /* PolycodeTemplateAppDelegate.h */,
 				F270EDDB1802369600602266 /* PolycodeTemplateAppDelegate.mm */,
 			);
@@ -175,6 +179,8 @@
 				F262FABC18023736008D0205 /* AxeGame.h */,
 				F262FAC318023736008D0205 /* LevelState.cpp */,
 				F262FAC418023736008D0205 /* LevelState.h */,
+				F230B3C1181D9DAF004408FF /* LogoState.cpp */,
+				F230B3C2181D9DAF004408FF /* LogoState.h */,
 				F262FAC518023736008D0205 /* MenuState.cpp */,
 				F262FAC618023736008D0205 /* MenuState.h */,
 				F262FAC718023736008D0205 /* Player.cpp */,
@@ -199,9 +205,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6D2800B613760D3E00BD8D0D /* PolycodeTemplate */ = {
+		6D2800B613760D3E00BD8D0D /* AXE_Prototype */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6D2800D513760D3E00BD8D0D /* Build configuration list for PBXNativeTarget "PolycodeTemplate" */;
+			buildConfigurationList = 6D2800D513760D3E00BD8D0D /* Build configuration list for PBXNativeTarget "AXE_Prototype" */;
 			buildPhases = (
 				6D2800B313760D3E00BD8D0D /* Sources */,
 				6D2800B413760D3E00BD8D0D /* Frameworks */,
@@ -211,9 +217,9 @@
 			);
 			dependencies = (
 			);
-			name = PolycodeTemplate;
+			name = AXE_Prototype;
 			productName = PolycodeTemplate;
-			productReference = 6D2800B713760D3E00BD8D0D /* PolycodeTemplate.app */;
+			productReference = 6D2800B713760D3E00BD8D0D /* AXE_Prototype.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -224,7 +230,7 @@
 			attributes = {
 				ORGANIZATIONNAME = Tomatogon;
 			};
-			buildConfigurationList = 6D2800B113760D3E00BD8D0D /* Build configuration list for PBXProject "PolycodeTemplate" */;
+			buildConfigurationList = 6D2800B113760D3E00BD8D0D /* Build configuration list for PBXProject "AXE_Prototype" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -236,7 +242,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6D2800B613760D3E00BD8D0D /* PolycodeTemplate */,
+				6D2800B613760D3E00BD8D0D /* AXE_Prototype */,
 			);
 		};
 /* End PBXProject section */
@@ -248,7 +254,7 @@
 			files = (
 				F270EDDE1802369600602266 /* MainMenu.xib in Resources */,
 				F262FAD718023E72008D0205 /* Assets in Resources */,
-				F270EDDF1802369600602266 /* PolycodeTemplate-Info.plist in Resources */,
+				F270EDDF1802369600602266 /* AXE_Prototype-Info.plist in Resources */,
 				F262FAB6180236C5008D0205 /* default.pak in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -268,6 +274,7 @@
 				F270EDE01802369600602266 /* PolycodeTemplateAppDelegate.mm in Sources */,
 				F262FACC18023736008D0205 /* GameState.cpp in Sources */,
 				F270EDDD1802369600602266 /* main.m in Sources */,
+				F230B3C3181D9DAF004408FF /* LogoState.cpp in Sources */,
 				F262FACE18023736008D0205 /* MenuState.cpp in Sources */,
 				F262FACA18023736008D0205 /* Game.cpp in Sources */,
 			);
@@ -316,21 +323,21 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "PolycodeTemplate-Prefix.pch";
+				GCC_PREFIX_HEADER = "AXE_Prototype-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../Polycode/Core/Include\"",
 					"\"$(SRCROOT)/../Polycode/Core/Dependencies/Include\"",
 					/Developer/SDKs/MacOSX10.6.sdk/System/Library/Frameworks/OpenAL.framework/Headers,
 					/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/OpenAL.framework/Headers,
 				);
-				INFOPLIST_FILE = "$(SRCROOT)/PolycodeTemplate-Info.plist";
+				INFOPLIST_FILE = "AXE_Prototype-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../Polycode/Core/lib\"",
 					"\"$(SRCROOT)/../Polycode/Dependencies/Lib\"",
 					"\"$(SRCROOT)/../Polycode/Core/Dependencies/lib\"",
 				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = AXE_Prototype;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -343,21 +350,21 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "PolycodeTemplate-Prefix.pch";
+				GCC_PREFIX_HEADER = "AXE_Prototype-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"\"$(SRCROOT)/../Polycode/Core/Include\"",
 					"\"$(SRCROOT)/../Polycode/Core/Dependencies/Include\"",
 					/Developer/SDKs/MacOSX10.6.sdk/System/Library/Frameworks/OpenAL.framework/Headers,
 					/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.7.sdk/System/Library/Frameworks/OpenAL.framework/Headers,
 				);
-				INFOPLIST_FILE = "$(SRCROOT)/PolycodeTemplate-Info.plist";
+				INFOPLIST_FILE = "AXE_Prototype-Info.plist";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../Polycode/Core/lib\"",
 					"\"$(SRCROOT)/../Polycode/Dependencies/Lib\"",
 					"\"$(SRCROOT)/../Polycode/Core/Dependencies/lib\"",
 				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = AXE_Prototype;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -365,7 +372,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		6D2800B113760D3E00BD8D0D /* Build configuration list for PBXProject "PolycodeTemplate" */ = {
+		6D2800B113760D3E00BD8D0D /* Build configuration list for PBXProject "AXE_Prototype" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6D2800D313760D3E00BD8D0D /* Debug */,
@@ -374,7 +381,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6D2800D513760D3E00BD8D0D /* Build configuration list for PBXNativeTarget "PolycodeTemplate" */ = {
+		6D2800D513760D3E00BD8D0D /* Build configuration list for PBXNativeTarget "AXE_Prototype" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6D2800D613760D3E00BD8D0D /* Debug */,
