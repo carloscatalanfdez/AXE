@@ -11,12 +11,12 @@ using Microsoft.Xna.Framework.Media;
 
 using bEngine;
 using AXE.Game;
+using AXE.Game.Screens;
+using AXE.Game.Control;
 
 namespace AXE
 {
-    /// <summary>
     /// This is the main type for your game
-    /// </summary>
     public class AxeGame : bGame
     {
         Screen screen;
@@ -34,9 +34,9 @@ namespace AXE
 
         protected override void Initialize()
         {
-            screen = new LogoScreen();
-            changeWorld(screen);
+            Controller.getInstance().setGame(this);
 
+            changeWorld(new LogoScreen());
             base.Initialize();
         }
 
@@ -45,6 +45,12 @@ namespace AXE
             Common.GameInput.getInstance().update();
 
             base.update(gameTime);
+        }
+
+        public void changeWorld(Screen screen)
+        {
+            this.screen = screen;
+            base.changeWorld(screen);
         }
     }
 }

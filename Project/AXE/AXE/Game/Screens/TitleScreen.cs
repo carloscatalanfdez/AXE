@@ -7,8 +7,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 using bEngine;
 using bEngine.Graphics;
+using AXE.Common;
+using AXE.Game.Control;
 
-namespace AXE.Game
+namespace AXE.Game.Screens
 {
     class TitleScreen : Screen
     {
@@ -27,6 +29,11 @@ namespace AXE.Game
         public override void update(GameTime dt)
         {
             base.update(dt);
+
+            if (GameInput.getInstance().pressed(Pad.start))
+            {
+                Controller.getInstance().onGameStart();
+            }
         }
 
         public override void render(GameTime dt, SpriteBatch sb, Matrix matrix)

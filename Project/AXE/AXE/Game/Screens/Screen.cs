@@ -5,12 +5,12 @@ using System.Text;
 
 using bEngine;
 
-namespace AXE.Game
+namespace AXE.Game.Screens
 {
     /**
      * Common base class for every screen in Axe game
      **/
-    class Screen : bGameState
+    public class Screen : bGameState
     {
         public Screen()
             : base()

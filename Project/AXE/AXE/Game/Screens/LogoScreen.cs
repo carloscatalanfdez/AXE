@@ -10,7 +10,7 @@ using bEngine.Graphics;
 
 using AXE.Common;
 
-namespace AXE.Game
+namespace AXE.Game.Screens
 {
     class LogoScreen : Screen
     {
