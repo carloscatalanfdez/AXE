@@ -24,7 +24,7 @@ namespace AXE.Game.Entities
         GameInput mginput = GameInput.getInstance();
 
         // Some declarations
-        public enum MovementState { Idle, Walk, Jump, Death };
+        public enum MovementState { Idle, Walk, Jump, Fall, Death };
         public enum ActionState { None, Squid }
         public enum Dir { Left, Right };
 
@@ -89,6 +89,8 @@ namespace AXE.Game.Entities
             graphic.add(new bAnim("death", fssss));
             int[] fsssss = { 1 };
             graphic.add(new bAnim("squid", fsssss));
+            int[] fssssss = { 0,2,0,1 };
+            graphic.add(new bAnim("fall", fssssss, 0.4f));
 
             graphic.play("idle");
 
@@ -208,7 +210,14 @@ namespace AXE.Game.Entities
 
                     if (onair)
                     {
-                        state = MovementState.Jump;
+                        if (vspeed < 0)
+                        {
+                            state = MovementState.Jump;
+                        }
+                        else
+                        {
+                            state = MovementState.Fall;
+                        }
                     }
                     else
                     {
@@ -236,6 +245,7 @@ namespace AXE.Game.Entities
                     }
 
                     break;
+                case MovementState.Fall:
                 case MovementState.Jump:
                     if (onair)
                     {
@@ -277,6 +287,11 @@ namespace AXE.Game.Entities
                                 current_hspeed = Math.Min(current_hspeed + air_haccel, jumpMaxSpeed);
                             }
                             facing = Dir.Right;
+                        }
+
+                        if (vspeed > 0)
+                        {
+                            state = MovementState.Fall;
                         }
 
                         moveTo.X += current_hspeed;
@@ -371,6 +386,14 @@ namespace AXE.Game.Entities
                 case MovementState.Jump:
                     graphic.color = Color.Red;
                     graphic.play("jump");
+                    if (facing == Dir.Right)
+                        graphic.flipped = true;
+                    else
+                        graphic.flipped = false;
+                    break;
+                case MovementState.Fall:
+                    graphic.color = Color.Red;
+                    graphic.play("fall");
                     if (facing == Dir.Right)
                         graphic.flipped = true;
                     else
