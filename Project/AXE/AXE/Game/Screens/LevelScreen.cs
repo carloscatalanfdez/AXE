@@ -62,6 +62,7 @@ namespace AXE.Game.Screens
             entities.Add("items", new List<bEntity>());
             entities.Add("player", new List<bEntity>());
             entities.Add("enemy", new List<bEntity>());
+            entities.Add("stairs", new List<bEntity>());
             
             // Load level
             if (id < Controller.getInstance().data.maxLevels)
@@ -80,6 +81,9 @@ namespace AXE.Game.Screens
                 ground.mask = new bMask(0, 0, 300, 20);
                 ground.mask.game = game;
                 _add(ground, "solid");
+
+                Stairs stairs = new Stairs(0, 206, 20, 40);
+                _add(stairs, "stairs");
 
                 // Dummy map
                 levelMap = new LevelMap(null);

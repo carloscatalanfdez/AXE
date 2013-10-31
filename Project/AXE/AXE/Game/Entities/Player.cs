@@ -24,7 +24,7 @@ namespace AXE.Game.Entities
         GameInput mginput = GameInput.getInstance();
 
         // Some declarations
-        public enum MovementState { Idle, Walk, Jump, Fall, Death };
+        public enum MovementState { Idle, Walk, Jump, Fall, Ladder, Death };
         public enum ActionState { None, Squid }
         public enum Dir { Left, Right };
 
@@ -89,8 +89,10 @@ namespace AXE.Game.Entities
             graphic.add(new bAnim("death", fssss));
             int[] fsssss = { 1 };
             graphic.add(new bAnim("squid", fsssss));
-            int[] fssssss = { 0,2,0,1 };
+            int[] fssssss = { 0, 2, 0, 1 };
             graphic.add(new bAnim("fall", fssssss, 0.4f));
+            int[] fsssssss = { 3, 4 };
+            graphic.add(new bAnim("ladder", fsssssss, 0.1f));
 
             graphic.play("idle");
 
@@ -137,6 +139,10 @@ namespace AXE.Game.Entities
             {
                 onDeath("fall");
             }
+
+            Stairs ladder = (Stairs) instancePlace(x, y, "stairs");
+            bool onladder = ladder != null;
+            bool toLadder = false;
 
             bool onair = !placeMeeting(x, y + 1, "solid");
             if (onair)
@@ -242,8 +248,49 @@ namespace AXE.Game.Entities
                         {
                             
                         }
+
+                        // Ladders
+                        if (action == ActionState.None)
+                        {
+                            if (onladder)
+                            {
+                                if (input.up() || input.down() && (!input.left() && !input.right()))
+                                    state = MovementState.Ladder;
+                            }
+                            else if (placeMeeting(x, y + 1, "stairs") && input.down())
+                            {
+                                moveTo.Y += 2;
+                                bEntity g = (bEntity)instancePlace(moveTo, "stairs");
+                                if (g != null)
+                                    moveTo.X = g.x;
+                                toLadder = true;
+                                state = MovementState.Ladder;
+                            }
+                        }
                     }
 
+                    break;
+                case MovementState.Ladder:
+                    if (onladder)
+                    {
+                        moveTo.X = ladder.x;
+
+                        if (input.up())
+                            moveTo.Y -= hspeed;
+                        else if (input.down())
+                            moveTo.Y += hspeed;
+                        if ((input.left() || input.right()) && !(input.down() || input.up()))
+                            if (placeMeeting(x, y + 1, "solid") || placeMeeting(x, y + 1, "onewaysolid", onewaysolidCondition))
+                                state = MovementState.Idle;
+                    }
+                    else
+                    {
+                        state = MovementState.Jump;
+                        if (input.up())
+                            vspeed = -2.0f;
+                        else
+                            vspeed = 0;
+                    }
                     break;
                 case MovementState.Fall:
                 case MovementState.Jump:
@@ -317,7 +364,7 @@ namespace AXE.Game.Entities
 
             moveTo.Y += vspeed;
 
-            if (state == MovementState.Death)
+            if (state == MovementState.Death || toLadder)
                 pos = moveTo;
             else
             {
@@ -398,6 +445,15 @@ namespace AXE.Game.Entities
                         graphic.flipped = true;
                     else
                         graphic.flipped = false;
+                    break;
+                case MovementState.Ladder:
+                    graphic.play("ladder");
+                    graphic.flipped = false;
+                    if (moveTo.Y - initialPosition.Y != 0)
+                        graphic.currentAnim.resume();
+                    else
+                        graphic.currentAnim.pause();
+
                     break;
                 case MovementState.Death:
                     graphic.currentAnim.pause();
