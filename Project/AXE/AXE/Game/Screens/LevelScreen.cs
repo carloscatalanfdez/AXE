@@ -33,6 +33,7 @@ namespace AXE.Game.Screens
         public int height { get { return levelMap.tilemap.height; } }
         public bCamera2d camera;
         LevelMap levelMap;
+        protected bStamp background;
 
         // Players
         public Player playerA, playerB;
@@ -89,6 +90,8 @@ namespace AXE.Game.Screens
                 levelMap = new LevelMap(null);
                 levelMap.tilemap = new bTilemap(400, 256, 8, 8, bDummyRect.sharedDummyRect(game));
                 // Do not add it because there's no file and it will break
+
+                background = new bStamp(game.Content.Load<Texture2D>("Assets/Backgrounds/bg"));
             }
 
 
@@ -183,7 +186,8 @@ namespace AXE.Game.Screens
                     matrix);
 
             // Render bg
-            sb.Draw(bDummyRect.sharedDummyRect(game), game.getViewRectangle(), Colors.white);
+            // sb.Draw(bDummyRect.sharedDummyRect(game), game.getViewRectangle(), Colors.white);
+            background.render(sb, Vector2.Zero);
 
             // Render entities
             foreach (String key in entities.Keys)

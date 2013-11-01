@@ -66,5 +66,8 @@
     <Filter Include="Game\Game">
       <UniqueIdentifier>{45c78742-7e0e-4f21-8a15-9d3e23425970}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Utils">
+      <UniqueIdentifier>{4cd9bc9f-e743-4ced-9433-dd373c3f5a4f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

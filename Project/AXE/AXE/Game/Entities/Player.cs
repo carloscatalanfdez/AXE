@@ -78,20 +78,20 @@ namespace AXE.Game.Entities
             attributes.Add("player");
             attributes.Add("moveable");
 
-            graphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/player"), 17, 26);
+            graphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/knight-sheet"), 24, 32);
             int[] fs = { 0 };
             graphic.add(new bAnim("idle", fs, 0.1f));
-            int[] fss = { 0, 1, 0, 2 };
+            int[] fss = { 1, 2, 3, 2 };
             graphic.add(new bAnim("walk", fss, 0.5f));
-            int[] fsss = { 2 };
+            int[] fsss = { 8 };
             graphic.add(new bAnim("jump", fsss, 0.0f));
-            int[] fssss = { 2 };
+            int[] fssss = { 8 };
             graphic.add(new bAnim("death", fssss));
-            int[] fsssss = { 1 };
+            int[] fsssss = { 9 };
             graphic.add(new bAnim("squid", fsssss));
-            int[] fssssss = { 0, 2, 0, 1 };
+            int[] fssssss = { 8 };
             graphic.add(new bAnim("fall", fssssss, 0.4f));
-            int[] fsssssss = { 3, 4 };
+            int[] fsssssss = { 10, 11 };
             graphic.add(new bAnim("ladder", fsssssss, 0.1f));
 
             graphic.play("idle");
@@ -426,25 +426,25 @@ namespace AXE.Game.Entities
                         graphic.play("squid");
 
                     if (facing == Dir.Right)
-                        graphic.flipped = true;
-                    else
                         graphic.flipped = false;
+                    else
+                        graphic.flipped = true;
                     break;
                 case MovementState.Jump:
                     graphic.color = Color.Red;
                     graphic.play("jump");
                     if (facing == Dir.Right)
-                        graphic.flipped = true;
-                    else
                         graphic.flipped = false;
+                    else
+                        graphic.flipped = true;
                     break;
                 case MovementState.Fall:
                     graphic.color = Color.Red;
                     graphic.play("fall");
                     if (facing == Dir.Right)
-                        graphic.flipped = true;
-                    else
                         graphic.flipped = false;
+                    else
+                        graphic.flipped = true;
                     break;
                 case MovementState.Ladder:
                     graphic.play("ladder");
