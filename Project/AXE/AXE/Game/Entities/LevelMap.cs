@@ -109,6 +109,8 @@ namespace AXE.Game.Entities
                 }
             }
 
+            tsetFilename = "basic";
+
             tilemap = new bTilemap(w, h, tileWidth, tileHeight, game.Content.Load<Texture2D>("Assets/Tilesets/" + tsetFilename));
             tilemap.parseTiles(tiles);
 
@@ -135,6 +137,16 @@ namespace AXE.Game.Entities
                     break;
                 case "Exit":
                     // TODO: handle exit
+                    break;
+                case "PlayerStart":
+                    break;
+                case "Ladder":
+                    int width = int.Parse(element.GetAttribute("width"));
+                    int height = int.Parse(element.GetAttribute("height"));
+                    ge = new Stairs(x, y, width, height);
+                    break;
+                case "OneWayPlatform":
+                    ge = new OneWayPlatform(x, y);
                     break;
             }
 

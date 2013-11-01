@@ -64,11 +64,13 @@ namespace AXE.Game.Screens
             entities.Add("player", new List<bEntity>());
             entities.Add("enemy", new List<bEntity>());
             entities.Add("stairs", new List<bEntity>());
-            
+
+            id = 0;
+
             // Load level
             if (id < Controller.getInstance().data.maxLevels)
             {
-                String fname = id.ToString();
+                String fname = "test";// id.ToString();
                 levelMap = new LevelMap(fname);
                 _add(levelMap, "solid"); // Adding to world performs init & loading
                 name = levelMap.name;
@@ -90,10 +92,10 @@ namespace AXE.Game.Screens
                 levelMap = new LevelMap(null);
                 levelMap.tilemap = new bTilemap(400, 256, 8, 8, bDummyRect.sharedDummyRect(game));
                 // Do not add it because there's no file and it will break
-
-                background = new bStamp(game.Content.Load<Texture2D>("Assets/Backgrounds/bg"));
             }
 
+            background = new bStamp(game.Content.Load<Texture2D>("Assets/Backgrounds/bg"));
+            background.color = new Color(0.0f, 0.0f, 0.0f, 0.0f);
 
             // Add player
             if (id < Controller.getInstance().data.maxLevels)
@@ -186,7 +188,7 @@ namespace AXE.Game.Screens
                     matrix);
 
             // Render bg
-            // sb.Draw(bDummyRect.sharedDummyRect(game), game.getViewRectangle(), Colors.white);
+            sb.Draw(bDummyRect.sharedDummyRect(game), game.getViewRectangle(), Color.Black);
             background.render(sb, Vector2.Zero);
 
             // Render entities
@@ -248,9 +250,10 @@ namespace AXE.Game.Screens
             {
                 if (e == null)
                     continue;
-                // Add entities with its categories here
-                //else if (e is EntityCategory)
-                //    _add(e, "category");
+                else if (e is OneWayPlatform)
+                    _add(e, "onewaysolid");
+                else if (e is Stairs)
+                    _add(e, "stairs");
             }
         }
 

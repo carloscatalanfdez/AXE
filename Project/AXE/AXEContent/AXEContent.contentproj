@@ -69,9 +69,7 @@
       <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Assets\Tilesets\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Compile Include="Assets\Sprites\knight-sheet.png">
       <Name>knight-sheet</Name>
@@ -82,6 +80,13 @@
   <ItemGroup>
     <Compile Include="Assets\Backgrounds\bg.png">
       <Name>bg</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assets\Tilesets\basic.png">
+      <Name>basic</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

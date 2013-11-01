@@ -105,7 +105,7 @@ namespace AXE.Game.Entities
             air_haccel = 0f;
             justLanded = false;
             runSpeedFactor = 2;
-            jumpPower = 6.0f;
+            jumpPower = 5.5f;
             jumpMaxSpeed = 0.0f;
             deathDelayTime = 0;
             playDeathAnim = false;
@@ -324,7 +324,7 @@ namespace AXE.Game.Entities
                             if (current_hspeed < 0)
                             {
                                 action = ActionState.Squid;
-                                current_hspeed += air_haccel * 2;
+                                current_hspeed += air_haccel/* * 2*/;
                                 if (jumpedFacing == Dir.Left)
                                     current_hspeed = Math.Min(current_hspeed, 0);
                             }
