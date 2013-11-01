@@ -109,6 +109,7 @@
   <ItemGroup>
     <Compile Include="Game\Control\LevelScreen.cs" />
     <Compile Include="Game\Control\PlayerData.cs" />
+    <Compile Include="Game\Entities\Entity.cs" />
     <Compile Include="Game\Entities\OneWayPlatform.cs" />
     <Compile Include="Game\Entities\Stairs.cs" />
     <Compile Include="Game\Utils\Colors.cs" />

@@ -32,7 +32,7 @@ namespace AXE.Game.Entities
             : base(0, 0)
         {
             entities = new List<bEntity>();
-
+            playerStart = Vector2.Zero;
             mapName = fname;
         }
 
@@ -139,6 +139,7 @@ namespace AXE.Game.Entities
                     // TODO: handle exit
                     break;
                 case "PlayerStart":
+                    playerStart = new Vector2(x, y);
                     break;
                 case "Ladder":
                     int width = int.Parse(element.GetAttribute("width"));

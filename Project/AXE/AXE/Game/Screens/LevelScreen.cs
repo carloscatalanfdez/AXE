@@ -40,7 +40,7 @@ namespace AXE.Game.Screens
         public Player[] players { get { return new Player[] {playerA, playerB}; } }
 
         // Debug
-        String msg;
+        // String msg;
         
         public LevelScreen(int id, int lastCheckpoint = -1)
             : base()

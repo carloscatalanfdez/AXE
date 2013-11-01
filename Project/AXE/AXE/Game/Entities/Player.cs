@@ -18,7 +18,7 @@ using AXE.Game.Screens;
 
 namespace AXE.Game.Entities
 {
-    class Player : bEntity
+    class Player : Entity
     {
         // Utilities
         GameInput mginput = GameInput.getInstance();
@@ -26,7 +26,7 @@ namespace AXE.Game.Entities
         // Some declarations
         public enum MovementState { Idle, Walk, Jump, Fall, Ladder, Death };
         public enum ActionState { None, Squid }
-        public enum Dir { Left, Right };
+        public enum Dir { None, Left, Right };
 
         // Data
         public PlayerData data;
@@ -35,6 +35,7 @@ namespace AXE.Game.Entities
         public bSpritemap graphic;
         public float hspeed;
         public float vspeed, gravity;
+        public Dir showWrapEffect;
 
         // Accelerated movement
         public float current_hspeed;
@@ -73,7 +74,7 @@ namespace AXE.Game.Entities
         {
             base.init();
 
-            mask = new bMask(0, 0, 8, 24, 4, 8);
+            mask = new bMask(0, 0, 16, 24, 4, 8);
             mask.game = game;
             attributes.Add("player");
             attributes.Add("moveable");
@@ -96,6 +97,8 @@ namespace AXE.Game.Entities
 
             graphic.play("idle");
 
+            showWrapEffect = Dir.None;
+
             hspeed = 1.5f;
             vspeed = 0f;
             gravity = 0.5f;
@@ -115,6 +118,12 @@ namespace AXE.Game.Entities
             facing = Dir.Right;
 
             debugText = "";
+            floater = false;
+        }
+
+        public override int graphicWidth()
+        {
+            return graphic.width;
         }
 
         override public void update()
@@ -395,8 +404,20 @@ namespace AXE.Game.Entities
                     current_hspeed = 0;
                 }
 
-                // Dont' cross the border, scum!
-                x = Math.Min(Math.Max(x, 0), (world as LevelScreen).width - graphic.width);
+                // Wrap (effect)
+                if (x < 0)
+                    showWrapEffect = Dir.Right;
+                else if (x + (graphic.width) > (world as LevelScreen).width)
+                    showWrapEffect = Dir.Left;
+                else
+                    showWrapEffect = Dir.None;
+                     
+
+                // Wrap (mechanic)
+                /*if (x + (graphic.width) / 2 < 0)
+                    x = (world as LevelScreen).width - (graphic.width/2);
+                else if (x + (graphic.width) / 2 > (world as LevelScreen).width)
+                    x = -(graphic.width)/2;*/
 
                 // The y movement was stopped
                 if (remnant.Y != 0 && vspeed < 0)
@@ -466,7 +487,7 @@ namespace AXE.Game.Entities
                 graphic.color = Color.Yellow;
 
 
-            graphic.color = Color.White;
+            // graphic.color = Color.White;
 
             base.update();
             graphic.update();
@@ -524,6 +545,18 @@ namespace AXE.Game.Entities
         {
             base.render(dt, sb);
             graphic.render(sb, pos);
+            Color c = graphic.color;
+            if (showWrapEffect == Dir.Left)
+            {
+                //graphic.color = Color.Aqua;
+                graphic.render(sb, new Vector2(0 + (pos.X - (world as LevelScreen).width), pos.Y));
+            }
+            else if (showWrapEffect == Dir.Right)
+            {
+                //graphic.color = Color.Aqua;
+                graphic.render(sb, new Vector2((world as LevelScreen).width + pos.X, pos.Y));
+            }
+            graphic.color = c;
 
             sb.DrawString(game.gameFont, debugText, new Vector2(x, y - 8), Colors.white);
         }
