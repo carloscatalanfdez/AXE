@@ -46,9 +46,9 @@ namespace AXE.Game.Entities
             int[] fs = { 0 };
             graphic.add(new bAnim("grabbed", fs, 0.0f));
             int[] fss = { 4, 5, 6, 7 };
-            graphic.add(new bAnim("cw-rotation", fss, 0.0f));
+            graphic.add(new bAnim("cw-rotation", fss, 0.7f));
             int[] fsss = { 8, 9, 10, 11 };
-            graphic.add(new bAnim("ccw-rotation", fsss, 0.0f));
+            graphic.add(new bAnim("ccw-rotation", fsss, 0.7f));
             int[] fssss = { 12 };
             graphic.add(new bAnim("idle", fssss, 0.0f));
 
