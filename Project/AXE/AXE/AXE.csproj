@@ -113,6 +113,7 @@
     <Compile Include="Game\Entities\Base\IWeapon.cs" />
     <Compile Include="Game\Entities\Entity.cs" />
     <Compile Include="Game\Entities\Base\IWeaponHolder.cs" />
+    <Compile Include="Game\Entities\Door.cs" />
     <Compile Include="Game\Entities\OneWayPlatform.cs" />
     <Compile Include="Game\Entities\Stairs.cs" />
     <Compile Include="Game\Utils\Colors.cs" />

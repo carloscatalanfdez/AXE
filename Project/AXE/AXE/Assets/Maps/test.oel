@@ -129,5 +129,6 @@
     <OneWayPlatform id="16" x="-8" y="184" />
     <OneWayPlatform id="63" x="312" y="240" />
     <OneWayPlatform id="64" x="-8" y="240" />
+    <ExitDoor id="65" x="120" y="40" />
   </Entities>
 </level>

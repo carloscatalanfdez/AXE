@@ -271,6 +271,8 @@ namespace AXE.Game.Screens
                     _add(e, "onewaysolid");
                 else if (e is Stairs)
                     _add(e, "stairs");
+                else if (e is Door)
+                    _add(e, "items");
             }
         }
 

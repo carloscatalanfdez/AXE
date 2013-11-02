@@ -137,11 +137,12 @@ namespace AXE.Game.Entities
                 case "Entry":
                     // TODO: handle entry
                     break;
-                case "Exit":
-                    // TODO: handle exit
+                case "ExitDoor":
+                    ge = new Door(x, y, Door.Type.Exit);
                     break;
                 case "PlayerStart":
                     playerStart = new Vector2(x, y);
+                    ge = new Door(x, y, Door.Type.Entry);
                     break;
                 case "Ladder":
                     int width = int.Parse(element.GetAttribute("width"));

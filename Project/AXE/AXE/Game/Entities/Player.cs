@@ -25,7 +25,7 @@ namespace AXE.Game.Entities
         GameInput mginput = GameInput.getInstance();
 
         // Some declarations
-        public enum MovementState { Idle, Walk, Jump, Fall, Ladder, Death, Attacking, Attacked };
+        public enum MovementState { Idle, Walk, Jump, Fall, Ladder, Death, Attacking, Attacked, Exit };
         public enum ActionState { None, Squid }
         public enum Dir { None, Left, Right };
 
@@ -98,6 +98,7 @@ namespace AXE.Game.Entities
             graphic.add(new bAnim("ladder", new int[] { 10, 11 }, 0.1f));
             graphic.add(new bAnim("readyweapon", new int[] { 0, 16, 17, 17, 17 }, 0.5f, false));
             graphic.add(new bAnim("thrownweapon", new int[] { 18, 18 }, 0.2f, false));
+            graphic.add(new bAnim("exit", new int[] { 4 }));
 
             graphic.play("idle");
             layer = 0;
@@ -288,7 +289,7 @@ namespace AXE.Game.Entities
                                     current_hspeed = 0;
                                 }
                             }
-                            else if (placeMeeting(x, y + 1, "stairs") && input.down())
+                            else if (input.down() && placeMeeting(x, y + 1, "stairs"))
                             {
                                 moveTo.Y += 2;
                                 bEntity g = (bEntity)instancePlace(moveTo, "stairs");
@@ -298,6 +299,19 @@ namespace AXE.Game.Entities
                                 state = MovementState.Ladder;
                                 justLanded = false;
                                 current_hspeed = 0;
+                            }
+                            else if (input.up() && placeMeeting(x, y, "items"))
+                            {
+                                bEntity door = (bEntity)instancePlace(x, y, "items");
+                                if (door is Door)
+                                {
+                                    Door exitDoor = (door as Door);
+                                    if (exitDoor.type == Door.Type.Exit)
+                                    {
+                                        state = MovementState.Exit;
+                                        timer[1] = 15;
+                                    }
+                                }
                             }
                         }
                     }
@@ -565,13 +579,16 @@ namespace AXE.Game.Entities
                     if (playDeathAnim)
                         graphic.play("death");
                     break;
+                case MovementState.Exit:
+                    graphic.play("exit");
+                    break;
             }
 
             if (justLanded)
                 graphic.color = Color.Yellow;
 
 
-            // graphic.color = Color.White;
+            graphic.color = Color.White;
 
             base.update();
             graphic.update();
@@ -603,6 +620,16 @@ namespace AXE.Game.Entities
                     playDeathAnim = true;
                     collidable = false;
                     vspeed = -jumpPower;
+                    break;
+                case 1:
+                    Door door = (instancePlace(x, y, "items") as Door);
+                    if (door != null)
+                    {
+                        door.graphic.play("closed");
+                        if (weapon != null)
+                            world.remove((weapon as bEntity));
+                        visible = false;
+                    }
                     break;
             }
         }
