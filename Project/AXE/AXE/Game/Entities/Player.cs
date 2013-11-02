@@ -240,22 +240,6 @@ namespace AXE.Game.Entities
                         }
                     }   
 
-                    if (mginput.pressed(Pad.b))
-                    {
-                        if (axe != null)
-                        {
-                            axe.onThrow(10, facing);
-                        }
-                        else
-                        {
-                            bEntity entity = instancePlace(pos, "axe");
-                            if (entity != null)
-                            {
-                                (entity as Axe).onGrab(this);
-                            }
-                        }
-                    }
-
                     if (onair)
                     {
                         if (vspeed < 0)
@@ -462,6 +446,23 @@ namespace AXE.Game.Entities
                 }
             }
 
+            // Handle axe
+            if (mginput.pressed(Pad.b))
+            {
+                if (axe != null)
+                {
+                    axe.onThrow(10, facing);
+                }
+                else
+                {
+                    bEntity entity = instancePlace(pos, "axe");
+                    if (entity != null)
+                    {
+                        (entity as Axe).onGrab(this);
+                    }
+                }
+            }
+
             switch (state)
             {
                 case MovementState.Idle:
@@ -522,7 +523,7 @@ namespace AXE.Game.Entities
             graphic.update();
         }
 
-        public bool onewaysolidCondition(bEntity me, bEntity other)
+        public static bool onewaysolidCondition(bEntity me, bEntity other)
         {
             if (me is Player)
             {

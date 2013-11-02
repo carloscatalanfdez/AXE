@@ -23,6 +23,7 @@ namespace AXE.Game.Entities
 
         public float current_hspeed;
         public float current_vspeed;
+        public float gravity;
 
         public Axe(int x, int y, Player holder) : base(x, y)
         {
@@ -53,6 +54,7 @@ namespace AXE.Game.Entities
             graphic.add(new bAnim("idle", fssss, 0.0f));
 
             current_hspeed = current_vspeed = 0;
+            gravity = 0.5f;
 
             if (holder == null)
             {
@@ -105,22 +107,48 @@ namespace AXE.Game.Entities
                     break;
                 case MovementState.Flying:
                     moveTo.X += current_hspeed;
-                    Vector2 remnant;
-                    // Check wether we collide first with a solid or a onewaysolid,
-                    // and use that data to position the player character.
-                    Vector2 oldPos = pos;
-                    Vector2 remnantOneWay = moveToContact(moveTo, "solid");
-                    Vector2 posOneWay = pos;
-                    pos = oldPos;
-                    remnant = moveToContact(moveTo, "solid");
-                    Vector2 posSolid = pos;
+                    Vector2 remnant = moveToContact(moveTo, "solid");
 
                     // We have been stopped
                     if (remnant.X != 0)
                     {
                         // Stop accelerating if we have stopped
-                        current_hspeed = 0;
+                        current_hspeed = - current_hspeed / 10;
+                        current_vspeed = -2;
                         state = MovementState.Bouncing;
+                    }
+                    break;
+                case MovementState.Bouncing:
+                    current_vspeed += gravity;
+
+                    moveTo.Y += current_vspeed;
+                    moveTo.X += current_hspeed;
+                                    Vector2 oldPos = pos;
+                Vector2 remnantOneWay = moveToContact(moveTo, "onewaysolid", Player.onewaysolidCondition);
+                Vector2 posOneWay = pos;
+                pos = oldPos;
+                Vector2 remnantSolid = moveToContact(moveTo, "solid");
+                Vector2 posSolid = pos;
+                if (remnantOneWay.Length() > remnantSolid.Length())
+                {
+                    remnant = remnantOneWay;
+                    pos = posOneWay;
+                }
+                else
+                {
+                    remnant = remnantSolid;
+                    pos = posSolid;
+                }
+
+                    if (remnant.Y != 0 && current_vspeed < 0)
+                    {
+                        // Touched ceiling
+                        current_vspeed = 0;
+                    }
+                    else if (remnant.Y != 0 && current_vspeed > 0)
+                    {
+                        current_vspeed = 0;
+                        state = MovementState.Idle;
                     }
                     break;
                 default:
