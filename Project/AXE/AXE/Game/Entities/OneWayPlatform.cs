@@ -8,7 +8,7 @@ using bEngine;
 
 namespace AXE.Game.Entities
 {
-    public class OneWayPlatform : bEntity
+    class OneWayPlatform : Entity
     {
         public OneWayPlatform(int x, int y)
             : base(x, y)
@@ -24,6 +24,8 @@ namespace AXE.Game.Entities
             mask.h = 8;
 
             mask.update(x, y);
+
+            visible = false;
         }
 
         public override void render(GameTime dt, Microsoft.Xna.Framework.Graphics.SpriteBatch sb)

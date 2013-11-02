@@ -7,7 +7,7 @@ using bEngine;
 
 namespace AXE.Game.Entities
 {
-    public class Stairs : bEntity
+    class Stairs : Entity
     {
         int w, h;
         public Stairs(int x, int y, int w, int h) : base(x, y)
@@ -24,6 +24,8 @@ namespace AXE.Game.Entities
             mask.y = this.y;
             mask.w = this.w;
             mask.h = this.h;
+
+            visible = false;
         }
     }
 }

@@ -21,6 +21,9 @@ namespace AXE.Game.Screens
         // Some declarations...
         public enum State { Enter, Gameplay, Exit };
 
+        // Render ordering
+        List<bEntity> renderQueue;
+
         // Management
         public int id;
         public String name;
@@ -106,7 +109,7 @@ namespace AXE.Game.Screens
                 int playerY = (int)levelMap.playerStart.Y;
                 playerA = new Player(playerX, playerY, GameData.get().playerAData);
                 Axe axe = new Axe(playerX, playerY, playerA);
-                playerA.axe = axe;
+                playerA.setWeapon(axe);
                 _add(playerA, "player");
                 _add(axe, "axe");
             }
@@ -125,6 +128,8 @@ namespace AXE.Game.Screens
             camera.bounds = new Rectangle(levelMap.x, levelMap.y, levelMap.tilemap.width, levelMap.tilemap.height);
    
             state = State.Gameplay;
+
+            renderQueue = new List<bEntity>();
         }
 
         public override void update(GameTime dt)
@@ -198,9 +203,15 @@ namespace AXE.Game.Screens
             background.render(sb, Vector2.Zero);
 
             // Render entities
+            renderQueue.Clear();
             foreach (String key in entities.Keys)
                 foreach (bEntity entity in entities[key])
-                    entity.render(dt, sb);
+                    if (!(entity is Entity) || (entity is Entity) && ((entity as Entity).visible))
+                        renderQueue.Add(entity);
+
+            renderQueue.Sort((a, b) => (b.layer - a.layer));
+            foreach (bEntity entity in renderQueue)
+                entity.render(dt, sb);
 
             // Pause!
             if (paused)
@@ -269,6 +280,11 @@ namespace AXE.Game.Screens
             viewRect.Inflate(viewRect.Width / 4, viewRect.Height / 4);
 
             return viewRect.Intersects(e.mask.rect);
+        }
+
+        public int layerSelector(bEntity a, bEntity b)
+        {
+            return a.layer - b.layer;
         }
     }
 }

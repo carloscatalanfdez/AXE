@@ -8,9 +8,12 @@ using Microsoft.Xna.Framework.Graphics;
 using AXE.Game.Screens;
 using Microsoft.Xna.Framework;
 
+using AXE.Game.Entities;
+using AXE.Game.Entities.Base;
+
 namespace AXE.Game.Entities
 {
-    class Axe : Entity
+    class Axe : Entity, IWeapon
     {
         public enum MovementState { Idle, Grabbed, Flying, Bouncing };
 
@@ -19,13 +22,13 @@ namespace AXE.Game.Entities
 
         public bSpritemap graphic;
 
-        public Player holder;
+        public IWeaponHolder holder;
 
         public float current_hspeed;
         public float current_vspeed;
         public float gravity;
 
-        public Axe(int x, int y, Player holder) : base(x, y)
+        public Axe(int x, int y, IWeaponHolder holder) : base(x, y)
         {
             this.holder = holder;  // can be null
         }
@@ -56,6 +59,8 @@ namespace AXE.Game.Entities
             current_hspeed = current_vspeed = 0;
             gravity = 0.5f;
 
+            layer = 10;
+
             if (holder == null)
             {
                 graphic.play("idle");
@@ -65,31 +70,14 @@ namespace AXE.Game.Entities
             else
             {
                 graphic.play("grabbed");
-                dir = holder.facing;
+                dir = holder.getFacing();
                 state = MovementState.Grabbed;
             }
-        }
-
-        public void onGrab(Player holder)
-        {
-            holder.axe = this;
-            graphic.play("grabbed");
-            dir = holder.facing;
-            state = MovementState.Grabbed;
-            this.holder = holder;
         }
 
         public override int graphicWidth()
         {
             return 14;
-        }
-
-        public virtual void onThrow(int force, Player.Dir dir)
-        {
-            state = MovementState.Flying;
-            current_hspeed = force * holder.directionToSign(dir);
-            holder.axe = null;
-            holder = null;
         }
 
         override public void update()
@@ -100,10 +88,13 @@ namespace AXE.Game.Entities
             // Prepare step
             Vector2 moveTo = pos;
 
+            if (holder != null)
+                dir = holder.getFacing();
+
             switch (state)
             {
                 case MovementState.Grabbed:
-                    pos = holder.pos;
+                    pos = holder.getHandPosition() - getGrabPosition();
                     break;
                 case MovementState.Flying:
                     moveTo.X += current_hspeed;
@@ -123,22 +114,22 @@ namespace AXE.Game.Entities
 
                     moveTo.Y += current_vspeed;
                     moveTo.X += current_hspeed;
-                                    Vector2 oldPos = pos;
-                Vector2 remnantOneWay = moveToContact(moveTo, "onewaysolid", Player.onewaysolidCondition);
-                Vector2 posOneWay = pos;
-                pos = oldPos;
-                Vector2 remnantSolid = moveToContact(moveTo, "solid");
-                Vector2 posSolid = pos;
-                if (remnantOneWay.Length() > remnantSolid.Length())
-                {
-                    remnant = remnantOneWay;
-                    pos = posOneWay;
-                }
-                else
-                {
-                    remnant = remnantSolid;
-                    pos = posSolid;
-                }
+                    Vector2 oldPos = pos;
+                    Vector2 remnantOneWay = moveToContact(moveTo, "onewaysolid", Player.onewaysolidCondition);
+                    Vector2 posOneWay = pos;
+                    pos = oldPos;
+                    Vector2 remnantSolid = moveToContact(moveTo, "solid");
+                    Vector2 posSolid = pos;
+                    if (remnantOneWay.Length() > remnantSolid.Length())
+                    {
+                        remnant = remnantOneWay;
+                        pos = posOneWay;
+                    }
+                    else
+                    {
+                        remnant = remnantSolid;
+                        pos = posSolid;
+                    }
 
                     if (remnant.Y != 0 && current_vspeed < 0)
                     {
@@ -150,6 +141,7 @@ namespace AXE.Game.Entities
                         current_vspeed = 0;
                         state = MovementState.Idle;
                     }
+
                     break;
                 default:
                     break;
@@ -159,9 +151,19 @@ namespace AXE.Game.Entities
             {
                 case MovementState.Idle:
                     graphic.play("idle");
+                    if (dir == Player.Dir.Left)
+                        graphic.flipped = true;
+                    else if (dir == Player.Dir.Right)
+                        graphic.flipped = false;
+
                     break;
                 case MovementState.Grabbed:
                     graphic.play("grabbed");
+                    if (dir == Player.Dir.Left)
+                        graphic.flipped = true;
+                    else if (dir == Player.Dir.Right)
+                        graphic.flipped = false;
+
                     break;
                 case MovementState.Flying:
                 case MovementState.Bouncing:
@@ -185,6 +187,29 @@ namespace AXE.Game.Entities
         {
             base.render(dt, sb);
             graphic.render(sb, pos);
+        }
+
+        /* IWeapon implementation */
+        public Vector2 getGrabPosition()
+        {
+            return new Vector2(5, 6);
+        }
+
+        public void onGrab(IWeaponHolder holder)
+        {
+            holder.setWeapon(this);
+            graphic.play("grabbed");
+            dir = holder.getFacing();
+            state = MovementState.Grabbed;
+            this.holder = holder;
+        }
+
+        public virtual void onThrow(int force, Player.Dir dir)
+        {
+            state = MovementState.Flying;
+            current_hspeed = force * holder.getDirectionAsSign(dir);
+            holder.removeWeapon();
+            holder = null;
         }
     }
 }

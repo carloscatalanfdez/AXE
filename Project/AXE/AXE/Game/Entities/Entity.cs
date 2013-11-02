@@ -13,6 +13,8 @@ namespace AXE.Game.Entities
 {
     class Entity : bEntity
     {
+        public bool visible = true;
+
         public virtual int graphicWidth()
         {
             throw new NotImplementedException("Declare this method for this class!");

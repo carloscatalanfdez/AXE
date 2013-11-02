@@ -117,6 +117,8 @@ namespace AXE.Game.Entities
             mask = new bSolidGrid(w / tileWidth, h / tileHeight, tileWidth, tileHeight);
             mask.game = game;
             (mask as bSolidGrid).parseSolids(solids);
+
+            layer = 20;
         }
 
         public bEntity parseEntity(XmlReader element)

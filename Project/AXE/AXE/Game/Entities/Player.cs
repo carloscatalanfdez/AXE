@@ -15,16 +15,17 @@ using bEngine.Helpers.Transitions;
 using AXE.Common;
 using AXE.Game.Control;
 using AXE.Game.Screens;
+using AXE.Game.Entities.Base;
 
 namespace AXE.Game.Entities
 {
-    class Player : Entity
+    class Player : Entity, IWeaponHolder
     {
         // Utilities
         GameInput mginput = GameInput.getInstance();
 
         // Some declarations
-        public enum MovementState { Idle, Walk, Jump, Fall, Ladder, Death };
+        public enum MovementState { Idle, Walk, Jump, Fall, Ladder, Death, Attacking, Attacked };
         public enum ActionState { None, Squid }
         public enum Dir { None, Left, Right };
 
@@ -60,7 +61,13 @@ namespace AXE.Game.Entities
         public Vector2 initialPosition;
         public Vector2 moveTo;
 
-        public Axe axe;
+        protected IWeapon weapon;
+        protected int attackAnimationPositionCorrection
+        {
+            get { return -3; }
+        }
+        public bool appliedPositionCorrection;
+        public Vector2 graphicPositionCorrection;
 
         // Debug
         String debugText;
@@ -82,22 +89,18 @@ namespace AXE.Game.Entities
             attributes.Add("moveable");
 
             graphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/knight-sheet"), 24, 32);
-            int[] fs = { 0 };
-            graphic.add(new bAnim("idle", fs, 0.1f));
-            int[] fss = { 1, 2, 3, 2 };
-            graphic.add(new bAnim("walk", fss, 0.5f));
-            int[] fsss = { 8 };
-            graphic.add(new bAnim("jump", fsss, 0.0f));
-            int[] fssss = { 8 };
-            graphic.add(new bAnim("death", fssss));
-            int[] fsssss = { 9 };
-            graphic.add(new bAnim("squid", fsssss));
-            int[] fssssss = { 8 };
-            graphic.add(new bAnim("fall", fssssss, 0.4f));
-            int[] fsssssss = { 10, 11 };
-            graphic.add(new bAnim("ladder", fsssssss, 0.1f));
+            graphic.add(new bAnim("idle", new int[] { 0 }, 0.1f));
+            graphic.add(new bAnim("walk", new int[] { 1, 2, 3, 2 }, 0.2f));
+            graphic.add(new bAnim("jump", new int[] { 8 }, 0.0f));
+            graphic.add(new bAnim("death", new int[] { 8 }));
+            graphic.add(new bAnim("squid", new int[] { 9 }));
+            graphic.add(new bAnim("fall", new int[] { 8 }, 0.4f));
+            graphic.add(new bAnim("ladder", new int[] { 10, 11 }, 0.1f));
+            graphic.add(new bAnim("readyweapon", new int[] { 0, 16, 17, 17, 17 }, 0.5f, false));
+            graphic.add(new bAnim("thrownweapon", new int[] { 18, 18 }, 0.2f, false));
 
             graphic.play("idle");
+            layer = 0;
 
             showWrapEffect = Dir.None;
 
@@ -114,6 +117,8 @@ namespace AXE.Game.Entities
             jumpMaxSpeed = 0.0f;
             deathDelayTime = 0;
             playDeathAnim = false;
+            appliedPositionCorrection = false;
+            graphicPositionCorrection = Vector2.Zero;
 
             state = MovementState.Idle;
             action = ActionState.None;
@@ -277,7 +282,11 @@ namespace AXE.Game.Entities
                             if (onladder)
                             {
                                 if (input.up() || input.down() && (!input.left() && !input.right()))
+                                {
                                     state = MovementState.Ladder;
+                                    justLanded = false;
+                                    current_hspeed = 0;
+                                }
                             }
                             else if (placeMeeting(x, y + 1, "stairs") && input.down())
                             {
@@ -287,6 +296,8 @@ namespace AXE.Game.Entities
                                     moveTo.X = g.x;
                                 toLadder = true;
                                 state = MovementState.Ladder;
+                                justLanded = false;
+                                current_hspeed = 0;
                             }
                         }
                     }
@@ -295,7 +306,7 @@ namespace AXE.Game.Entities
                 case MovementState.Ladder:
                     if (onladder)
                     {
-                        moveTo.X = ladder.x;
+                        moveTo.X = ladder.x - mask.offsetx;
 
                         if (input.up())
                             moveTo.Y -= hspeed;
@@ -382,6 +393,35 @@ namespace AXE.Game.Entities
                     }
 
                     break;
+                case MovementState.Attacking:
+                    if (!appliedPositionCorrection)
+                    {
+                        // moveTo.X += attackAnimationPositionCorrection * getDirectionAsSign(facing);
+                        graphicPositionCorrection.X = attackAnimationPositionCorrection * getDirectionAsSign(facing);
+                        appliedPositionCorrection = true;
+                    }
+
+                    if (graphic.currentAnim.finished)
+                    {
+                        if (weapon != null)
+                        {
+                            weapon.onThrow(10, facing);
+                            state = MovementState.Attacked;
+                            graphic.play("thrownweapon");
+                        }
+                    }
+                    break;
+                case MovementState.Attacked:
+                    if (graphic.currentAnim.finished)
+                    {
+                        // moveTo.X -= attackAnimationPositionCorrection * getDirectionAsSign(facing);
+                        // graphicPositionCorrection.X = -attackAnimationPositionCorrection * getDirectionAsSign(facing);
+                        graphicPositionCorrection = Vector2.Zero;
+                        appliedPositionCorrection = false;
+                        state = MovementState.Idle;
+                    }
+
+                    break;
             }
 
             moveTo.Y += vspeed;
@@ -424,7 +464,7 @@ namespace AXE.Game.Entities
                     showWrapEffect = Dir.Left;
                 else
                     showWrapEffect = Dir.None;
-                     
+
 
                 // Wrap (mechanic)
                 /*if (x + (graphic.width) / 2 < 0)
@@ -449,16 +489,30 @@ namespace AXE.Game.Entities
             // Handle axe
             if (mginput.pressed(Pad.b))
             {
-                if (axe != null)
+                if (weapon != null)
                 {
-                    axe.onThrow(10, facing);
+                    if (!onair)
+                    {
+                        if (state != MovementState.Attacking && state != MovementState.Attacked)
+                        {
+                            state = MovementState.Attacking;
+                            graphic.play("readyweapon");
+                        }
+                    }
+                    else
+                    {
+                        weapon.onThrow(10, facing);
+                    }
                 }
                 else
                 {
-                    bEntity entity = instancePlace(pos, "axe");
-                    if (entity != null)
+                    if (state != MovementState.Attacking && state != MovementState.Attacked)
                     {
-                        (entity as Axe).onGrab(this);
+                        bEntity entity = instancePlace(pos, "axe");
+                        if (entity != null)
+                        {
+                            (entity as Axe).onGrab(this);
+                        }
                     }
                 }
             }
@@ -574,17 +628,17 @@ namespace AXE.Game.Entities
         override public void render(GameTime dt, SpriteBatch sb)
         {
             base.render(dt, sb);
-            graphic.render(sb, pos);
+            graphic.render(sb, pos + graphicPositionCorrection);
             Color c = graphic.color;
             if (showWrapEffect == Dir.Left)
             {
                 //graphic.color = Color.Aqua;
-                graphic.render(sb, new Vector2(0 + (pos.X - (world as LevelScreen).width), pos.Y));
+                graphic.render(sb, new Vector2(0 + (pos.X - (world as LevelScreen).width), pos.Y) + graphicPositionCorrection);
             }
             else if (showWrapEffect == Dir.Right)
             {
                 //graphic.color = Color.Aqua;
-                graphic.render(sb, new Vector2((world as LevelScreen).width + pos.X, pos.Y));
+                graphic.render(sb, new Vector2((world as LevelScreen).width + pos.X, pos.Y) + graphicPositionCorrection);
             }
             graphic.color = c;
 
@@ -599,6 +653,91 @@ namespace AXE.Game.Entities
         public bool isPaused()
         {
             return (world as LevelScreen).isPaused();
+        }
+
+        /* IWeaponHolder implementation */
+        public void setWeapon(IWeapon weapon)
+        {
+            this.weapon = weapon;
+        }
+
+        public void removeWeapon()
+        {
+            this.weapon = null;
+        }
+
+        public Vector2 getPosition()
+        {
+            return pos;
+        }
+
+        public Vector2 getHandPosition()
+        {
+            Vector2 hand = new Vector2(x, y);
+
+            hand.Y += 21;
+            if (facing == Dir.Right)
+                hand.X += 19;
+            else if (facing == Dir.Left)
+                hand.X += 2;
+
+            switch (graphic.currentAnim.frame)
+            {
+                case 1:
+                    if (facing == Dir.Right)
+                        hand.X = x + 15;
+                    else
+                        hand.X = x + 5;
+                    hand.Y = y + 22;
+                break;
+                case 2:
+                    if (facing == Dir.Right)
+                        hand.X = x + 18;
+                    else
+                        hand.X = x + 1;
+                    hand.Y = y + 21;
+                break;
+                case 3:
+                    if (facing == Dir.Right)
+                        hand.X = x + 19;
+                    else
+                        hand.X = x + 0;
+                    hand.Y = y + 18;
+                break;
+                case 16:
+                    if (facing == Dir.Right)
+                        hand.X = x + 17;
+                    else
+                        hand.X = x + 3;
+                    hand.Y = y + 11;
+                break;
+                case 17:
+                    if (facing == Dir.Right)
+                        hand.X = x;
+                    else
+                        hand.X = x + 20;
+                    hand.Y = y + 10;
+                    
+                break;
+                case 18:
+                    // No weapon in this frame :D
+                break;
+            }
+
+            hand += graphicPositionCorrection;
+
+            return hand;
+        }
+
+        public Dir getFacing()
+        {
+            return facing;
+        }
+
+        /** 20131102, RDLH: This should not be in the interface! **/
+        public int getDirectionAsSign(Dir dir)
+        {
+            return directionToSign(dir);
         }
 
         void handleDebugRoutines()
