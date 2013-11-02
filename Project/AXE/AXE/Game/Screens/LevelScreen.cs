@@ -62,6 +62,7 @@ namespace AXE.Game.Screens
             entities.Add("onewaysolid", new List<bEntity>());
             entities.Add("items", new List<bEntity>());
             entities.Add("player", new List<bEntity>());
+            entities.Add("axe", new List<bEntity>());
             entities.Add("enemy", new List<bEntity>());
             entities.Add("stairs", new List<bEntity>());
 
@@ -103,12 +104,17 @@ namespace AXE.Game.Screens
                 // TODO: add logic for positioning and multiplayer
                 int playerX = (int)levelMap.playerStart.X;
                 int playerY = (int)levelMap.playerStart.Y;
-                _add(new Player(playerX, playerY, GameData.get().playerAData), "player");
+                playerA = new Player(playerX, playerY, GameData.get().playerAData);
+                Axe axe = new Axe(playerX, playerY, playerA);
+                playerA.axe = axe;
+                _add(playerA, "player");
+                _add(axe, "axe");
             }
             else
             {
                 // Handle ending/nonsense
-                _add(new Player(width / 2 - 30, height / 2, GameData.get().playerAData), "player");
+                playerA = new Player(width / 2 - 30, height / 2, GameData.get().playerAData);
+                _add(playerA, "player");
             }
 
             // Add loaded entities

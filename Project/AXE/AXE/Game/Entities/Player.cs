@@ -60,6 +60,8 @@ namespace AXE.Game.Entities
         public Vector2 initialPosition;
         public Vector2 moveTo;
 
+        public Axe axe;
+
         // Debug
         String debugText;
         bool floater;
@@ -119,6 +121,21 @@ namespace AXE.Game.Entities
 
             debugText = "";
             floater = false;
+        }
+
+        public int directionToSign(Dir dir) {
+            if (dir == Dir.Left)
+            {
+                return -1;
+            }
+            else if (dir == Dir.Right)
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         public override int graphicWidth()
@@ -223,6 +240,22 @@ namespace AXE.Game.Entities
                         }
                     }   
 
+                    if (mginput.pressed(Pad.b))
+                    {
+                        if (axe != null)
+                        {
+                            axe.onThrow(10, facing);
+                        }
+                        else
+                        {
+                            bEntity entity = instancePlace(pos, "axe");
+                            if (entity != null)
+                            {
+                                (entity as Axe).onGrab(this);
+                            }
+                        }
+                    }
+
                     if (onair)
                     {
                         if (vspeed < 0)
@@ -252,10 +285,6 @@ namespace AXE.Game.Entities
                                 vspeed -= jumpPower / 8;
                             if (action == ActionState.Squid)
                                 vspeed -= jumpPower / 8 * 2;
-                        }
-                        else if (mginput.pressed(Pad.b))
-                        {
-                            
                         }
 
                         // Ladders
