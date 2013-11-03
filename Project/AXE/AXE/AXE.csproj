@@ -109,7 +109,8 @@
   <ItemGroup>
     <Compile Include="Game\Control\LevelScreen.cs" />
     <Compile Include="Game\Control\PlayerData.cs" />
-    <Compile Include="Game\Entities\Axe.cs" />
+    <Compile Include="Game\Entities\Axes\NormalAxe.cs" />
+    <Compile Include="Game\Entities\Base\Axe.cs" />
     <Compile Include="Game\Entities\Base\Enemy.cs" />
     <Compile Include="Game\Entities\Base\IWeapon.cs" />
     <Compile Include="Game\Entities\Enemies\Imp.cs" />

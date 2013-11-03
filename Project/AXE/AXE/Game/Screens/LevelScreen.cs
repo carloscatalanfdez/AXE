@@ -13,6 +13,7 @@ using bEngine.Helpers;
 using AXE.Common;
 using AXE.Game.Entities;
 using AXE.Game.Control;
+using AXE.Game.Entities.Axes;
 
 namespace AXE.Game.Screens
 {
@@ -108,9 +109,11 @@ namespace AXE.Game.Screens
                 int playerX = (int)levelMap.playerStart.X;
                 int playerY = (int)levelMap.playerStart.Y;
                 playerA = new Player(playerX, playerY, GameData.get().playerAData);
-                Axe axe = new Axe(playerX, playerY, playerA);
-                playerA.setWeapon(axe);
+                Axe stick = new Axe(playerX, playerY, playerA);
+                NormalAxe axe = new NormalAxe(playerX + 40, playerY, null);
+                playerA.setWeapon(stick);
                 _add(playerA, "player");
+                _add(stick, "axe");
                 _add(axe, "axe");
             }
             else

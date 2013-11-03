@@ -50,11 +50,32 @@ namespace AXE.Game.Entities
         {
             base.init();
 
+            initGraphic();
+            initSoundEffects();
+            initHolderState();
+
+            initParams();
+        }
+
+        protected virtual void initParams()
+        {
             mask = new bMask(0, 0, 14, 14);
             mask.game = game;
             attributes.Add("axe");
+            current_hspeed = current_vspeed = 0;
+            gravity = 0.5f;
 
-            graphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/axe-sheet"), 14, 14);
+            layer = 10;
+        }
+
+        protected virtual void initGraphic()
+        {
+            graphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/stick-sheet"), 14, 14);
+            loadAnims();
+        }
+
+        protected virtual void loadAnims()
+        {
             int[] fs = { 0 };
             graphic.add(new bAnim("grabbed", fs, 0.0f));
             int[] fss = { 4, 5, 6, 7 };
@@ -63,12 +84,10 @@ namespace AXE.Game.Entities
             graphic.add(new bAnim("ccw-rotation", fsss, 0.7f));
             int[] fssss = { 12 };
             graphic.add(new bAnim("idle", fssss, 0.0f));
+        }
 
-            current_hspeed = current_vspeed = 0;
-            gravity = 0.5f;
-
-            layer = 10;
-
+        protected virtual void initHolderState()
+        {
             if (holder == null)
             {
                 graphic.play("idle");
@@ -81,7 +100,10 @@ namespace AXE.Game.Entities
                 dir = holder.getFacing();
                 state = MovementState.Grabbed;
             }
+        }
 
+        protected virtual void initSoundEffects()
+        {
             sfxThrow = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-thrown");
             sfxHit = game.Content.Load<SoundEffect>("Assets/Sfx/axe-hit");
             sfxDrop = game.Content.Load<SoundEffect>("Assets/Sfx/axe-drop");
@@ -121,16 +143,14 @@ namespace AXE.Game.Entities
                     break;
                 case MovementState.Flying:
                     moveTo.X += current_hspeed;
+                    moveTo.Y += current_vspeed;
                     Vector2 remnant = moveToContact(moveTo, "solid");
 
                     // We have been stopped
-                    if (remnant.X != 0)
+                    if (remnant.X != 0 || remnant.Y != 0)
                     {
                         // Stop accelerating if we have stopped
-                        current_hspeed = - current_hspeed / 10;
-                        current_vspeed = -2;
-                        state = MovementState.Bouncing;
-                        sfxHit.Play();
+                        onBounce();
                     }
                     break;
                 case MovementState.Bouncing:
@@ -168,6 +188,16 @@ namespace AXE.Game.Entities
                     }
 
                     break;
+                case MovementState.Idle:
+                    bool onair = !placeMeeting(x, y + 1, "solid");
+                    if (onair)
+                        onair = !placeMeeting(x, y + 1, "onewaysolid", onewaysolidCondition);
+                    if (onair)
+                    {
+                        state = MovementState.Bouncing;
+                        dir = Dir.None;
+                    }
+                    break;
                 default:
                     break;
             }
@@ -201,9 +231,13 @@ namespace AXE.Game.Entities
                     {
                         graphic.play("ccw-rotation");
                     }
-                    else
+                    else if (dir == Player.Dir.Right)
                     {
                         graphic.play("cw-rotation");
+                    }
+                    else
+                    {
+                        graphic.play("idle");
                     }
 
                     break;
@@ -219,7 +253,7 @@ namespace AXE.Game.Entities
         }
 
         /* IWeapon implementation */
-        public Vector2 getGrabPosition()
+        public virtual Vector2 getGrabPosition()
         {
             return new Vector2(5, 6);
         }
@@ -241,6 +275,19 @@ namespace AXE.Game.Entities
             current_hspeed = force * holder.getDirectionAsSign(dir);
             holder.removeWeapon();
             holder = null;
+        }
+
+        public virtual void onBounce()
+        {
+            current_hspeed = -current_hspeed / 10;
+            current_vspeed = -2;
+            state = MovementState.Bouncing;
+            sfxHit.Play();
+        }
+
+        public virtual void onStuck()
+        {
+
         }
     }
 }
