@@ -16,6 +16,7 @@ using AXE.Common;
 using AXE.Game.Control;
 using AXE.Game.Screens;
 using AXE.Game.Entities.Base;
+using AXE.Game.Utils;
 
 namespace AXE.Game.Entities
 {
@@ -62,6 +63,7 @@ namespace AXE.Game.Entities
         public Vector2 moveTo;
 
         protected IWeapon weapon;
+        protected HotspotContainer hotspotContainer;
 
         // Debug
         String debugText;
@@ -94,6 +96,8 @@ namespace AXE.Game.Entities
             graphic.add(new bAnim("readyweapon", new int[] { 0, 16, 17, 17, 17 }, 0.5f, false));
             graphic.add(new bAnim("thrownweapon", new int[] { 18, 18 }, 0.2f, false));
             graphic.add(new bAnim("exit", new int[] { 4 }));
+
+            hotspotContainer = new HotspotContainer("Assets/SpriteConfs/knight-hotspots.cfg");
 
             graphic.play("idle");
             layer = 0;
@@ -686,53 +690,23 @@ namespace AXE.Game.Entities
         {
             Vector2 hand = new Vector2(x, y);
 
-            hand.Y += 21;
-            if (facing == Dir.Right)
-                hand.X += 22;
-            else if (facing == Dir.Left)
-                hand.X += 5;
+            int curFrame = graphic.currentAnim.frame;
 
-            switch (graphic.currentAnim.frame)
+            // Right and Left direction hotspots for the current frame
+            if (!hotspotContainer.hotspots.ContainsKey(curFrame))
             {
-                case 1:
-                    if (facing == Dir.Right)
-                        hand.X = x + 18;
-                    else
-                        hand.X = x + 8;
-                    hand.Y = y + 22;
-                break;
-                case 2:
-                    if (facing == Dir.Right)
-                        hand.X = x + 21;
-                    else
-                        hand.X = x + 4;
-                    hand.Y = y + 21;
-                break;
-                case 3:
-                    if (facing == Dir.Right)
-                        hand.X = x + 22;
-                    else
-                        hand.X = x + 3;
-                    hand.Y = y + 18;
-                break;
-                case 16:
-                    if (facing == Dir.Right)
-                        hand.X = x + 17;
-                    else
-                        hand.X = x + 3;
-                    hand.Y = y + 11;
-                break;
-                case 17:
-                    if (facing == Dir.Right)
-                        hand.X = x;
-                    else
-                        hand.X = x + 20;
-                    hand.Y = y + 10;
-                    
-                break;
-                case 18:
-                    // No weapon in this frame :D
-                break;
+                // default value
+                curFrame = -1;
+            }
+            Vector2[] hotspotsPoints = hotspotContainer.hotspots[curFrame];
+
+            if (facing == Dir.Right)
+            {
+                hand += hotspotsPoints[0];
+            }
+            else
+            {
+                hand += hotspotsPoints[1];
             }
 
             return hand;
