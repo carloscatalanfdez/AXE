@@ -43,7 +43,7 @@ namespace AXE.Game.Entities
         public float current_hspeed;
         public float haccel;
         public float air_haccel;
-        public bool justLanded;
+        public bool isLanding;
         public float runSpeedFactor;
         public float jumpPower;
         public Dir jumpedFacing;
@@ -54,6 +54,7 @@ namespace AXE.Game.Entities
         public bool playDeathAnim;
         
         // State vars
+        public MovementState previousState;
         public MovementState state;
         public ActionState action;
         public Dir facing;
@@ -110,7 +111,7 @@ namespace AXE.Game.Entities
             current_hspeed = 0;
             haccel = 0.2f;
             air_haccel = 0f;
-            justLanded = false;
+            isLanding = false;
             runSpeedFactor = 2;
             jumpPower = 5.5f;
             jumpMaxSpeed = 0.0f;
@@ -143,6 +144,13 @@ namespace AXE.Game.Entities
         public override int graphicWidth()
         {
             return graphic.width;
+        }
+
+        public override void onUpdateBegin()
+        {
+            base.onUpdateBegin();
+
+            previousState = state;
         }
 
         override public void onUpdate()
@@ -179,66 +187,7 @@ namespace AXE.Game.Entities
                 case MovementState.Walk:
                     state = MovementState.Idle;
 
-                    if (mginput.check(PadButton.left))
-                    {
-                        // Going right - squid
-                        if (current_hspeed > 0)
-                        {
-                            action = ActionState.Squid;
-                            current_hspeed -= _haccel*2;
-                        }
-                        else
-                        {
-                            action = ActionState.None;
-                            current_hspeed = Math.Max(current_hspeed - _haccel, -_hspeed);
-                        }
-                        moveTo.X += current_hspeed;
-                        facing = Dir.Left;
-                        state = MovementState.Walk;
-                        // If has started moving, hasn't just landed
-                        justLanded = false;
-                    }
-                    else if (mginput.check(PadButton.right))
-                    {
-                        if (current_hspeed < 0)
-                        {
-                            action = ActionState.Squid;
-                            current_hspeed += _haccel*2;
-                        }
-                        else
-                        {
-                            action = ActionState.None;
-                            current_hspeed = Math.Min(current_hspeed + _haccel, _hspeed);
-                        }
-                        moveTo.X += current_hspeed;
-                        facing = Dir.Right;
-                        state = MovementState.Walk;
-                        // If has started moving, hasn't just landed
-                        justLanded = false;
-                    }
-                    else
-                    {
-                        action = ActionState.None;
-
-                        moveTo.X += current_hspeed;
-
-                        // Decelerate
-                        float temp_haccel = haccel;
-                        if (justLanded)
-                            temp_haccel = 2 * haccel;
-                        if (Math.Abs(current_hspeed) > temp_haccel)
-                        {
-                            if (current_hspeed > 0)
-                                current_hspeed -= 2*temp_haccel;
-                            else if (current_hspeed < 0)
-                                current_hspeed += 2*temp_haccel;
-                        }
-                        else
-                        {
-                            justLanded = false;
-                            current_hspeed = 0;
-                        }
-                    }   
+                    handleAcceleratedMovement(ref _haccel, ref _hspeed);
 
                     if (onair)
                     {
@@ -258,7 +207,7 @@ namespace AXE.Game.Entities
                         if (mginput.pressed(PadButton.a))
                         {
                             state = MovementState.Jump;
-                            justLanded = false;
+                            isLanding = false;
                             jumpedFacing = facing;
                             jumpMaxSpeed = Math.Max(Math.Abs(current_hspeed)*1.5f, 3);
                             bool runningJump = Math.Abs(current_hspeed) > hspeed;
@@ -279,7 +228,7 @@ namespace AXE.Game.Entities
                                 if (input.up() || input.down() && (!input.left() && !input.right()))
                                 {
                                     state = MovementState.Ladder;
-                                    justLanded = false;
+                                    isLanding = false;
                                     current_hspeed = 0;
                                 }
                             }
@@ -291,7 +240,7 @@ namespace AXE.Game.Entities
                                     moveTo.X = g.x;
                                 toLadder = true;
                                 state = MovementState.Ladder;
-                                justLanded = false;
+                                isLanding = false;
                                 current_hspeed = 0;
                             }
                             else if (input.up() && placeMeeting(x, y, "items"))
@@ -337,52 +286,7 @@ namespace AXE.Game.Entities
                 case MovementState.Jump:
                     if (onair)
                     {
-                        if (mginput.released(PadButton.a) && vspeed < 0)
-                            vspeed /= 2;
-
-                        if (!floater)
-                            vspeed += gravity;
-
-                        if (mginput.check(PadButton.left))
-                        {
-                            // Going right - squid
-                            if (current_hspeed > 0)
-                            {
-                                action = ActionState.Squid;
-                                current_hspeed -= air_haccel;
-                                if (jumpedFacing == Dir.Right)
-                                    current_hspeed = Math.Max(current_hspeed, 0);
-                            }
-                            else
-                            {
-                                action = ActionState.None;
-                                current_hspeed = Math.Max(current_hspeed - air_haccel, -jumpMaxSpeed);
-                            }
-                            facing = Dir.Left;
-                        }
-                        else if (mginput.check(PadButton.right))
-                        {
-                            if (current_hspeed < 0)
-                            {
-                                action = ActionState.Squid;
-                                current_hspeed += air_haccel/* * 2*/;
-                                if (jumpedFacing == Dir.Left)
-                                    current_hspeed = Math.Min(current_hspeed, 0);
-                            }
-                            else
-                            {
-                                action = ActionState.None;
-                                current_hspeed = Math.Min(current_hspeed + air_haccel, jumpMaxSpeed);
-                            }
-                            facing = Dir.Right;
-                        }
-
-                        if (vspeed > 0)
-                        {
-                            state = MovementState.Fall;
-                        }
-
-                        moveTo.X += current_hspeed;
+                        handleOnAirMovement();
                     }
                     // Go to standing state, acknowleding the case in which
                     // the player is moving through a one way platform
@@ -415,8 +319,6 @@ namespace AXE.Game.Entities
                 case MovementState.Attacked:
                     if (graphic.currentAnim.finished)
                     {
-                        // moveTo.X -= attackAnimationPositionCorrection * getDirectionAsSign(facing);
-                        // graphicPositionCorrection.X = -attackAnimationPositionCorrection * getDirectionAsSign(facing);
                         state = MovementState.Idle;
                     }
 
@@ -481,7 +383,7 @@ namespace AXE.Game.Entities
                 else if (remnant.Y != 0 && vspeed > 0)
                 {
                     // Landed
-                    justLanded = true;
+                    isLanding = true;
                 }
             }
 
@@ -515,6 +417,11 @@ namespace AXE.Game.Entities
                     }
                 }
             }
+        }
+
+        public override void onUpdateEnd()
+        {
+            base.onUpdateEnd();
 
             switch (state)
             {
@@ -569,12 +476,126 @@ namespace AXE.Game.Entities
                     break;
             }
 
-            if (justLanded)
+            if (isLanding)
                 graphic.color = Color.Yellow;
 
 
-            graphic.color = Color.White;
+            //graphic.color = Color.White;
             graphic.update();
+        }
+
+        public void handleAcceleratedMovement(ref float _haccel, ref float _hspeed)
+        {
+            if (mginput.check(PadButton.left))
+            {
+                // Going right - squid
+                if (current_hspeed > 0)
+                {
+                    action = ActionState.Squid;
+                    current_hspeed -= _haccel * 2;
+                }
+                else
+                {
+                    action = ActionState.None;
+                    current_hspeed = Math.Max(current_hspeed - _haccel, -_hspeed);
+                }
+                moveTo.X += current_hspeed;
+                facing = Dir.Left;
+                state = MovementState.Walk;
+                // If has started moving, hasn't just landed
+                isLanding = false;
+            }
+            else if (mginput.check(PadButton.right))
+            {
+                if (current_hspeed < 0)
+                {
+                    action = ActionState.Squid;
+                    current_hspeed += _haccel * 2;
+                }
+                else
+                {
+                    action = ActionState.None;
+                    current_hspeed = Math.Min(current_hspeed + _haccel, _hspeed);
+                }
+                moveTo.X += current_hspeed;
+                facing = Dir.Right;
+                state = MovementState.Walk;
+                // If has started moving, hasn't just landed
+                isLanding = false;
+            }
+            else
+            {
+                action = ActionState.None;
+
+                moveTo.X += current_hspeed;
+
+                // Decelerate
+                float temp_haccel = haccel;
+                if (isLanding)
+                    temp_haccel = 2 * haccel;
+                if (Math.Abs(current_hspeed) > temp_haccel)
+                {
+                    if (current_hspeed > 0)
+                        current_hspeed -= 2 * temp_haccel;
+                    else if (current_hspeed < 0)
+                        current_hspeed += 2 * temp_haccel;
+                }
+                else
+                {
+                    isLanding = false;
+                    current_hspeed = 0;
+                }
+            }   
+        }
+
+        public void handleOnAirMovement()
+        {
+            if (mginput.released(PadButton.a) && vspeed < 0)
+                vspeed /= 2;
+
+            if (!floater)
+                vspeed += gravity;
+
+            if (mginput.check(PadButton.left))
+            {
+                // Going right - squid
+                if (current_hspeed > 0)
+                {
+                    action = ActionState.Squid;
+                    current_hspeed -= air_haccel;
+                    if (jumpedFacing == Dir.Right)
+                        current_hspeed = Math.Max(current_hspeed, 0);
+                }
+                else
+                {
+                    action = ActionState.None;
+                    current_hspeed = Math.Max(current_hspeed - air_haccel, -jumpMaxSpeed);
+                }
+                facing = Dir.Left;
+            }
+            else if (mginput.check(PadButton.right))
+            {
+                if (current_hspeed < 0)
+                {
+                    action = ActionState.Squid;
+                    current_hspeed += air_haccel/* * 2*/;
+                    if (jumpedFacing == Dir.Left)
+                        current_hspeed = Math.Min(current_hspeed, 0);
+                }
+                else
+                {
+                    action = ActionState.None;
+                    current_hspeed = Math.Min(current_hspeed + air_haccel, jumpMaxSpeed);
+                }
+                facing = Dir.Right;
+            }
+
+            if (vspeed > 0)
+            {
+                state = MovementState.Fall;
+            }
+
+            moveTo.X += current_hspeed;
         }
 
         // Return true if handled, else handled by flow

@@ -145,6 +145,11 @@ namespace AXE.Game.Entities
                 default:
                     break;
             }
+        }
+
+        public override void onUpdateEnd()
+        {
+            base.onUpdateEnd();
 
             switch (state)
             {
@@ -174,7 +179,7 @@ namespace AXE.Game.Entities
                     {
                         graphic.play("cw-rotation");
                     }
-                    
+
                     break;
             }
 
