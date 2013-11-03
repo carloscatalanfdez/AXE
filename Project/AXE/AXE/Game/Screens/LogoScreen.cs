@@ -15,7 +15,6 @@ namespace AXE.Game.Screens
     class LogoScreen : Screen
     {
         bStamp logo;
-        GameInput input;
 
         public LogoScreen()
             : base()

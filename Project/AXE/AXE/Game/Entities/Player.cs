@@ -62,12 +62,6 @@ namespace AXE.Game.Entities
         public Vector2 moveTo;
 
         protected IWeapon weapon;
-        protected int attackAnimationPositionCorrection
-        {
-            get { return -3; }
-        }
-        public bool appliedPositionCorrection;
-        public Vector2 graphicPositionCorrection;
 
         // Debug
         String debugText;
@@ -84,12 +78,12 @@ namespace AXE.Game.Entities
         {
             base.init();
 
-            mask = new bMask(0, 0, 16, 24, 4, 8);
+            mask = new bMask(0, 0, 16, 24, 7, 8);
             mask.game = game;
             attributes.Add("player");
             attributes.Add("moveable");
 
-            graphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/knight-sheet"), 24, 32);
+            graphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/knight-sheet"), 30, 32);
             graphic.add(new bAnim("idle", new int[] { 0 }, 0.1f));
             graphic.add(new bAnim("walk", new int[] { 1, 2, 3, 2 }, 0.2f));
             graphic.add(new bAnim("jump", new int[] { 8 }, 0.0f));
@@ -119,8 +113,6 @@ namespace AXE.Game.Entities
             jumpMaxSpeed = 0.0f;
             deathDelayTime = 0;
             playDeathAnim = false;
-            appliedPositionCorrection = false;
-            graphicPositionCorrection = Vector2.Zero;
 
             state = MovementState.Idle;
             action = ActionState.None;
@@ -409,13 +401,6 @@ namespace AXE.Game.Entities
 
                     break;
                 case MovementState.Attacking:
-                    if (!appliedPositionCorrection)
-                    {
-                        // moveTo.X += attackAnimationPositionCorrection * getDirectionAsSign(facing);
-                        graphicPositionCorrection.X = attackAnimationPositionCorrection * getDirectionAsSign(facing);
-                        appliedPositionCorrection = true;
-                    }
-
                     if (graphic.currentAnim.finished)
                     {
                         if (weapon != null)
@@ -431,8 +416,6 @@ namespace AXE.Game.Entities
                     {
                         // moveTo.X -= attackAnimationPositionCorrection * getDirectionAsSign(facing);
                         // graphicPositionCorrection.X = -attackAnimationPositionCorrection * getDirectionAsSign(facing);
-                        graphicPositionCorrection = Vector2.Zero;
-                        appliedPositionCorrection = false;
                         state = MovementState.Idle;
                     }
 
@@ -656,17 +639,17 @@ namespace AXE.Game.Entities
         override public void render(GameTime dt, SpriteBatch sb)
         {
             base.render(dt, sb);
-            graphic.render(sb, pos + graphicPositionCorrection);
+            graphic.render(sb, pos);
             Color c = graphic.color;
             if (showWrapEffect == Dir.Left)
             {
                 //graphic.color = Color.Aqua;
-                graphic.render(sb, new Vector2(0 + (pos.X - (world as LevelScreen).width), pos.Y) + graphicPositionCorrection);
+                graphic.render(sb, new Vector2(0 + (pos.X - (world as LevelScreen).width), pos.Y));
             }
             else if (showWrapEffect == Dir.Right)
             {
                 //graphic.color = Color.Aqua;
-                graphic.render(sb, new Vector2((world as LevelScreen).width + pos.X, pos.Y) + graphicPositionCorrection);
+                graphic.render(sb, new Vector2((world as LevelScreen).width + pos.X, pos.Y));
             }
             graphic.color = c;
 
@@ -705,31 +688,31 @@ namespace AXE.Game.Entities
 
             hand.Y += 21;
             if (facing == Dir.Right)
-                hand.X += 19;
+                hand.X += 22;
             else if (facing == Dir.Left)
-                hand.X += 2;
+                hand.X += 5;
 
             switch (graphic.currentAnim.frame)
             {
                 case 1:
                     if (facing == Dir.Right)
-                        hand.X = x + 15;
+                        hand.X = x + 18;
                     else
-                        hand.X = x + 5;
+                        hand.X = x + 8;
                     hand.Y = y + 22;
                 break;
                 case 2:
                     if (facing == Dir.Right)
-                        hand.X = x + 18;
+                        hand.X = x + 21;
                     else
-                        hand.X = x + 1;
+                        hand.X = x + 4;
                     hand.Y = y + 21;
                 break;
                 case 3:
                     if (facing == Dir.Right)
-                        hand.X = x + 19;
+                        hand.X = x + 22;
                     else
-                        hand.X = x + 0;
+                        hand.X = x + 3;
                     hand.Y = y + 18;
                 break;
                 case 16:
@@ -751,8 +734,6 @@ namespace AXE.Game.Entities
                     // No weapon in this frame :D
                 break;
             }
-
-            hand += graphicPositionCorrection;
 
             return hand;
         }
