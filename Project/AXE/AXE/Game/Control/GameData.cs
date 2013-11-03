@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AXE.Game.Control;
+using Microsoft.Xna.Framework;
 
 namespace AXE.Game.Control
 {
@@ -22,8 +23,8 @@ namespace AXE.Game.Control
 
         public GameData()
         {
-            playerAData = new PlayerData(0);
-            playerBData = new PlayerData(1);
+            playerAData = new PlayerData(PlayerIndex.One);
+            playerBData = new PlayerData(PlayerIndex.Two);
         }
 
         public void init()

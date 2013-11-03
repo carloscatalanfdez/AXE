@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Microsoft.Xna.Framework;
 
 namespace AXE.Game.Control
 {
@@ -10,9 +11,9 @@ namespace AXE.Game.Control
      */
     class PlayerData
     {
-        public int id;
+        public PlayerIndex id;
 
-        public PlayerData(int id)
+        public PlayerData(PlayerIndex id)
         {
             this.id = id;
         }

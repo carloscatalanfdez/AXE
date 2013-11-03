@@ -137,7 +137,7 @@ namespace AXE.Game.Screens
             base.update(dt);
 
             if (GameData.get().level < GameData.get().maxLevels)
-                if (GameInput.getInstance().pressed(Pad.start))
+                if (GameInput.getInstance(PlayerIndex.One).pressed(PadButton.start))
                 {
                     handlePause();
                 }

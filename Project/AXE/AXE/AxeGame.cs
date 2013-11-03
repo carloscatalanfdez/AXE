@@ -42,7 +42,8 @@ namespace AXE
 
         public override void update(GameTime gameTime)
         {
-            Common.GameInput.getInstance().update();
+            Common.GameInput.getInstance(PlayerIndex.One).update();
+            Common.GameInput.getInstance(PlayerIndex.Two).update();
 
             base.update(gameTime);
         }

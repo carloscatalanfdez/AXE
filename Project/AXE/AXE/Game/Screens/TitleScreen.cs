@@ -30,7 +30,7 @@ namespace AXE.Game.Screens
         {
             base.update(dt);
 
-            if (GameInput.getInstance().pressed(Pad.start))
+            if (GameInput.getInstance(PlayerIndex.One).pressed(PadButton.start))
             {
                 Controller.getInstance().onGameStart();
             }

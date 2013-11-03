@@ -10,6 +10,7 @@ using bEngine.Helpers.Transitions;
 using AXE.Common;
 using AXE.Game;
 using AXE.Game.Screens;
+using Microsoft.Xna.Framework;
 
 namespace AXE.Game.Control
 {
@@ -26,9 +27,14 @@ namespace AXE.Game.Control
         AxeGame game;
         public GameData data;
 
+        public GameInput playerAInput;
+        public GameInput playerBInput;
+
         Controller()
         {
             data = new GameData();
+            playerAInput = new GameInput(PlayerIndex.One);
+            playerBInput = new GameInput(PlayerIndex.Two);
         }
 
         public void setGame(AxeGame game)
@@ -39,6 +45,13 @@ namespace AXE.Game.Control
         public void onMenuStart()
         {
             game.changeWorld(new TitleScreen());
+        }
+
+        public void changePlayerButtonConf(PlayerIndex index, Dictionary<PadButton, List<Object>> mappingConf)
+        {
+            GameInput.getInstance(index).setMapping(mappingConf);
+
+            // store to disk maybe?
         }
 
         public void onGameStart()

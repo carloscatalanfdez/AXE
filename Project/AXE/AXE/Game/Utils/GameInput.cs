@@ -6,46 +6,56 @@ using System.Text;
 using Microsoft.Xna.Framework.Input;
 
 using bEngine;
+using Microsoft.Xna.Framework;
+using AXE.Game.Control;
 
 namespace AXE.Common
 {
-    enum Pad { left, right, up, down, a, b, start, debug1, debug2 };
+    enum PadButton { left, right, up, down, a, b, c, start, coin };
 
     class GameInput
     {
-        static GameInput _instance;
-        public static GameInput getInstance()
+        public static GameInput getInstance(PlayerIndex index = PlayerIndex.One)
         {
-            if (_instance == null)
-                _instance = new GameInput();
-            return _instance;
+            switch (index)
+            {
+                default:
+                case PlayerIndex.One:
+                    return Controller.getInstance().playerAInput;
+                case PlayerIndex.Two:
+                    return Controller.getInstance().playerBInput;
+            }
         }
 
+        public PlayerIndex index;
         public bInput input = bGame.input;
 
         public float joyHThreshold = 0.3f;
         public float joyVThreshold = 0.3f;
 
-        public Dictionary<Pad, bool> currentStickState, previousStickState;
+        public Dictionary<PadButton, bool> currentStickState, previousStickState;
+        private Dictionary<PadButton, List<Object>> mappingConf;
 
-        public GameInput()
+        public GameInput(PlayerIndex index)
         {
-            currentStickState = new Dictionary<Pad, bool>();
-            previousStickState = new Dictionary<Pad, bool>();
+            currentStickState = new Dictionary<PadButton, bool>();
+            previousStickState = new Dictionary<PadButton, bool>();
+
+            this.index = index;
         }
 
         public void update()
         {
-            foreach (Pad key in currentStickState.Keys)
+            foreach (PadButton key in currentStickState.Keys)
                 previousStickState[key] = currentStickState[key];
 
-            currentStickState[Pad.left] = check(Pad.left);
-            currentStickState[Pad.right] = check(Pad.right);
-            currentStickState[Pad.up] = check(Pad.up);
-            currentStickState[Pad.down] = check(Pad.down);
+            currentStickState[PadButton.left] = check(PadButton.left);
+            currentStickState[PadButton.right] = check(PadButton.right);
+            currentStickState[PadButton.up] = check(PadButton.up);
+            currentStickState[PadButton.down] = check(PadButton.down);
         }
 
-        public bool check(Pad btn)
+        public bool check(PadButton btn)
         {
             List<Object> inputs = getInputKeys(btn);
 
@@ -55,7 +65,7 @@ namespace AXE.Common
                 if (i is Keys)
                     result = input.check((Keys)i);
                 else
-                    result = input.check((Buttons)i);
+                    result = input.check((Buttons)i, index);
 
                 if (result)
                     break;
@@ -65,17 +75,17 @@ namespace AXE.Common
             {
                 switch (btn)
                 {
-                    case Pad.left:
-                        result = input.left();
+                    case PadButton.left:
+                        result = input.left(index);
                         break;
-                    case Pad.right:
-                        result = input.right();
+                    case PadButton.right:
+                        result = input.right(index);
                         break;
-                    case Pad.up:
-                        result = input.up();
+                    case PadButton.up:
+                        result = input.up(index);
                         break;
-                    case Pad.down:
-                        result = input.down();
+                    case PadButton.down:
+                        result = input.down(index);
                         break;
                 }
             }
@@ -83,7 +93,7 @@ namespace AXE.Common
             return result;
         }
 
-        public bool pressed(Pad btn)
+        public bool pressed(PadButton btn)
         {
             List<Object> inputs = getInputKeys(btn);
 
@@ -93,7 +103,7 @@ namespace AXE.Common
                 if (i is Keys)
                     result = input.pressed((Keys)i);
                 else
-                    result = input.pressed((Buttons)i);
+                    result = input.pressed((Buttons)i, index);
 
                 if (result)
                     break;
@@ -107,7 +117,7 @@ namespace AXE.Common
             return result;
         }
 
-        public bool released(Pad btn)
+        public bool released(PadButton btn)
         {
             List<Object> inputs = getInputKeys(btn);
 
@@ -117,7 +127,7 @@ namespace AXE.Common
                 if (i is Keys)
                     result = input.released((Keys)i);
                 else
-                    result = input.released((Buttons)i);
+                    result = input.released((Buttons)i, index);
 
                 if (result)
                     break;
@@ -131,53 +141,40 @@ namespace AXE.Common
             return result;
         }
 
-        bool isDir(Pad btn)
+        bool isDir(PadButton btn)
         {
-            return btn == Pad.left || btn == Pad.right || btn == Pad.up || btn == Pad.down;
+            return btn == PadButton.left || btn == PadButton.right || btn == PadButton.up || btn == PadButton.down;
         }
 
-        List<Object> getInputKeys(Pad btn)
+        List<Object> getInputKeys(PadButton btn)
         {
-            List<Object> list = new List<Object>();
-            switch (btn)
+            if (mappingConf == null)
             {
-                case Pad.left:
-                    list.Add(Keys.Left);
-                    break;
-                case Pad.right:
-                    list.Add(Keys.Right);
-                    break;
-                case Pad.up:
-                    list.Add(Keys.Up);
-                    break;
-                case Pad.down:
-                    list.Add(Keys.Down);
-                    break;
-                case Pad.a:
-                    list.Add(Buttons.A);
-                    list.Add(Keys.A);
-                    list.Add(Keys.Z);
-                    break;
-                case Pad.b:
-                    list.Add(Buttons.X);
-                    list.Add(Keys.S);
-                    list.Add(Keys.X);
-                    break;
-                case Pad.start:
-                    list.Add(Buttons.Start);
-                    list.Add(Keys.Enter);
-                    break;
-                case Pad.debug1:
-                    list.Add(Buttons.B);
-                    list.Add(Keys.Q);
-                    break;
-                case Pad.debug2:
-                    list.Add(Buttons.Y);
-                    list.Add(Keys.W);
-                    break;
+                mappingConf = getDefaultMappingConf();
             }
 
-            return list;
+            return mappingConf[btn];
+        }
+
+        private Dictionary<PadButton, List<Object>> getDefaultMappingConf()
+        {
+            return new Dictionary<PadButton, List<Object>> 
+            {
+                { PadButton.left, new List<Object> { Keys.Left } },
+                { PadButton.right, new List<Object> { Keys.Right } },
+                { PadButton.up, new List<Object> { Keys.Up } },
+                { PadButton.down, new List<Object> { Keys.Down } },
+                { PadButton.a, new List<Object> { Buttons.A, Keys.A, Keys.Z } },
+                { PadButton.b, new List<Object> { Buttons.X, Keys.S, Keys.X } },
+                { PadButton.start, new List<Object> { Buttons.Start, Keys.Enter } },
+                { PadButton.coin, new List<Object> { Buttons.B, Keys.Q } },
+                { PadButton.c, new List<Object> { Buttons.Y, Keys.W } }
+            };
+        }
+
+        public void setMapping(Dictionary<PadButton, List<Object>> mappingConf)
+        {
+            this.mappingConf = mappingConf;
         }
     }
 }

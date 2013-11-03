@@ -22,7 +22,7 @@ namespace AXE.Game.Entities
     class Player : Entity, IWeaponHolder
     {
         // Utilities
-        GameInput mginput = GameInput.getInstance();
+        GameInput mginput;
 
         // Some declarations
         public enum MovementState { Idle, Walk, Jump, Fall, Ladder, Death, Attacking, Attacked, Exit };
@@ -77,6 +77,7 @@ namespace AXE.Game.Entities
             : base(x, y)
         {
             this.data = data;
+            this.mginput = GameInput.getInstance(data.id);
         }
 
         override public void init()
@@ -185,7 +186,7 @@ namespace AXE.Game.Entities
                 case MovementState.Walk:
                     state = MovementState.Idle;
 
-                    if (mginput.check(Pad.left))
+                    if (mginput.check(PadButton.left))
                     {
                         // Going right - squid
                         if (current_hspeed > 0)
@@ -204,7 +205,7 @@ namespace AXE.Game.Entities
                         // If has started moving, hasn't just landed
                         justLanded = false;
                     }
-                    else if (mginput.check(Pad.right))
+                    else if (mginput.check(PadButton.right))
                     {
                         if (current_hspeed < 0)
                         {
@@ -261,7 +262,7 @@ namespace AXE.Game.Entities
                     {
                         vspeed = 0f;
                         
-                        if (mginput.pressed(Pad.a))
+                        if (mginput.pressed(PadButton.a))
                         {
                             state = MovementState.Jump;
                             justLanded = false;
@@ -343,13 +344,13 @@ namespace AXE.Game.Entities
                 case MovementState.Jump:
                     if (onair)
                     {
-                        if (mginput.released(Pad.a) && vspeed < 0)
+                        if (mginput.released(PadButton.a) && vspeed < 0)
                             vspeed /= 2;
 
                         if (!floater)
                             vspeed += gravity;
 
-                        if (mginput.check(Pad.left))
+                        if (mginput.check(PadButton.left))
                         {
                             // Going right - squid
                             if (current_hspeed > 0)
@@ -366,7 +367,7 @@ namespace AXE.Game.Entities
                             }
                             facing = Dir.Left;
                         }
-                        else if (mginput.check(Pad.right))
+                        else if (mginput.check(PadButton.right))
                         {
                             if (current_hspeed < 0)
                             {
@@ -501,7 +502,7 @@ namespace AXE.Game.Entities
             }
 
             // Handle axe
-            if (mginput.pressed(Pad.b))
+            if (mginput.pressed(PadButton.b))
             {
                 if (weapon != null)
                 {

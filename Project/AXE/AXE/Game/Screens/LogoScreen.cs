@@ -24,7 +24,6 @@ namespace AXE.Game.Screens
 
         public override void init()
         {
-            input = GameInput.getInstance();
             logo = new bStamp(game.Content.Load<Texture2D>("Assets/badladns_banner"));
         }
 
@@ -32,7 +31,7 @@ namespace AXE.Game.Screens
         {
             base.update(dt);
 
-            if (input.pressed(Pad.start))
+            if (GameInput.getInstance(PlayerIndex.One).pressed(PadButton.start) || GameInput.getInstance(PlayerIndex.Two).pressed(PadButton.start))
                 game.changeWorld(new TitleScreen());
         }
 
