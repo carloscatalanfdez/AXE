@@ -80,10 +80,9 @@ namespace AXE.Game.Entities
             return 14;
         }
 
-        override public void update()
+        override public void onUpdate()
         {
-            if ((world as LevelScreen).isPaused())
-                return;
+            base.onUpdate();
 
             // Prepare step
             Vector2 moveTo = pos;
@@ -115,7 +114,7 @@ namespace AXE.Game.Entities
                     moveTo.Y += current_vspeed;
                     moveTo.X += current_hspeed;
                     Vector2 oldPos = pos;
-                    Vector2 remnantOneWay = moveToContact(moveTo, "onewaysolid", Player.onewaysolidCondition);
+                    Vector2 remnantOneWay = moveToContact(moveTo, "onewaysolid", onewaysolidCondition);
                     Vector2 posOneWay = pos;
                     pos = oldPos;
                     Vector2 remnantSolid = moveToContact(moveTo, "solid");
@@ -179,7 +178,6 @@ namespace AXE.Game.Entities
                     break;
             }
 
-            base.update();
             graphic.update();
         }
 

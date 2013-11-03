@@ -69,10 +69,9 @@ namespace AXE.Game.Entities
             }
         }
 
-        public override void update()
+        public override void onUpdate()
         {
-            base.update();
-
+            base.onUpdate();
             graphic.update();
 
             if (type == Type.Exit)

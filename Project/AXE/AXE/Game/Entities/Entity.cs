@@ -14,6 +14,7 @@ namespace AXE.Game.Entities
     class Entity : bEntity
     {
         public bool visible = true;
+        public Vector2 previousPosition;
 
         public virtual int graphicWidth()
         {
@@ -23,6 +24,37 @@ namespace AXE.Game.Entities
         public Entity(int x, int y)
             : base(x, y)
         {
+        }
+
+        public virtual void onUpdateBegin()
+        {
+            previousPosition = pos;
+        }
+
+        public virtual void onUpdate()
+        {
+        }
+
+        public virtual void onUpdateEnd()
+        {
+        }
+
+        public override void update()
+        {
+            if (!isPaused())
+            {
+                onUpdateBegin();
+
+                onUpdate();
+                base.update();
+
+                onUpdateEnd();
+            }
+        }
+
+        public bool isPaused()
+        {
+            return (world as LevelScreen).isPaused();
         }
 
         override public Vector2 moveToContact(Vector2 to, String category, Func<bEntity, bEntity, bool> condition = null)
@@ -86,6 +118,17 @@ namespace AXE.Game.Entities
             if (xWrapApplied && remnant.X != 0)
                 remnant.X = 0;
             return remnant;
+        }
+
+        public bool onewaysolidCondition(bEntity me, bEntity other)
+        {
+            if (me is Entity)
+            {
+                Entity p = me as Entity;
+                return (p.previousPosition.Y + p.mask.offsety + me.mask.h <= other.mask.y);
+            }
+            else
+                return true;
         }
     }
 }

@@ -59,7 +59,6 @@ namespace AXE.Game.Entities
         public Dir facing;
 
         // Step variables
-        public Vector2 initialPosition;
         public Vector2 moveTo;
 
         protected IWeapon weapon;
@@ -146,15 +145,13 @@ namespace AXE.Game.Entities
             return graphic.width;
         }
 
-        override public void update()
+        override public void onUpdate()
         {
-            if (isPaused())
-                return;
+            base.onUpdate();
 
             // Prepare step
             color = Color.White;
 
-            initialPosition = pos;
             moveTo = pos;
 
             float _hspeed = hspeed;
@@ -556,7 +553,7 @@ namespace AXE.Game.Entities
                 case MovementState.Ladder:
                     graphic.play("ladder");
                     graphic.flipped = false;
-                    if (moveTo.Y - initialPosition.Y != 0)
+                    if (moveTo.Y - previousPosition.Y != 0)
                         graphic.currentAnim.resume();
                     else
                         graphic.currentAnim.pause();
@@ -577,20 +574,7 @@ namespace AXE.Game.Entities
 
 
             graphic.color = Color.White;
-
-            base.update();
             graphic.update();
-        }
-
-        public static bool onewaysolidCondition(bEntity me, bEntity other)
-        {
-            if (me is Player)
-            {
-                Player p = me as Player;
-                return (p.initialPosition.Y + p.mask.offsety + me.mask.h <= other.mask.y);
-            }
-            else
-                return true;
         }
 
         // Return true if handled, else handled by flow
@@ -663,11 +647,6 @@ namespace AXE.Game.Entities
         public bool isFlipped()
         {
             return graphic.flipped;
-        }
-
-        public bool isPaused()
-        {
-            return (world as LevelScreen).isPaused();
         }
 
         /* IWeaponHolder implementation */

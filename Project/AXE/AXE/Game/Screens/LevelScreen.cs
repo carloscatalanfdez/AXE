@@ -99,7 +99,7 @@ namespace AXE.Game.Screens
             }
 
             background = new bStamp(game.Content.Load<Texture2D>("Assets/Backgrounds/bg"));
-            //background.color = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+            background.color = new Color(0.0f, 0.0f, 0.0f, 0.0f);
 
             // Add player
             if (id < Controller.getInstance().data.maxLevels)
