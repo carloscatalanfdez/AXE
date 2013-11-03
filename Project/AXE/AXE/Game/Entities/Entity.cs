@@ -13,10 +13,17 @@ namespace AXE.Game.Entities
 {
     class Entity : bEntity
     {
+        public enum Dir { None, Left, Right };
+
         public bool visible = true;
         public Vector2 previousPosition;
 
         public virtual int graphicWidth()
+        {
+            throw new NotImplementedException("Declare this method for this class!");
+        }
+
+        public virtual int graphicHeight()
         {
             throw new NotImplementedException("Declare this method for this class!");
         }
@@ -130,5 +137,22 @@ namespace AXE.Game.Entities
             else
                 return true;
         }
+
+        public int directionToSign(Dir dir)
+        {
+            if (dir == Dir.Left)
+            {
+                return -1;
+            }
+            else if (dir == Dir.Right)
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
     }
 }

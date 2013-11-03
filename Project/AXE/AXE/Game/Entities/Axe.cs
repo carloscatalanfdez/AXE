@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Audio;
+
 using bEngine;
 using bEngine.Graphics;
-using Microsoft.Xna.Framework.Graphics;
-using AXE.Game.Screens;
-using Microsoft.Xna.Framework;
 
+using AXE.Game.Screens;
 using AXE.Game.Entities;
 using AXE.Game.Entities.Base;
 
@@ -27,6 +30,11 @@ namespace AXE.Game.Entities
         public float current_hspeed;
         public float current_vspeed;
         public float gravity;
+
+        public SoundEffect sfxThrow;
+        public SoundEffect sfxHit;
+        public SoundEffect sfxDrop;
+        public SoundEffect sfxGrab;
 
         public Axe(int x, int y, IWeaponHolder holder) : base(x, y)
         {
@@ -73,6 +81,11 @@ namespace AXE.Game.Entities
                 dir = holder.getFacing();
                 state = MovementState.Grabbed;
             }
+
+            sfxThrow = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-thrown");
+            sfxHit = game.Content.Load<SoundEffect>("Assets/Sfx/axe-hit");
+            sfxDrop = game.Content.Load<SoundEffect>("Assets/Sfx/axe-drop");
+            sfxGrab = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-grab");
         }
 
         public override int graphicWidth()
@@ -106,6 +119,7 @@ namespace AXE.Game.Entities
                         current_hspeed = - current_hspeed / 10;
                         current_vspeed = -2;
                         state = MovementState.Bouncing;
+                        sfxHit.Play();
                     }
                     break;
                 case MovementState.Bouncing:
@@ -139,6 +153,7 @@ namespace AXE.Game.Entities
                     {
                         current_vspeed = 0;
                         state = MovementState.Idle;
+                        sfxDrop.Play();
                     }
 
                     break;
@@ -200,6 +215,7 @@ namespace AXE.Game.Entities
 
         public void onGrab(IWeaponHolder holder)
         {
+            sfxGrab.Play();
             holder.setWeapon(this);
             graphic.play("grabbed");
             dir = holder.getFacing();
@@ -209,6 +225,7 @@ namespace AXE.Game.Entities
 
         public virtual void onThrow(int force, Player.Dir dir)
         {
+            sfxThrow.Play();
             state = MovementState.Flying;
             current_hspeed = force * holder.getDirectionAsSign(dir);
             holder.removeWeapon();

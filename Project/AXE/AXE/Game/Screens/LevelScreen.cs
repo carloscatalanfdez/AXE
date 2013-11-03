@@ -273,6 +273,8 @@ namespace AXE.Game.Screens
                     _add(e, "stairs");
                 else if (e is Door)
                     _add(e, "items");
+                else if (e is AXE.Game.Entities.Base.Enemy)
+                    _add(e, "enemy");
             }
         }
 

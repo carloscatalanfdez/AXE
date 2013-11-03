@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Audio;
 
 using bEngine;
 using bEngine.Graphics;
@@ -24,11 +25,11 @@ namespace AXE.Game.Entities
     {
         // Utilities
         GameInput mginput;
+        Random random;
 
         // Some declarations
         public enum MovementState { Idle, Walk, Jump, Fall, Ladder, Death, Attacking, Attacked, Exit };
         public enum ActionState { None, Squid }
-        public enum Dir { None, Left, Right };
 
         // Data
         public PlayerData data;
@@ -60,10 +61,17 @@ namespace AXE.Game.Entities
         public Dir facing;
 
         // Step variables
+        public Vector2 stepInitialPosition;
         public Vector2 moveTo;
 
+        // Weapon holding variables
         protected IWeapon weapon;
         protected HotspotContainer hotspotContainer;
+        
+        // Sound effects
+        protected List<SoundEffect> sfxSteps;
+        protected SoundEffect sfxLanded;
+        protected SoundEffect sfxCharge;
 
         // Debug
         String debugText;
@@ -79,6 +87,8 @@ namespace AXE.Game.Entities
         override public void init()
         {
             base.init();
+
+            random = new Random();
 
             mask = new bMask(0, 0, 16, 24, 7, 8);
             mask.game = game;
@@ -124,21 +134,18 @@ namespace AXE.Game.Entities
 
             debugText = "";
             floater = false;
+
+            loadSoundEffects();
         }
 
-        public int directionToSign(Dir dir) {
-            if (dir == Dir.Left)
-            {
-                return -1;
-            }
-            else if (dir == Dir.Right)
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
+        protected void loadSoundEffects()
+        {
+            sfxSteps = new List<SoundEffect>();
+            for (int i = 1; i <= 3; i++)
+                sfxSteps.Add(game.Content.Load<SoundEffect>("Assets/Sfx/sfx-step." + i));
+
+            sfxLanded = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-land");
+            sfxCharge = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-charge");
         }
 
         public override int graphicWidth()
@@ -160,6 +167,7 @@ namespace AXE.Game.Entities
             // Prepare step
             color = Color.White;
 
+            stepInitialPosition = pos;
             moveTo = pos;
 
             float _hspeed = hspeed;
@@ -167,6 +175,8 @@ namespace AXE.Game.Entities
 
             // Debug
             handleDebugRoutines();
+
+            handleSoundEffects();
 
             // Check for outside playfield death
             if (state != MovementState.Death && y + mask.h / 2 > (world as LevelScreen).height)
@@ -366,13 +376,6 @@ namespace AXE.Game.Entities
                 else
                     showWrapEffect = Dir.None;
 
-
-                // Wrap (mechanic)
-                /*if (x + (graphic.width) / 2 < 0)
-                    x = (world as LevelScreen).width - (graphic.width/2);
-                else if (x + (graphic.width) / 2 > (world as LevelScreen).width)
-                    x = -(graphic.width)/2;*/
-
                 // The y movement was stopped
                 if (remnant.Y != 0 && vspeed < 0)
                 {
@@ -384,6 +387,8 @@ namespace AXE.Game.Entities
                 {
                     // Landed
                     isLanding = true;
+                    sfxSteps[0].Play();
+                    sfxSteps[1].Play();
                 }
             }
 
@@ -398,6 +403,7 @@ namespace AXE.Game.Entities
                         {
                             state = MovementState.Attacking;
                             graphic.play("readyweapon");
+                            sfxCharge.Play();
                         }
                     }
                     else
@@ -633,7 +639,43 @@ namespace AXE.Game.Entities
                 return;
 
             if (type == "solid")
-                color = Color.Yellow;
+                color = Color.Turquoise;
+
+            if (type == "enemy")
+            {
+                // First, reposition
+                pos.X = stepInitialPosition.X;
+                if (placeMeeting(x, y, "enemy"))
+                {
+                    // If it doesn't work (still colliding) jump or something
+                    // Check first if the enemy is on top, so to not jump throw it
+                    if (vspeed < 0 && other.y + (other as Entity).graphicHeight() / 2 < y)
+                    {
+                        if (!handleJumpHit())
+                        {
+                            vspeed = 0;
+                            pos.Y = stepInitialPosition.Y;
+                        }
+                    }
+                    else
+                    {
+                        state = MovementState.Jump;
+                        vspeed = -jumpPower / 2;
+                        if (other.x + (other as Entity).graphicWidth()/2 < x + graphicWidth()/2)
+                        {
+                            jumpedFacing = Dir.Right;
+                            facing = Dir.Left;
+                            current_hspeed = getDirectionAsSign(Dir.Right) * hspeed;
+                        }
+                        else if (other.x + (other as Entity).graphicWidth() / 2 > x + graphicWidth() / 2)
+                        {
+                            jumpedFacing = Dir.Left;
+                            facing = Dir.Right;
+                            current_hspeed = getDirectionAsSign(Dir.Left) * hspeed;
+                        }
+                    }
+                }
+            }
         }
 
         public void onDeath(String type = "")
@@ -721,6 +763,29 @@ namespace AXE.Game.Entities
         public int getDirectionAsSign(Dir dir)
         {
             return directionToSign(dir);
+        }
+        /* End of IWeaponHolder implementation */
+
+        bool playedStepEffect = false;
+        public void handleSoundEffects()
+        {
+            float relativeX = pos.X / (world as LevelScreen).width - 0.5f;
+            switch (state)
+            {
+                case MovementState.Walk:
+                    int currentFrame = graphic.currentAnim.frame;
+                    if (currentFrame == 2 && !playedStepEffect)
+                    {
+                        playedStepEffect = true;
+                        sfxSteps[random.Next(sfxSteps.Count)].Play(1f, 0.0f, relativeX);
+                    }
+                    else if (currentFrame != 2)
+                        playedStepEffect = false;
+
+                    break;
+                default:
+                    break;
+            }
         }
 
         void handleDebugRoutines()

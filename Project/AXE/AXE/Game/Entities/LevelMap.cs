@@ -152,6 +152,9 @@ namespace AXE.Game.Entities
                 case "OneWayPlatform":
                     ge = new OneWayPlatform(x, y);
                     break;
+                case "Imp":
+                    ge = new Enemies.Imp(x, y);
+                    break;
             }
 
             if (ge != null)

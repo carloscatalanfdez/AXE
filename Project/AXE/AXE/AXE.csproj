@@ -110,7 +110,9 @@
     <Compile Include="Game\Control\LevelScreen.cs" />
     <Compile Include="Game\Control\PlayerData.cs" />
     <Compile Include="Game\Entities\Axe.cs" />
+    <Compile Include="Game\Entities\Base\Enemy.cs" />
     <Compile Include="Game\Entities\Base\IWeapon.cs" />
+    <Compile Include="Game\Entities\Enemies\Imp.cs" />
     <Compile Include="Game\Entities\Entity.cs" />
     <Compile Include="Game\Entities\Base\IWeaponHolder.cs" />
     <Compile Include="Game\Entities\Door.cs" />
@@ -127,6 +129,7 @@
     <Compile Include="Game\Screens\Screen.cs" />
     <Compile Include="Game\Screens\LogoScreen.cs" />
     <Compile Include="Game\Utils\HotspotContainer.cs" />
+    <Compile Include="Game\Utils\Tools.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="AxeGame.cs" />
