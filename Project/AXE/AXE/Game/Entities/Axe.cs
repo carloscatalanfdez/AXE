@@ -93,6 +93,17 @@ namespace AXE.Game.Entities
             return 14;
         }
 
+        public override void onCollision(string type, bEntity other)
+        {
+            if (type == "enemy" && state == MovementState.Flying)
+            {
+                current_hspeed = -current_hspeed / 10;
+                current_vspeed = -2;
+                state = MovementState.Bouncing;
+                sfxDrop.Play();
+            }
+        }
+
         override public void onUpdate()
         {
             base.onUpdate();

@@ -164,6 +164,17 @@ namespace AXE.Game.Screens
                             i.onCollision("player", p);
                         }
                 }
+
+                foreach (bEntity w in entities["axe"])
+                {
+                    foreach (bEntity e in entities["enemy"])
+                        if (w.collides(e))
+                        {
+                            e.onCollision("axe", w);
+                            w.onCollision("enemy", e);
+                        }
+                }
+                    
             }
             
             // Update camera

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
 using bEngine;
@@ -32,6 +33,8 @@ namespace AXE.Game.Entities.Enemies
         int turnBaseTime, turnOptionalTime;
 
         Dir showWrapEffect;
+
+        List<SoundEffect> sfxSteps;
 
         public Imp(int x, int y)
             : base(x, y)
@@ -67,6 +70,11 @@ namespace AXE.Game.Entities.Enemies
                 facing = Dir.Right;
             else
                 facing = Dir.Left;
+
+            sfxSteps = new List<SoundEffect>();
+            sfxSteps.Add(game.Content.Load<SoundEffect>("Assets/Sfx/sfx-dirtstep.1"));
+            sfxSteps.Add(game.Content.Load<SoundEffect>("Assets/Sfx/sfx-dirtstep.2"));
+            sfxSteps.Add(game.Content.Load<SoundEffect>("Assets/Sfx/sfx-dirtstep.3"));
 
             state = State.None;
             changeState(State.Idle);
@@ -229,6 +237,8 @@ namespace AXE.Game.Entities.Enemies
             }
 
             graphic.flipped = (facing == Dir.Left);
+
+            handleSoundEffects();
         }
 
         public override void render(GameTime dt, SpriteBatch sb)
@@ -257,6 +267,28 @@ namespace AXE.Game.Entities.Enemies
         public override int graphicHeight()
         {
             return graphic.height;
+        }
+
+        bool playedStepEffect = false;
+        public void handleSoundEffects()
+        {
+            float relativeX = pos.X / (world as LevelScreen).width - 0.5f;
+            switch (state)
+            {
+                case State.Walk:
+                    int currentFrame = graphic.currentAnim.frame;
+                    if (currentFrame == 2 && !playedStepEffect)
+                    {
+                        playedStepEffect = true;
+                        sfxSteps[Utils.Tools.random.Next(sfxSteps.Count)].Play(0.5f, 0.0f, relativeX);
+                    }
+                    else if (currentFrame != 2)
+                        playedStepEffect = false;
+
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }
