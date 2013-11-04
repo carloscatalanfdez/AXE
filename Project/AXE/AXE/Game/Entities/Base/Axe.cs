@@ -201,6 +201,7 @@ namespace AXE.Game.Entities
                         if (stuckToSide == stuckTo.facing)
                         {
                             pos = stuckTo.pos + stuckOffset;
+                            facing = stuckFacing;
                         }
                         else
                         {
