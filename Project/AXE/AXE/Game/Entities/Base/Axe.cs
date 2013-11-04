@@ -41,6 +41,7 @@ namespace AXE.Game.Entities
         public SoundEffect sfxHit;
         public SoundEffect sfxDrop;
         public SoundEffect sfxGrab;
+        public SoundEffect sfxHurt;
 
         public Axe(int x, int y, IWeaponHolder holder) : base(x, y)
         {
@@ -114,6 +115,7 @@ namespace AXE.Game.Entities
             sfxHit = game.Content.Load<SoundEffect>("Assets/Sfx/axe-hit");
             sfxDrop = game.Content.Load<SoundEffect>("Assets/Sfx/axe-drop");
             sfxGrab = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-grab");
+            sfxHurt = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-hurt");
         }
 
         public override int graphicWidth()
@@ -194,15 +196,18 @@ namespace AXE.Game.Entities
 
                     break;
                 case MovementState.Stuck:
-                    if (stuckToSide == stuckTo.facing)
+                    if (stuckTo != null)
                     {
-                        pos = stuckTo.pos + stuckOffset;
-                    }
-                    else
-                    {
-                        pos.X = stuckTo.pos.X + stuckTo.graphicWidth() - graphicWidth() - stuckOffset.X;
-                        pos.Y = stuckTo.pos.Y + stuckOffset.Y;
-                        facing = stuckFacing == Dir.Left ? Dir.Right : Dir.Left;
+                        if (stuckToSide == stuckTo.facing)
+                        {
+                            pos = stuckTo.pos + stuckOffset;
+                        }
+                        else
+                        {
+                            pos.X = stuckTo.pos.X + stuckTo.graphicWidth() - graphicWidth() - stuckOffset.X;
+                            pos.Y = stuckTo.pos.Y + stuckOffset.Y;
+                            facing = stuckFacing == Dir.Left ? Dir.Right : Dir.Left;
+                        }
                     }
 
                     break;
@@ -224,6 +229,11 @@ namespace AXE.Game.Entities
         public override void onUpdateEnd()
         {
             base.onUpdateEnd();
+
+            if (state != MovementState.Stuck)
+            {
+                stuckTo = null;
+            }
 
             switch (state)
             {
@@ -320,8 +330,14 @@ namespace AXE.Game.Entities
                 stuckOffset = pos - entity.pos;
                 stuckToSide = stuckTo.facing;
                 stuckFacing = facing;
+
+                sfxHurt.Play();
             }
-            // otherwise it's a solid and the axe can remain there
+            else
+            {
+                // otherwise it's a solid and the axe can remain there
+                sfxHit.Play();
+            }
         }
     }
 }
