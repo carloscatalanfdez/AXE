@@ -70,12 +70,10 @@ namespace AXE.Game.Screens
             entities.Add("enemy", new List<bEntity>());
             entities.Add("stairs", new List<bEntity>());
 
-            id = 0;
-
             // Load level
             if (id < Controller.getInstance().data.maxLevels)
             {
-                String fname = "test";// id.ToString();
+                String fname = id.ToString();
                 levelMap = new LevelMap(fname);
                 _add(levelMap, "solid"); // Adding to world performs init & loading
                 name = levelMap.name;
@@ -227,10 +225,13 @@ namespace AXE.Game.Screens
             foreach (bEntity entity in renderQueue)
                 entity.render(dt, sb);
 
+            sb.DrawString(game.gameFont, "STAGE " + (id+1), new Vector2(8, 8), Color.White);
+
             // Pause!
             if (paused)
             {
                 // Pause render
+                sb.DrawString(game.gameFont, "PAUSE", new Vector2(game.getWidth() / 2 - "PAUSE".Length * 8 / 2), Color.White);
             }
         }
 

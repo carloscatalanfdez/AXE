@@ -29,10 +29,10 @@ namespace AXE.Game.Control
 
         public void init()
         {
-            maxLevels = int.MaxValue;
+            maxLevels = 1;
 
             // DEBUG
-            level = maxLevels;
+            level = 0;
         }
     }
 }

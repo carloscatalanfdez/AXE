@@ -181,6 +181,9 @@
     <None Include="Assets\Maps\axe.oep">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Assets\Maps\0.oel">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Assets\Maps\test.oel">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

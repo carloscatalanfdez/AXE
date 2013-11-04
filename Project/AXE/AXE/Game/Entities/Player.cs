@@ -30,7 +30,10 @@ namespace AXE.Game.Entities
         // Some declarations
         public enum MovementState { Idle, Walk, Jump, Fall, Ladder, Death, Attacking, Attacked, Exit };
         public enum ActionState { None, Squid }
-
+        public const int EXIT_ANIM_TIMER = 1;
+        public const int EXIT_TRANSITION_TIMER = 2;
+        public int exitTransitionWaitTime;
+        public int exitAnimationWaitTime;
         // Data
         public PlayerData data;
 
@@ -133,6 +136,9 @@ namespace AXE.Game.Entities
 
             debugText = "";
             floater = false;
+
+            exitTransitionWaitTime = 15;
+            exitAnimationWaitTime = 15;
 
             loadSoundEffects();
         }
@@ -261,7 +267,7 @@ namespace AXE.Game.Entities
                                     if (exitDoor.type == Door.Type.Exit)
                                     {
                                         state = MovementState.Exit;
-                                        timer[1] = 15;
+                                        timer[EXIT_ANIM_TIMER] = exitAnimationWaitTime;
                                     }
                                 }
                             }
@@ -619,7 +625,7 @@ namespace AXE.Game.Entities
                     collidable = false;
                     vspeed = -jumpPower;
                     break;
-                case 1:
+                case EXIT_ANIM_TIMER:
                     Door door = (instancePlace(x, y, "items") as Door);
                     if (door != null)
                     {
@@ -627,7 +633,11 @@ namespace AXE.Game.Entities
                         if (weapon != null)
                             world.remove((weapon as bEntity));
                         visible = false;
+                        timer[EXIT_TRANSITION_TIMER] = exitTransitionWaitTime;
                     }
+                    break;
+                case EXIT_TRANSITION_TIMER:
+                    Controller.getInstance().goToNextLevel();
                     break;
             }
         }

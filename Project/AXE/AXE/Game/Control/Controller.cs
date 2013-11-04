@@ -73,13 +73,14 @@ namespace AXE.Game.Control
 
         public void onGameWin()
         {
+            onGameStart();
         }
 
         public int goToNextLevel()
         {
             // Handle level progression
             data.level += 1;
-            if (data.level > data.maxLevels)
+            if (data.level >= data.maxLevels)
                 onGameWin();
             else
                 game.changeWorld(new LevelScreen(data.level), new FadeToColor(game, Colors.clear, 10));
