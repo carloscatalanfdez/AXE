@@ -20,12 +20,11 @@ namespace AXE.Game.Entities.Axes
 
         protected override void initParams()
         {
-            mask = new bMask(0, 0, 16, 16);
+            mask = new bMask(0, 0, 15, 15, 3, 3);
             mask.game = game;
             attributes.Add("axe");
             current_hspeed = current_vspeed = 0;
             gravity = 0.8f;
-            graphic.color = Color.Yellow;
 
             layer = 10;
         }
@@ -34,6 +33,17 @@ namespace AXE.Game.Entities.Axes
         {
             graphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/axe-sheet"), 20, 20);
             loadAnims();
+        }
+
+        public override int graphicWidth()
+        {
+            return 20;
+        }
+
+        /* IWeapon implementation */
+        public override Vector2 getGrabPosition()
+        {
+            return new Vector2(8, 10);
         }
     }
 }
