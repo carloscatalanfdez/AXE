@@ -23,7 +23,6 @@ namespace AXE.Game.Entities.Enemies
         public State state;
 
         bSpritemap graphic;
-        Dir facing;
 
         Vector2 moveTo;
 

@@ -18,14 +18,20 @@ namespace AXE.Game.Entities
 {
     class Axe : Entity, IWeapon
     {
-        public enum MovementState { Idle, Grabbed, Flying, Bouncing };
+        public enum MovementState { Idle, Grabbed, Flying, Stuck, Bouncing };
 
         public MovementState state;
-        public Player.Dir dir;
 
         public bSpritemap graphic;
 
+        // When grabbed
         public IWeaponHolder holder;
+
+        // When stuck
+        public Entity stuckTo;  // Entity the axe is stuck to
+        public Vector2 stuckOffset;  // Offset at (in stuckTo's coordinates) which the axe is stuck
+        public Dir stuckToSide;  // StuckTo's facing direction when we got stuck
+        public Dir stuckFacing;  // Axe's facing direction when we got stuck
 
         public float current_hspeed;
         public float current_vspeed;
@@ -91,13 +97,13 @@ namespace AXE.Game.Entities
             if (holder == null)
             {
                 graphic.play("idle");
-                dir = Player.Dir.None;
+                facing = Player.Dir.None;
                 state = MovementState.Idle;
             }
             else
             {
                 graphic.play("grabbed");
-                dir = holder.getFacing();
+                facing = holder.getFacing();
                 state = MovementState.Grabbed;
             }
         }
@@ -119,10 +125,8 @@ namespace AXE.Game.Entities
         {
             if (type == "enemy" && state == MovementState.Flying)
             {
-                current_hspeed = -current_hspeed / 10;
-                current_vspeed = -2;
-                state = MovementState.Bouncing;
-                sfxDrop.Play();
+                Entity entity = other as Entity;
+                onHitSolid(entity);
             }
         }
 
@@ -134,7 +138,7 @@ namespace AXE.Game.Entities
             Vector2 moveTo = pos;
 
             if (holder != null)
-                dir = holder.getFacing();
+                facing = holder.getFacing();
 
             switch (state)
             {
@@ -150,7 +154,8 @@ namespace AXE.Game.Entities
                     if (remnant.X != 0 || remnant.Y != 0)
                     {
                         // Stop accelerating if we have stopped
-                        onBounce();
+                        bEntity entity = instancePlace(moveTo, "solid");
+                        onHitSolid(entity);
                     }
                     break;
                 case MovementState.Bouncing:
@@ -188,6 +193,19 @@ namespace AXE.Game.Entities
                     }
 
                     break;
+                case MovementState.Stuck:
+                    if (stuckToSide == stuckTo.facing)
+                    {
+                        pos = stuckTo.pos + stuckOffset;
+                    }
+                    else
+                    {
+                        pos.X = stuckTo.pos.X + stuckTo.graphicWidth() - graphicWidth() - stuckOffset.X;
+                        pos.Y = stuckTo.pos.Y + stuckOffset.Y;
+                        facing = stuckFacing == Dir.Left ? Dir.Right : Dir.Left;
+                    }
+
+                    break;
                 case MovementState.Idle:
                     bool onair = !placeMeeting(x, y + 1, "solid");
                     if (onair)
@@ -195,7 +213,7 @@ namespace AXE.Game.Entities
                     if (onair)
                     {
                         state = MovementState.Bouncing;
-                        dir = Dir.None;
+                        facing = Dir.None;
                     }
                     break;
                 default:
@@ -209,29 +227,30 @@ namespace AXE.Game.Entities
 
             switch (state)
             {
+                case MovementState.Stuck:
                 case MovementState.Idle:
                     graphic.play("idle");
-                    if (dir == Player.Dir.Left)
+                    if (facing == Player.Dir.Left)
                         graphic.flipped = true;
-                    else if (dir == Player.Dir.Right)
+                    else if (facing == Player.Dir.Right)
                         graphic.flipped = false;
 
                     break;
                 case MovementState.Grabbed:
                     graphic.play("grabbed");
-                    if (dir == Player.Dir.Left)
+                    if (facing == Player.Dir.Left)
                         graphic.flipped = true;
-                    else if (dir == Player.Dir.Right)
+                    else if (facing == Player.Dir.Right)
                         graphic.flipped = false;
 
                     break;
                 case MovementState.Flying:
                 case MovementState.Bouncing:
-                    if (dir == Player.Dir.Left)
+                    if (facing == Player.Dir.Left)
                     {
                         graphic.play("ccw-rotation");
                     }
-                    else if (dir == Player.Dir.Right)
+                    else if (facing == Player.Dir.Right)
                     {
                         graphic.play("cw-rotation");
                     }
@@ -263,7 +282,7 @@ namespace AXE.Game.Entities
             sfxGrab.Play();
             holder.setWeapon(this);
             graphic.play("grabbed");
-            dir = holder.getFacing();
+            facing = holder.getFacing();
             state = MovementState.Grabbed;
             this.holder = holder;
         }
@@ -285,9 +304,24 @@ namespace AXE.Game.Entities
             sfxHit.Play();
         }
 
-        public virtual void onStuck()
+        public virtual void onHitSolid(bEntity entity)
         {
+            // ignore entity by default
+            onBounce();
+        }
 
+        public virtual void onStuck(bEntity entity)
+        {
+            current_hspeed = current_vspeed = 0;
+            state = MovementState.Stuck;
+            if (entity is Entity)
+            {
+                stuckTo = entity as Entity;
+                stuckOffset = pos - entity.pos;
+                stuckToSide = stuckTo.facing;
+                stuckFacing = facing;
+            }
+            // otherwise it's a solid and the axe can remain there
         }
     }
 }

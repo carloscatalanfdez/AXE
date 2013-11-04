@@ -20,7 +20,7 @@ namespace AXE.Game.Entities.Axes
 
         protected override void initParams()
         {
-            mask = new bMask(0, 0, 15, 15, 3, 3);
+            mask = new bMask(0, 0, 14, 15, 3, 3);
             mask.game = game;
             attributes.Add("axe");
             current_hspeed = current_vspeed = 0;
@@ -44,6 +44,11 @@ namespace AXE.Game.Entities.Axes
         public override Vector2 getGrabPosition()
         {
             return new Vector2(8, 10);
+        }
+
+        public override void onHitSolid(bEntity entity)
+        {
+            onStuck(entity);
         }
     }
 }

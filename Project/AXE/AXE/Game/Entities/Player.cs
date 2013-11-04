@@ -58,7 +58,6 @@ namespace AXE.Game.Entities
         public MovementState previousState;
         public MovementState state;
         public ActionState action;
-        public Dir facing;
 
         // Step variables
         public Vector2 stepInitialPosition;

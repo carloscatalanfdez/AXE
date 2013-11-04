@@ -17,6 +17,7 @@ namespace AXE.Game.Entities
 
         public bool visible = true;
         public Vector2 previousPosition;
+        public Dir facing;
 
         public virtual int graphicWidth()
         {
