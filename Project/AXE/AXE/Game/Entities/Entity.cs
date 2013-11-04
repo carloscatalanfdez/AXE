@@ -155,5 +155,8 @@ namespace AXE.Game.Entities
             }
         }
 
+        public virtual void onHit(Entity other)
+        {
+        }
     }
 }

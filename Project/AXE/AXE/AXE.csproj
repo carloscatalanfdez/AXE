@@ -114,6 +114,7 @@
     <Compile Include="Game\Entities\Base\Enemy.cs" />
     <Compile Include="Game\Entities\Base\IWeapon.cs" />
     <Compile Include="Game\Entities\Enemies\Imp.cs" />
+    <Compile Include="Game\Entities\Enemies\KillerRect.cs" />
     <Compile Include="Game\Entities\Entity.cs" />
     <Compile Include="Game\Entities\Base\IWeaponHolder.cs" />
     <Compile Include="Game\Entities\Door.cs" />

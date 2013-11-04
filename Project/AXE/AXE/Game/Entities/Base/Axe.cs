@@ -316,7 +316,8 @@ namespace AXE.Game.Entities
 
         public virtual void onHitSolid(bEntity entity)
         {
-            // ignore entity by default
+            // notify other entity
+            (entity as Entity).onHit(this);
             onBounce();
         }
 

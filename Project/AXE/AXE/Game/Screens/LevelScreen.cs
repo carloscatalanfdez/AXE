@@ -67,6 +67,7 @@ namespace AXE.Game.Screens
             entities.Add("items", new List<bEntity>());
             entities.Add("player", new List<bEntity>());
             entities.Add("axe", new List<bEntity>());
+            entities.Add("hazard", new List<bEntity>());
             entities.Add("enemy", new List<bEntity>());
             entities.Add("stairs", new List<bEntity>());
 
@@ -163,6 +164,12 @@ namespace AXE.Game.Screens
                         {
                             p.onCollision("items", i);
                             i.onCollision("player", p);
+                        }
+                    foreach (bEntity h in entities["hazard"])
+                        if (p != h && p.collides(h))
+                        {
+                            h.onCollision("player", p);
+                            p.onCollision("hazard", h);
                         }
                 }
 

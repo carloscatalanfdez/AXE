@@ -14,17 +14,28 @@ using AXE.Game;
 using AXE.Game.Screens;
 using AXE.Game.Entities.Base;
 using AXE.Game.Utils;
+using AXE.Game.Entities.Axes;
 
 namespace AXE.Game.Entities.Enemies
 {
     class Imp : Enemy
     {
-        public enum State { None, Idle, Turn, Walk, Chase }
+        public enum State { None, Idle, Turn, Walk, Chase, ChaseRunning, Attacking, Attacked }
         public State state;
 
         bSpritemap graphic;
 
         Vector2 moveTo;
+        bMask watchMask;
+
+        bool beginChase;
+        int chaseReactionTime;
+
+        int attackThreshold;
+        int attackChargeTime;
+        int attackTime;
+        KillerRect weaponHitZone;
+        bStamp weaponHitImage;
 
         int hspeed;
         int idleBaseTime, idleOptionalTime;
@@ -48,6 +59,12 @@ namespace AXE.Game.Entities.Enemies
             graphic.add(new bAnim("idle", new int[] { 0 }));
             graphic.add(new bAnim("turn", new int[] { 9 }));
             graphic.add(new bAnim("walk", new int[] { 1, 2, 3, 2 }, 0.3f));
+            graphic.add(new bAnim("chase-reacting", new int[] { 4 }));
+            graphic.add(new bAnim("chase", new int[] { 1, 2, 3, 2 }, 0.5f));
+            graphic.add(new bAnim("chase-running-reacting", new int[] { 10 }));
+            graphic.add(new bAnim("chase-running", new int[] { 11, 12 }, 0.5f));
+            graphic.add(new bAnim("attack-charge", new int[] { 16, 17, 17, 17 }, 0.4f, false));
+            graphic.add(new bAnim("attacked", new int[] { 18 }));
             graphic.add(new bAnim("jump", new int[] { 8 }));
             graphic.play("idle");
 
@@ -55,6 +72,8 @@ namespace AXE.Game.Entities.Enemies
             mask.h = 21;
             mask.offsetx = 7;
             mask.offsety = 11;
+
+            watchMask = new bMask(x, y, 90, 24);
 
             hspeed = 1;
 
@@ -69,6 +88,14 @@ namespace AXE.Game.Entities.Enemies
                 facing = Dir.Right;
             else
                 facing = Dir.Left;
+
+            beginChase = false;
+            chaseReactionTime = 15;
+
+            attackThreshold = 30;
+            attackChargeTime = 10;
+            attackTime = 8;
+            weaponHitImage = new bStamp(graphic.image, new Rectangle(90, 64, 30, 32));
 
             sfxSteps = new List<SoundEffect>();
             sfxSteps.Add(game.Content.Load<SoundEffect>("Assets/Sfx/sfx-dirtstep.1"));
@@ -92,6 +119,7 @@ namespace AXE.Game.Entities.Enemies
         {
             if (newState != state)
             {
+                bool performChange = true;
                 switch (newState)
                 {
                     case State.Idle:
@@ -104,10 +132,30 @@ namespace AXE.Game.Entities.Enemies
                         timer[0] = turnBaseTime + Tools.random.Next(turnOptionalTime) - turnOptionalTime;
                         break;
                     case State.Chase:
+                        beginChase = false;
+                        timer[1] = chaseReactionTime;
+                        break;
+                    case State.ChaseRunning:
+                        beginChase = false;
+                        timer[1] = (int) (chaseReactionTime * 1.5f);
+                        break;
+                    case State.Attacking:
+                        timer[0] = attackChargeTime;
+                        break;
+                    case State.Attacked:
+                        int xx, yy = 4;
+                        if (facing == Dir.Right)
+                            xx = 20;
+                        else
+                            xx = -10;
+                        weaponHitZone = new KillerRect(x+xx, y+yy, 20, 27);
+                        world.add(weaponHitZone, "enemy");
+                        timer[0] = attackTime;
                         break;
                 }
 
-                state = newState;
+                if (performChange)
+                    state = newState;
             }
         }
 
@@ -139,8 +187,26 @@ namespace AXE.Game.Entities.Enemies
                             changeState(State.Walk);
                             break;
                         case State.Chase:
+                        case State.ChaseRunning:
+                            break;
+                        case State.Attacking:
+                            changeState(State.Attacked);
+                            // Sound!
+                            break;
+                        case State.Attacked:
+                            changeState(State.Idle);
+                            if (weaponHitZone != null)
+                            {
+                                world.remove(weaponHitZone);
+                                weaponHitZone = null;
+                            }
+
                             break;
                     }
+                break;
+                case 1:
+                    if (state == State.Chase || state == State.ChaseRunning)
+                        beginChase = true;
                 break;
             }
         }
@@ -181,10 +247,81 @@ namespace AXE.Game.Entities.Enemies
                     graphic.play("turn");
                     break;
                 case State.Chase:
+                case State.ChaseRunning:
+                    if (beginChase)
+                    {
+                        if (state == State.Chase)
+                            graphic.play("chase");
+                        else
+                            graphic.play("chase-running");
+
+                        int hsp = (int)(hspeed * 2 * (state == State.ChaseRunning ? 1.5 : 1));
+                        nextPosition = new Vector2(x + directionToSign(facing) * hsp, y);
+                        wontFall = checkForGround(
+                                (int)(nextPosition.X + directionToSign(facing) * graphicWidth() / 2),
+                                (int)nextPosition.Y);
+                        wontCollide = !placeMeeting(
+                                (int)nextPosition.X,
+                                (int)nextPosition.Y, new String[] { "player", "solid" });
+                        if (wontFall && wontCollide)
+                            moveTo.X += directionToSign(facing) * hsp;
+                        else if (!wontFall || !wontCollide)
+                            changeState(State.Idle);
+                    }
+                    else
+                    {
+                        if (state == State.Chase)
+                            graphic.play("chase-reacting");
+                        else
+                            graphic.play("chase-running-reacting");
+                    }
+                    break;
+                case State.Attacking:
+                    graphic.play("attack-charge");
+                    break;
+                case State.Attacked:
+                    graphic.play("attacked");
                     break;
             }
 
-            if (state == State.Walk)
+            if (state == State.Idle || state == State.Walk || state == State.Turn)
+            {
+                Dir facingDir = facing;
+                if (state == State.Turn)
+                    if (facingDir == Dir.Left) facingDir = Dir.Right;
+                    else facingDir = Dir.Left;
+                if (facingDir == Dir.Left)
+                    watchMask.offsetx = -watchMask.w;
+                else
+                    watchMask.offsetx = graphicWidth();
+                watchMask.offsety = (graphicHeight() - watchMask.h);
+
+                bMask holdMyMaskPlease = mask;
+                mask = watchMask;
+
+                bool sawYou = placeMeeting(x, y, "player");
+                mask = holdMyMaskPlease; // thank you!
+
+                if (sawYou)
+                {
+                    facing = facingDir;
+                    changeState(State.Chase);
+                }
+            }
+            else if (state == State.Chase)
+            {
+                Player[] players = (world as LevelScreen).players;
+                foreach (Player player in players)
+                {
+                    if (player != null && (player.pos - pos).Length() < attackThreshold)
+                    {
+                        changeState(State.Attacking);
+                    }
+                }
+
+            }
+
+            if (state == State.Walk || state == State.Chase || state == State.ChaseRunning)
             {
                 Vector2 remnant;
                 // Check wether we collide first with a solid or a onewaysolid,
@@ -245,6 +382,18 @@ namespace AXE.Game.Entities.Enemies
             base.render(dt, sb);
 
             graphic.render(sb, pos);
+            if (state == State.Attacked)
+                if (facing == Dir.Left)
+                {
+                    weaponHitImage.flipped = true;
+                    weaponHitImage.render(sb, new Vector2(x - weaponHitImage.width, y));
+                }
+                else
+                {
+                    weaponHitImage.flipped = false;
+                    weaponHitImage.render(sb, new Vector2(x + graphicWidth(), y));
+                }
+
             if (showWrapEffect == Dir.Left)
             {
                 graphic.render(sb, new Vector2(0 + (pos.X - (world as LevelScreen).width), pos.Y));
@@ -275,6 +424,8 @@ namespace AXE.Game.Entities.Enemies
             switch (state)
             {
                 case State.Walk:
+                case State.Chase:
+                case State.ChaseRunning:
                     int currentFrame = graphic.currentAnim.frame;
                     if (currentFrame == 2 && !playedStepEffect)
                     {
@@ -287,6 +438,21 @@ namespace AXE.Game.Entities.Enemies
                     break;
                 default:
                     break;
+            }
+        }
+
+        public override void onHit(Entity other)
+        {
+            base.onHit(other);
+
+            if (other is NormalAxe); // Kill me here or whatuverr
+            else if (other is Axe)
+            {
+                // Get MaD!
+                if (other.x + other.graphicWidth() / 2 < x + graphicWidth()/2)
+                    facing = Dir.Left;
+                else facing = Dir.Right;
+                changeState(State.ChaseRunning);
             }
         }
     }
