@@ -45,6 +45,18 @@ namespace AXE
             Common.GameInput.getInstance(PlayerIndex.One).update();
             Common.GameInput.getInstance(PlayerIndex.Two).update();
 
+            if (Common.GameInput.getInstance(PlayerIndex.One).pressed(Common.PadButton.coin))
+            {
+                if (GameData.get().actualCoins > 0)
+                {
+                    GameData.get().insertedCoins++;
+                    GameData.get().actualCoins--;
+                }
+            }
+
+            if (Common.GameInput.getInstance(PlayerIndex.One).pressed(Common.PadButton.debug))
+                bConfig.DEBUG = !bConfig.DEBUG;
+
             base.update(gameTime);
         }
 

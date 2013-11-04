@@ -11,7 +11,7 @@ using AXE.Game.Control;
 
 namespace AXE.Common
 {
-    enum PadButton { left, right, up, down, a, b, c, start, coin };
+    enum PadButton { left, right, up, down, a, b, c, start, coin, debug };
 
     class GameInput
     {
@@ -166,9 +166,10 @@ namespace AXE.Common
                 { PadButton.down, new List<Object> { Keys.Down } },
                 { PadButton.a, new List<Object> { Buttons.A, Keys.A, Keys.Z } },
                 { PadButton.b, new List<Object> { Buttons.X, Keys.S, Keys.X } },
-                { PadButton.start, new List<Object> { Buttons.Start, Keys.Enter } },
-                { PadButton.coin, new List<Object> { Buttons.B, Keys.Q } },
-                { PadButton.c, new List<Object> { Buttons.Y, Keys.W } }
+                { PadButton.start, new List<Object> { Buttons.Start, Keys.D1, Keys.D2 } },
+                { PadButton.coin, new List<Object> { Buttons.B, Keys.Q, Keys.D5, Keys.D6 } },
+                { PadButton.c, new List<Object> { Buttons.Y, Keys.W } },
+                { PadButton.debug, new List<Object> { Buttons.Back, Keys.Tab } }
             };
         }
 

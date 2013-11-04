@@ -73,7 +73,7 @@ namespace AXE.Game.Control
 
         public void onGameWin()
         {
-            onGameStart();
+            game.changeWorld(new WinScreen(), new FadeToColor(game, Color.Gray, 15));
         }
 
         public int goToNextLevel()

@@ -17,6 +17,9 @@ namespace AXE.Game.Control
         // Declare here game data
         public int level;
         public int maxLevels;
+        public int insertedCoins;
+        // Meta
+        public int actualCoins;
 
         public PlayerData playerAData;
         public PlayerData playerBData;
@@ -30,6 +33,8 @@ namespace AXE.Game.Control
         public void init()
         {
             maxLevels = 1;
+            insertedCoins = 0;
+            actualCoins = 10;
 
             // DEBUG
             level = 0;

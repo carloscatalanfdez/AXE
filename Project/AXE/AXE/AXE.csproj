@@ -119,6 +119,7 @@
     <Compile Include="Game\Entities\Door.cs" />
     <Compile Include="Game\Entities\OneWayPlatform.cs" />
     <Compile Include="Game\Entities\Stairs.cs" />
+    <Compile Include="Game\Screens\WinScreen.cs" />
     <Compile Include="Game\Utils\Colors.cs" />
     <Compile Include="Game\Control\Controller.cs" />
     <Compile Include="Game\Entities\LevelMap.cs" />
