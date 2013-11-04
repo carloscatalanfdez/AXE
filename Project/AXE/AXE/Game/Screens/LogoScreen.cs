@@ -9,6 +9,7 @@ using bEngine;
 using bEngine.Graphics;
 
 using AXE.Common;
+using AXE.Game.Control;
 
 namespace AXE.Game.Screens
 {
@@ -31,7 +32,8 @@ namespace AXE.Game.Screens
             base.update(dt);
 
             if (GameInput.getInstance(PlayerIndex.One).pressed(PadButton.start) || GameInput.getInstance(PlayerIndex.Two).pressed(PadButton.start))
-                game.changeWorld(new TitleScreen());
+                // game.changeWorld(new TitleScreen());
+                Controller.getInstance().onMenuStart();
         }
 
         public override void render(GameTime dt, SpriteBatch sb, Matrix matrix)

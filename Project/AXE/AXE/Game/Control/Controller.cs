@@ -44,21 +44,21 @@ namespace AXE.Game.Control
 
         public void onMenuStart()
         {
-            game.changeWorld(new TitleScreen());
+            // init game data here
+            if (!GameData.loadGame())
+                GameData.get().startNewGame();
+            game.changeWorld(new TitleScreen(), new FadeToColor(game, Color.Black));
         }
 
         public void changePlayerButtonConf(PlayerIndex index, Dictionary<PadButton, List<Object>> mappingConf)
         {
             GameInput.getInstance(index).setMapping(mappingConf);
-
             // store to disk maybe?
         }
 
         public void onGameStart()
         {
-            // init game data here
-            GameData.get().init();
-
+            GameData.get().initPlayData();
             // Go to first screen
             game.changeWorld(new LevelScreen(data.level), new FadeToColor(game, Colors.clear, 10));
         }
@@ -78,6 +78,8 @@ namespace AXE.Game.Control
 
         public int goToNextLevel()
         {
+            GameData.saveGame();
+
             // Handle level progression
             data.level += 1;
             if (data.level >= data.maxLevels)

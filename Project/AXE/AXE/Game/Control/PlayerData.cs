@@ -9,7 +9,7 @@ namespace AXE.Game.Control
     /**
      * Stores persistent info of the player (powerups, health)
      */
-    class PlayerData
+    public class PlayerData
     {
         public PlayerIndex id;
 

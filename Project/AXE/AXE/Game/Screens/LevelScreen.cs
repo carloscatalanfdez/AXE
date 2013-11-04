@@ -226,7 +226,7 @@ namespace AXE.Game.Screens
                 entity.render(dt, sb);
 
             sb.DrawString(game.gameFont, "STAGE " + (id+1), new Vector2(8, 8), Color.White);
-            String coinsStr = "COINS: " + (GameData.get().insertedCoins);
+            String coinsStr = "CREDITS: " + (GameData.get().credits) + " - COINS: " + (GameData.get().coins);
             sb.DrawString(game.gameFont, coinsStr, new Vector2(game.getWidth()/2-coinsStr.Length*8/2, game.getHeight()-8), Color.White);
 
             // Pause!
