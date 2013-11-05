@@ -33,27 +33,47 @@ namespace AXE.Game.Entities
             {
                 if (showWrapEffect == Dir.Left)
                 {
-                    bMask oppositeMask = new bMask(x, y, _mask.w, _mask.h, _mask.offsetx - (world as LevelScreen).width, _mask.offsety);
-                    oppositeMask.game = game;
                     _mask.update(x, y);
-                    bMask wrappedMask = new bMaskList(new bMask[] { _mask, oppositeMask }, x, y, false /* not connected */);
-                    wrappedMask.game = game;
-                    return wrappedMask;
+                    int clippedSize =_mask.x + _mask.w - (world as LevelScreen).width;
+
+                    if (clippedSize > 0)
+                    {
+                        int oppositeMaskSize = Math.Min(clippedSize, _mask.h);
+                        // Mask on the other side will have increasing width as we wrap
+                        // Starts at the beginning of the screen (taking into account mask offset)
+                        bMask oppositeMask = new bMask(x, y, oppositeMaskSize, _mask.h, -Math.Min(_mask.x, (world as LevelScreen).width) + _mask.offsetx, _mask.offsety);
+                        oppositeMask.game = game;
+                        // Mask on current side will have decreasing width as we wrap
+                        bMask currentClippedMask = new bMask(x, y, _mask.w - clippedSize, _mask.h, _mask.offsetx, _mask.offsety);
+                        currentClippedMask.game = game;
+                        bMask wrappedMask = new bMaskList(new bMask[] { currentClippedMask, oppositeMask }, x, y, false /* not connected */);
+                        wrappedMask.game = game;
+                        return wrappedMask;
+                    }
                 }
                 else if (showWrapEffect == Dir.Right)
                 {
-                    //graphic.color = Color.Aqua;
-                    bMask oppositeMask = new bMask(x, y, _mask.w, _mask.h, _mask.offsetx + (world as LevelScreen).width, _mask.offsety);
-                    oppositeMask.game = game;
                     _mask.update(x, y);
-                    bMask wrappedMask = new bMaskList(new bMask[] { _mask, oppositeMask }, x, y, false /* not connected */);
-                    wrappedMask.game = game;
-                    return wrappedMask;
+                    int clippedOffset = -_mask.x;
+
+                    if (clippedOffset > 0)
+                    {
+                        // Mask on the other side will have increasing width as we wrap
+                        // Starts at the end of the screen (taking into account mask offset)
+                        int currentMaskOffset = _mask.x >= 0 ? 0 : _mask.offsetx;
+                        int oppositeMaskSize = Math.Min(clippedOffset, _mask.w);
+                        bMask oppositeMask = new bMask(x, y, oppositeMaskSize, _mask.h, _mask.offsetx + (world as LevelScreen).width, _mask.offsety);
+                        oppositeMask.game = game;
+                        // Mask on current side will have decreasing width as we wrap
+                        bMask currentClippedMask = new bMask(0, y, _mask.w - clippedOffset, _mask.h, currentMaskOffset + clippedOffset, _mask.offsety);
+                        currentClippedMask.game = game;
+                        bMask wrappedMask = new bMaskList(new bMask[] { currentClippedMask, oppositeMask }, x, y, false /* not connected */);
+                        wrappedMask.game = game;
+                        return wrappedMask;
+                    }
                 }
-                else
-                {
-                    return _mask;
-                }
+
+                return _mask;
             }
             set { base.mask = value; }
         }
@@ -193,15 +213,12 @@ namespace AXE.Game.Entities
                 if (me.mask is bMaskList)
                 {
                     // Get mask at previous position
-                    Vector2 oldPos = me.pos;
-                    me.pos = previousPosition;
                     bMaskList masks = me.mask as bMaskList;
-                    me.pos = oldPos;
                     // Check if any mask is above the solid
                     bool collides = false;
                     foreach (bMask m in masks.masks)
                     {
-                        collides = (m.y + m.h <= other.mask.y);
+                        collides = (p.previousPosition.Y + m.offsety + m.h <= other.mask.y);
                         if (collides)
                             break;
                     }
