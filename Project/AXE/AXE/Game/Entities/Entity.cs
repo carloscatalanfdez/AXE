@@ -193,11 +193,10 @@ namespace AXE.Game.Entities
                 if (me.mask is bMaskList)
                 {
                     // Get mask at previous position
-                    Vector2 oldPos = pos;
-                    pos = previousPosition;
+                    Vector2 oldPos = me.pos;
+                    me.pos = previousPosition;
                     bMaskList masks = me.mask as bMaskList;
-                    pos = oldPos;
-                    
+                    me.pos = oldPos;
                     // Check if any mask is above the solid
                     bool collides = false;
                     foreach (bMask m in masks.masks)
