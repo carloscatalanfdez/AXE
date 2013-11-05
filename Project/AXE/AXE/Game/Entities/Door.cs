@@ -13,7 +13,11 @@ namespace AXE.Game.Entities
 {
     class Door : Entity
     {
-        public bSpritemap graphic;
+        public bSpritemap spgraphic
+        {
+            get { return (_graphic as bSpritemap); }
+            set { _graphic = value; }
+        }
         public bSpritemap sign;
         public Vector2 signPosition;
         protected Random random;
@@ -31,13 +35,13 @@ namespace AXE.Game.Entities
         {
             base.init();
 
-            graphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/door-sheet"), 24, 32);
-            graphic.add(new bAnim("closed", new int[] { 0 }));
-            graphic.add(new bAnim("open", new int[] { 1 }));
+            spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/door-sheet"), 24, 32);
+            spgraphic.add(new bAnim("closed", new int[] { 0 }));
+            spgraphic.add(new bAnim("open", new int[] { 1 }));
             if (type == Type.Entry)
-                graphic.play("closed");
+                spgraphic.play("closed");
             else
-                graphic.play("open");
+                spgraphic.play("open");
 
             mask.w = 8;
             mask.h = 8;
@@ -54,7 +58,7 @@ namespace AXE.Game.Entities
                 random = new Random();
                 timer[0] = random.Next(60);
 
-                signPosition = new Vector2(x + graphic.width / 2 - sign.width / 2, y - 18);
+                signPosition = new Vector2(x + spgraphic.width / 2 - sign.width / 2, y - 18);
             }
 
             layer = 19;
@@ -72,7 +76,7 @@ namespace AXE.Game.Entities
         public override void onUpdate()
         {
             base.onUpdate();
-            graphic.update();
+            spgraphic.update();
 
             if (type == Type.Exit)
             {
@@ -87,7 +91,7 @@ namespace AXE.Game.Entities
         {
             base.render(dt, sb);
 
-            graphic.render(sb, pos);
+            spgraphic.render(sb, pos);
 
             if (type == Type.Exit)
                 sign.render(sb, signPosition);

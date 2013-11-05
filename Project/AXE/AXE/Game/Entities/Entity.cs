@@ -29,7 +29,32 @@ namespace AXE.Game.Entities
 
         public override bMask mask
         {
-            get { return base.mask; }
+            get 
+            {
+                if (showWrapEffect == Dir.Left)
+                {
+                    bMask oppositeMask = new bMask(x - (world as LevelScreen).width, y, _mask.w, _mask.h, _mask.offsetx, _mask.offsety);
+                    oppositeMask.game = game;
+                    _mask.update(x, y);
+                    bMask wrappedMask = new bMaskList(new bMask[] { _mask, oppositeMask }, x, y, false /* not connected */);
+                    wrappedMask.game = game;
+                    return wrappedMask;
+                }
+                else if (showWrapEffect == Dir.Right)
+                {
+                    //graphic.color = Color.Aqua;
+                    bMask oppositeMask = new bMask((world as LevelScreen).width + x, y, _mask.w, _mask.h, _mask.offsetx, _mask.offsety);
+                    oppositeMask.game = game;
+                    _mask.update(x, y);
+                    bMask wrappedMask = new bMaskList(new bMask[] { _mask, oppositeMask }, x, y, false /* not connected */);
+                    wrappedMask.game = game;
+                    return wrappedMask;
+                }
+                else
+                {
+                    return _mask;
+                }
+            }
             set { base.mask = value; }
         }
 

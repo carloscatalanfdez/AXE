@@ -622,7 +622,7 @@ namespace AXE.Game.Entities
                     Door door = (instancePlace(x, y, "items") as Door);
                     if (door != null)
                     {
-                        door.graphic.play("closed");
+                        door.spgraphic.play("closed");
                         if (weapon != null)
                             world.remove((weapon as bEntity));
                         visible = false;
