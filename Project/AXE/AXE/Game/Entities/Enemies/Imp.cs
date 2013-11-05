@@ -46,8 +46,6 @@ namespace AXE.Game.Entities.Enemies
         int walkBaseTime, walkOptionalTime;
         int turnBaseTime, turnOptionalTime;
 
-        Dir showWrapEffect;
-
         List<SoundEffect> sfxSteps;
 
         public Imp(int x, int y)

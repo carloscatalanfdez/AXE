@@ -279,7 +279,17 @@ namespace AXE.Game.Entities
                 case MovementState.Ladder:
                     if (onladder)
                     {
-                        moveTo.X = ladder.x - mask.offsetx;
+                        // Choose one offset (doesn't matter which one, really, both should be good)
+                        bMask currentMask = mask;
+                        if (currentMask is bMaskList)
+                        {
+                            int maskXOffset = Math.Max((currentMask as bMaskList).masks[0].offsetx, (currentMask as bMaskList).masks[1].offsetx);
+                            moveTo.X = ladder.x - maskXOffset;
+                        }
+                        else
+                        {
+                            moveTo.X = ladder.x - mask.offsetx;
+                        }
 
                         if (input.up())
                             moveTo.Y -= hspeed;
