@@ -33,7 +33,7 @@ namespace AXE.Game.Entities
             {
                 if (showWrapEffect == Dir.Left)
                 {
-                    bMask oppositeMask = new bMask(x - (world as LevelScreen).width, y, _mask.w, _mask.h, _mask.offsetx, _mask.offsety);
+                    bMask oppositeMask = new bMask(x, y, _mask.w, _mask.h, _mask.offsetx - (world as LevelScreen).width, _mask.offsety);
                     oppositeMask.game = game;
                     _mask.update(x, y);
                     bMask wrappedMask = new bMaskList(new bMask[] { _mask, oppositeMask }, x, y, false /* not connected */);
@@ -43,7 +43,7 @@ namespace AXE.Game.Entities
                 else if (showWrapEffect == Dir.Right)
                 {
                     //graphic.color = Color.Aqua;
-                    bMask oppositeMask = new bMask((world as LevelScreen).width + x, y, _mask.w, _mask.h, _mask.offsetx, _mask.offsety);
+                    bMask oppositeMask = new bMask(x, y, _mask.w, _mask.h, _mask.offsetx + (world as LevelScreen).width, _mask.offsety);
                     oppositeMask.game = game;
                     _mask.update(x, y);
                     bMask wrappedMask = new bMaskList(new bMask[] { _mask, oppositeMask }, x, y, false /* not connected */);
