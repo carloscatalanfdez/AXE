@@ -27,6 +27,8 @@ namespace AXE.Game.Entities
             set { _graphic = value; }
         }
 
+        public bool mouseHover;
+
         public override bMask mask
         {
             get 
@@ -78,6 +80,7 @@ namespace AXE.Game.Entities
             base.init();
 
             showWrapEffect = Dir.None;
+            mouseHover = false;
         }
 
         public virtual void onUpdateBegin()
@@ -108,6 +111,8 @@ namespace AXE.Game.Entities
             if (!isPaused())
             {
                 onUpdateBegin();
+
+                mouseHover = mask.rect.Contains(bGame.input.mouseX, bGame.input.mouseY);
 
                 onUpdate();
                 base.update();
@@ -253,6 +258,9 @@ namespace AXE.Game.Entities
                     graphic.render(sb, new Vector2((world as LevelScreen).width + pos.X, pos.Y));
                 }
             }
+
+            if (mouseHover)
+                sb.Draw(bDummyRect.sharedDummyRect(game), mask.rect, Color.Snow);
         }
     }
 }

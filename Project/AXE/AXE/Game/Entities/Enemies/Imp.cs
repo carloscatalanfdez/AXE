@@ -377,6 +377,10 @@ namespace AXE.Game.Entities.Enemies
             spgraphic.flipped = (facing == Dir.Left);
 
             handleSoundEffects();
+
+            // Uberdebuggo temporal thingie!
+            if (mouseHover && input.check(Microsoft.Xna.Framework.Input.Keys.D))
+                world.remove(this);
         }
 
         public override void render(GameTime dt, SpriteBatch sb)

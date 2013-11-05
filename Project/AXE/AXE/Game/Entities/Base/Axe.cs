@@ -28,6 +28,10 @@ namespace AXE.Game.Entities
             set { _graphic = value; }
         }
 
+        // Misc
+        public int wrapCount;
+        public int wrapLimit;
+
         // When grabbed
         public IWeaponHolder holder;
 
@@ -75,6 +79,9 @@ namespace AXE.Game.Entities
             attributes.Add("axe");
             current_hspeed = current_vspeed = 0;
             gravity = 0.5f;
+
+            wrapCount = 0;
+            wrapLimit = 1;
 
             layer = 10;
         }
@@ -141,6 +148,7 @@ namespace AXE.Game.Entities
             base.onUpdate();
 
             // Prepare step
+            Vector2 initialPos = pos;
             Vector2 moveTo = pos;
 
             if (holder != null)
@@ -149,6 +157,8 @@ namespace AXE.Game.Entities
             switch (state)
             {
                 case MovementState.Grabbed:
+                    wrapCount = 0;
+
                     pos = holder.getHandPosition() - getGrabPosition();
                     break;
                 case MovementState.Flying:
@@ -165,6 +175,8 @@ namespace AXE.Game.Entities
                     }
                     break;
                 case MovementState.Bouncing:
+                    wrapCount = 0;
+
                     current_vspeed += gravity;
 
                     moveTo.Y += current_vspeed;
@@ -200,6 +212,7 @@ namespace AXE.Game.Entities
 
                     break;
                 case MovementState.Stuck:
+                    wrapCount = 0;
                     if (stuckTo != null)
                     {
                         if (stuckToSide == stuckTo.facing)
@@ -228,6 +241,20 @@ namespace AXE.Game.Entities
                     break;
                 default:
                     break;
+            }
+
+            int w = (world as LevelScreen).width;
+            bool justWrapped =
+                (initialPos.X > w / 2 && (pos.X < w / 2/* || pos.X > w*/)
+                    && facing == Dir.Right) ||
+                (initialPos.X < w / 2 && (pos.X > w / 2/* || pos.X < 0*/)
+                    && facing == Dir.Left);
+
+            if (justWrapped)
+            {
+                wrapCount++;
+                if (wrapCount > wrapLimit)
+                    world.remove(this);
             }
         }
 
@@ -294,6 +321,7 @@ namespace AXE.Game.Entities
 
         public void onGrab(IWeaponHolder holder)
         {
+            wrapCount = 0;
             sfxGrab.Play();
             holder.setWeapon(this);
             spgraphic.play("grabbed");
@@ -304,6 +332,7 @@ namespace AXE.Game.Entities
 
         public virtual void onThrow(int force, Player.Dir dir)
         {
+            wrapCount = 0;
             sfxThrow.Play();
             state = MovementState.Flying;
             current_hspeed = force * holder.getDirectionAsSign(dir);

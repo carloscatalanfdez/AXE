@@ -28,8 +28,8 @@ namespace AXE.Game.Entities
         Random random;
 
         // Some declarations
-        public enum MovementState { Idle, Walk, Jump, Fall, Ladder, Death, Attacking, Attacked, Exit };
-        public enum ActionState { None, Squid }
+        public enum MovementState { Idle, Walk, Jump, Ladder, Death, Attacking, Attacked, Exit };
+        public enum ActionState { None, Squid };
         public const int EXIT_ANIM_TIMER = 1;
         public const int EXIT_TRANSITION_TIMER = 2;
         public int exitTransitionWaitTime;
@@ -55,6 +55,7 @@ namespace AXE.Game.Entities
         public float jumpPower;
         public Dir jumpedFacing;
         public float jumpMaxSpeed;
+        public bool falling;
 
         // State params
         public int deathDelayTime;
@@ -109,7 +110,9 @@ namespace AXE.Game.Entities
             spgraphic.add(new bAnim("fall", new int[] { 8 }, 0.4f));
             spgraphic.add(new bAnim("ladder", new int[] { 10, 11 }, 0.1f));
             spgraphic.add(new bAnim("readyweapon", new int[] { 0, 16, 17, 17, 17 }, 0.5f, false));
+            spgraphic.add(new bAnim("air-readyweapon", new int[] { 8, 19, 20, 20, 20 }, 0.6f, false));
             spgraphic.add(new bAnim("thrownweapon", new int[] { 18, 18 }, 0.2f, false));
+            spgraphic.add(new bAnim("air-thrownweapon", new int[] { 18, 18 }, 0.2f, false));
             spgraphic.add(new bAnim("exit", new int[] { 4 }));
 
             hotspotContainer = new HotspotContainer("Assets/SpriteConfs/knight-hotspots.cfg");
@@ -213,7 +216,8 @@ namespace AXE.Game.Entities
                         }
                         else
                         {
-                            state = MovementState.Fall;
+                            state = MovementState.Jump;
+                            falling = true;
                         }
                     }
                     else
@@ -308,7 +312,6 @@ namespace AXE.Game.Entities
                             vspeed = 0;
                     }
                     break;
-                case MovementState.Fall:
                 case MovementState.Jump:
                     if (onair)
                     {
@@ -338,14 +341,49 @@ namespace AXE.Game.Entities
                         {
                             weapon.onThrow(10, facing);
                             state = MovementState.Attacked;
-                            spgraphic.play("thrownweapon");
+                            if (!onair)
+                                spgraphic.play("thrownweapon");
+                            else
+                                spgraphic.play("air-thrownweapon");
                         }
                     }
+                    else
+                    {
+                        if (onair)
+                        {
+                            handleOnAirMovement();
+                        }
+                        // Go to standing state, acknowleding the case in which
+                        // the player is moving through a one way platform
+                        else if (vspeed > 0)
+                        {
+                            // state = MovementState.Idle; // WUT??
+                        }
+                    }
+
                     break;
                 case MovementState.Attacked:
                     if (spgraphic.currentAnim.finished)
                     {
-                        state = MovementState.Idle;
+                        if (!onair)
+                            state = MovementState.Idle;
+                        else
+                            state = MovementState.Jump;
+                    }
+                    else
+                    {
+                        {
+                            if (onair)
+                            {
+                                handleOnAirMovement();
+                            }
+                            // Go to standing state, acknowleding the case in which
+                            // the player is moving through a one way platform
+                            else if (vspeed > 0)
+                            {
+                                // state = MovementState.Attacked; // WUT??
+                            }
+                        }
                     }
 
                     break;
@@ -416,7 +454,13 @@ namespace AXE.Game.Entities
                     }
                     else
                     {
-                        weapon.onThrow(10, facing);
+                        if (state != MovementState.Attacking && state != MovementState.Attacked)
+                        {
+                            state = MovementState.Attacking;
+                            spgraphic.play("air-readyweapon");
+                            sfxCharge.Play();
+                        }
+                        // weapon.onThrow(10, facing);
                     }
                 }
                 else
@@ -457,15 +501,10 @@ namespace AXE.Game.Entities
                     break;
                 case MovementState.Jump:
                     spgraphic.color = Color.Red;
-                    spgraphic.play("jump");
-                    if (facing == Dir.Right)
-                        spgraphic.flipped = false;
+                    if (falling)
+                        spgraphic.play("fall");
                     else
-                        spgraphic.flipped = true;
-                    break;
-                case MovementState.Fall:
-                    spgraphic.color = Color.Red;
-                    spgraphic.play("fall");
+                        spgraphic.play("jump");
                     if (facing == Dir.Right)
                         spgraphic.flipped = false;
                     else
@@ -494,7 +533,8 @@ namespace AXE.Game.Entities
                 spgraphic.color = Color.Yellow;
 
 
-            //graphic.color = Color.White;
+            graphic.color = Color.White;
+
             spgraphic.update();
         }
 
@@ -604,9 +644,10 @@ namespace AXE.Game.Entities
                 facing = Dir.Right;
             }
 
-            if (vspeed > 0)
+            if (vspeed > 0 && state != MovementState.Attacking && state != MovementState.Attacked)
             {
-                state = MovementState.Fall;
+                state = MovementState.Jump;
+                falling = true;
             }
 
             moveTo.X += current_hspeed;
