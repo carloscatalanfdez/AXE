@@ -201,7 +201,7 @@ namespace AXE.Game.Entities
                     bool collides = false;
                     foreach (bMask m in masks.masks)
                     {
-                        collides = (m.y + m.offsety + m.h <= other.mask.y);
+                        collides = (m.y + m.h <= other.mask.y);
                         if (collides)
                             break;
                     }
