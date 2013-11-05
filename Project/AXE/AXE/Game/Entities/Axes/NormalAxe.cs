@@ -31,7 +31,7 @@ namespace AXE.Game.Entities.Axes
 
         protected override void initGraphic()
         {
-            graphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/axe-sheet"), 20, 20);
+            spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/axe-sheet"), 20, 20);
             loadAnims();
         }
 

@@ -23,7 +23,11 @@ namespace AXE.Game.Entities.Enemies
         public enum State { None, Idle, Turn, Walk, Chase, ChaseRunning, Attacking, Attacked }
         public State state;
 
-        bSpritemap graphic;
+        public bSpritemap spgraphic
+        {
+            get { return (_graphic as bSpritemap); }
+            set { _graphic = value; }
+        }
 
         Vector2 moveTo;
         bMask watchMask;
@@ -55,18 +59,18 @@ namespace AXE.Game.Entities.Enemies
         {
             base.init();
 
-            graphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/imp-sheet"), 30, 32);
-            graphic.add(new bAnim("idle", new int[] { 0 }));
-            graphic.add(new bAnim("turn", new int[] { 9 }));
-            graphic.add(new bAnim("walk", new int[] { 1, 2, 3, 2 }, 0.3f));
-            graphic.add(new bAnim("chase-reacting", new int[] { 4 }));
-            graphic.add(new bAnim("chase", new int[] { 1, 2, 3, 2 }, 0.5f));
-            graphic.add(new bAnim("chase-running-reacting", new int[] { 10 }));
-            graphic.add(new bAnim("chase-running", new int[] { 11, 12 }, 0.5f));
-            graphic.add(new bAnim("attack-charge", new int[] { 16, 17, 17, 17 }, 0.4f, false));
-            graphic.add(new bAnim("attacked", new int[] { 18 }));
-            graphic.add(new bAnim("jump", new int[] { 8 }));
-            graphic.play("idle");
+            spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/imp-sheet"), 30, 32);
+            spgraphic.add(new bAnim("idle", new int[] { 0 }));
+            spgraphic.add(new bAnim("turn", new int[] { 9 }));
+            spgraphic.add(new bAnim("walk", new int[] { 1, 2, 3, 2 }, 0.3f));
+            spgraphic.add(new bAnim("chase-reacting", new int[] { 4 }));
+            spgraphic.add(new bAnim("chase", new int[] { 1, 2, 3, 2 }, 0.5f));
+            spgraphic.add(new bAnim("chase-running-reacting", new int[] { 10 }));
+            spgraphic.add(new bAnim("chase-running", new int[] { 11, 12 }, 0.5f));
+            spgraphic.add(new bAnim("attack-charge", new int[] { 16, 17, 17, 17 }, 0.4f, false));
+            spgraphic.add(new bAnim("attacked", new int[] { 18 }));
+            spgraphic.add(new bAnim("jump", new int[] { 8 }));
+            spgraphic.play("idle");
 
             mask.w = 16;
             mask.h = 21;
@@ -95,7 +99,7 @@ namespace AXE.Game.Entities.Enemies
             attackThreshold = 30;
             attackChargeTime = 10;
             attackTime = 8;
-            weaponHitImage = new bStamp(graphic.image, new Rectangle(90, 64, 30, 32));
+            weaponHitImage = new bStamp(spgraphic.image, new Rectangle(90, 64, 30, 32));
 
             sfxSteps = new List<SoundEffect>();
             sfxSteps.Add(game.Content.Load<SoundEffect>("Assets/Sfx/sfx-dirtstep.1"));
@@ -215,7 +219,7 @@ namespace AXE.Game.Entities.Enemies
         {
             base.update();
 
-            graphic.update();
+            spgraphic.update();
 
             moveTo = pos;
             bool onAir = !checkForGround(x, y);
@@ -223,10 +227,10 @@ namespace AXE.Game.Entities.Enemies
             switch (state)
             {
                 case State.Idle:
-                    graphic.play("idle");
+                    spgraphic.play("idle");
                     break;
                 case State.Walk:
-                    graphic.play("walk");
+                    spgraphic.play("walk");
 
                     Vector2 nextPosition = new Vector2(x + directionToSign(facing) * hspeed, y);
                     bool wontFall = checkForGround(
@@ -244,16 +248,16 @@ namespace AXE.Game.Entities.Enemies
 
                     break;
                 case State.Turn:
-                    graphic.play("turn");
+                    spgraphic.play("turn");
                     break;
                 case State.Chase:
                 case State.ChaseRunning:
                     if (beginChase)
                     {
                         if (state == State.Chase)
-                            graphic.play("chase");
+                            spgraphic.play("chase");
                         else
-                            graphic.play("chase-running");
+                            spgraphic.play("chase-running");
 
                         int hsp = (int)(hspeed * 2 * (state == State.ChaseRunning ? 1.5 : 1));
                         nextPosition = new Vector2(x + directionToSign(facing) * hsp, y);
@@ -271,16 +275,16 @@ namespace AXE.Game.Entities.Enemies
                     else
                     {
                         if (state == State.Chase)
-                            graphic.play("chase-reacting");
+                            spgraphic.play("chase-reacting");
                         else
-                            graphic.play("chase-running-reacting");
+                            spgraphic.play("chase-running-reacting");
                     }
                     break;
                 case State.Attacking:
-                    graphic.play("attack-charge");
+                    spgraphic.play("attack-charge");
                     break;
                 case State.Attacked:
-                    graphic.play("attacked");
+                    spgraphic.play("attacked");
                     break;
             }
 
@@ -351,7 +355,7 @@ namespace AXE.Game.Entities.Enemies
                 // Wrap (effect)
                 if (x < 0)
                     showWrapEffect = Dir.Right;
-                else if (x + (graphic.width) > (world as LevelScreen).width)
+                else if (x + (spgraphic.width) > (world as LevelScreen).width)
                     showWrapEffect = Dir.Left;
                 else
                     showWrapEffect = Dir.None;
@@ -372,7 +376,7 @@ namespace AXE.Game.Entities.Enemies
                 }*/
             }
 
-            graphic.flipped = (facing == Dir.Left);
+            spgraphic.flipped = (facing == Dir.Left);
 
             handleSoundEffects();
         }
@@ -381,7 +385,7 @@ namespace AXE.Game.Entities.Enemies
         {
             base.render(dt, sb);
 
-            graphic.render(sb, pos);
+            spgraphic.render(sb, pos);
             if (state == State.Attacked)
                 if (facing == Dir.Left)
                 {
@@ -396,11 +400,11 @@ namespace AXE.Game.Entities.Enemies
 
             if (showWrapEffect == Dir.Left)
             {
-                graphic.render(sb, new Vector2(0 + (pos.X - (world as LevelScreen).width), pos.Y));
+                spgraphic.render(sb, new Vector2(0 + (pos.X - (world as LevelScreen).width), pos.Y));
             }
             else if (showWrapEffect == Dir.Right)
             {
-                graphic.render(sb, new Vector2((world as LevelScreen).width + pos.X, pos.Y));
+                spgraphic.render(sb, new Vector2((world as LevelScreen).width + pos.X, pos.Y));
             }
 
             if (bConfig.DEBUG)
@@ -409,12 +413,12 @@ namespace AXE.Game.Entities.Enemies
 
         public override int graphicWidth()
         {
-            return graphic.width;
+            return spgraphic.width;
         }
 
         public override int graphicHeight()
         {
-            return graphic.height;
+            return spgraphic.height;
         }
 
         bool playedStepEffect = false;
@@ -426,7 +430,7 @@ namespace AXE.Game.Entities.Enemies
                 case State.Walk:
                 case State.Chase:
                 case State.ChaseRunning:
-                    int currentFrame = graphic.currentAnim.frame;
+                    int currentFrame = spgraphic.currentAnim.frame;
                     if (currentFrame == 2 && !playedStepEffect)
                     {
                         playedStepEffect = true;

@@ -38,10 +38,13 @@ namespace AXE.Game.Entities
         public PlayerData data;
 
         // Graphic, movement vars
-        public bSpritemap graphic;
+        public bSpritemap spgraphic
+        {
+            get { return (_graphic as bSpritemap); }
+            set { _graphic = value; }
+        }
         public float hspeed;
         public float vspeed, gravity;
-        public Dir showWrapEffect;
 
         // Accelerated movement
         public float current_hspeed;
@@ -97,24 +100,22 @@ namespace AXE.Game.Entities
             attributes.Add("player");
             attributes.Add("moveable");
 
-            graphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/knight-sheet"), 30, 32);
-            graphic.add(new bAnim("idle", new int[] { 0 }, 0.1f));
-            graphic.add(new bAnim("walk", new int[] { 1, 2, 3, 2 }, 0.2f));
-            graphic.add(new bAnim("jump", new int[] { 8 }, 0.0f));
-            graphic.add(new bAnim("death", new int[] { 8 }));
-            graphic.add(new bAnim("squid", new int[] { 9 }));
-            graphic.add(new bAnim("fall", new int[] { 8 }, 0.4f));
-            graphic.add(new bAnim("ladder", new int[] { 10, 11 }, 0.1f));
-            graphic.add(new bAnim("readyweapon", new int[] { 0, 16, 17, 17, 17 }, 0.5f, false));
-            graphic.add(new bAnim("thrownweapon", new int[] { 18, 18 }, 0.2f, false));
-            graphic.add(new bAnim("exit", new int[] { 4 }));
+            spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/knight-sheet"), 30, 32);
+            spgraphic.add(new bAnim("idle", new int[] { 0 }, 0.1f));
+            spgraphic.add(new bAnim("walk", new int[] { 1, 2, 3, 2 }, 0.2f));
+            spgraphic.add(new bAnim("jump", new int[] { 8 }, 0.0f));
+            spgraphic.add(new bAnim("death", new int[] { 8 }));
+            spgraphic.add(new bAnim("squid", new int[] { 9 }));
+            spgraphic.add(new bAnim("fall", new int[] { 8 }, 0.4f));
+            spgraphic.add(new bAnim("ladder", new int[] { 10, 11 }, 0.1f));
+            spgraphic.add(new bAnim("readyweapon", new int[] { 0, 16, 17, 17, 17 }, 0.5f, false));
+            spgraphic.add(new bAnim("thrownweapon", new int[] { 18, 18 }, 0.2f, false));
+            spgraphic.add(new bAnim("exit", new int[] { 4 }));
 
             hotspotContainer = new HotspotContainer("Assets/SpriteConfs/knight-hotspots.cfg");
 
-            graphic.play("idle");
+            spgraphic.play("idle");
             layer = 0;
-
-            showWrapEffect = Dir.None;
 
             hspeed = 1.5f;
             vspeed = 0f;
@@ -155,7 +156,7 @@ namespace AXE.Game.Entities
 
         public override int graphicWidth()
         {
-            return graphic.width;
+            return spgraphic.width;
         }
 
         public override void onUpdateBegin()
@@ -321,18 +322,18 @@ namespace AXE.Game.Entities
 
                     break;
                 case MovementState.Attacking:
-                    if (graphic.currentAnim.finished)
+                    if (spgraphic.currentAnim.finished)
                     {
                         if (weapon != null)
                         {
                             weapon.onThrow(10, facing);
                             state = MovementState.Attacked;
-                            graphic.play("thrownweapon");
+                            spgraphic.play("thrownweapon");
                         }
                     }
                     break;
                 case MovementState.Attacked:
-                    if (graphic.currentAnim.finished)
+                    if (spgraphic.currentAnim.finished)
                     {
                         state = MovementState.Idle;
                     }
@@ -373,14 +374,6 @@ namespace AXE.Game.Entities
                     current_hspeed = 0;
                 }
 
-                // Wrap (effect)
-                if (x < 0)
-                    showWrapEffect = Dir.Right;
-                else if (x + (graphic.width) > (world as LevelScreen).width)
-                    showWrapEffect = Dir.Left;
-                else
-                    showWrapEffect = Dir.None;
-
                 // The y movement was stopped
                 if (remnant.Y != 0 && vspeed < 0)
                 {
@@ -407,7 +400,7 @@ namespace AXE.Game.Entities
                         if (state != MovementState.Attacking && state != MovementState.Attacked)
                         {
                             state = MovementState.Attacking;
-                            graphic.play("readyweapon");
+                            spgraphic.play("readyweapon");
                             sfxCharge.Play();
                         }
                     }
@@ -438,61 +431,61 @@ namespace AXE.Game.Entities
             {
                 case MovementState.Idle:
                 case MovementState.Walk:
-                    graphic.color = Color.White;
+                    spgraphic.color = Color.White;
                     if (state == MovementState.Idle)
-                        graphic.play("idle");
+                        spgraphic.play("idle");
                     else if (state == MovementState.Walk)
-                        graphic.play("walk");
+                        spgraphic.play("walk");
 
                     if (action == ActionState.Squid)
-                        graphic.play("squid");
+                        spgraphic.play("squid");
 
                     if (facing == Dir.Right)
-                        graphic.flipped = false;
+                        spgraphic.flipped = false;
                     else
-                        graphic.flipped = true;
+                        spgraphic.flipped = true;
                     break;
                 case MovementState.Jump:
-                    graphic.color = Color.Red;
-                    graphic.play("jump");
+                    spgraphic.color = Color.Red;
+                    spgraphic.play("jump");
                     if (facing == Dir.Right)
-                        graphic.flipped = false;
+                        spgraphic.flipped = false;
                     else
-                        graphic.flipped = true;
+                        spgraphic.flipped = true;
                     break;
                 case MovementState.Fall:
-                    graphic.color = Color.Red;
-                    graphic.play("fall");
+                    spgraphic.color = Color.Red;
+                    spgraphic.play("fall");
                     if (facing == Dir.Right)
-                        graphic.flipped = false;
+                        spgraphic.flipped = false;
                     else
-                        graphic.flipped = true;
+                        spgraphic.flipped = true;
                     break;
                 case MovementState.Ladder:
-                    graphic.play("ladder");
-                    graphic.flipped = false;
+                    spgraphic.play("ladder");
+                    spgraphic.flipped = false;
                     if (moveTo.Y - previousPosition.Y != 0)
-                        graphic.currentAnim.resume();
+                        spgraphic.currentAnim.resume();
                     else
-                        graphic.currentAnim.pause();
+                        spgraphic.currentAnim.pause();
 
                     break;
                 case MovementState.Death:
-                    graphic.currentAnim.pause();
+                    spgraphic.currentAnim.pause();
                     if (playDeathAnim)
-                        graphic.play("death");
+                        spgraphic.play("death");
                     break;
                 case MovementState.Exit:
-                    graphic.play("exit");
+                    spgraphic.play("exit");
                     break;
             }
 
             if (isLanding)
-                graphic.color = Color.Yellow;
+                spgraphic.color = Color.Yellow;
 
 
             //graphic.color = Color.White;
-            graphic.update();
+            spgraphic.update();
         }
 
         public void handleAcceleratedMovement(ref float _haccel, ref float _hspeed)
@@ -699,26 +692,16 @@ namespace AXE.Game.Entities
         override public void render(GameTime dt, SpriteBatch sb)
         {
             base.render(dt, sb);
-            graphic.render(sb, pos);
-            Color c = graphic.color;
-            if (showWrapEffect == Dir.Left)
-            {
-                //graphic.color = Color.Aqua;
-                graphic.render(sb, new Vector2(0 + (pos.X - (world as LevelScreen).width), pos.Y));
-            }
-            else if (showWrapEffect == Dir.Right)
-            {
-                //graphic.color = Color.Aqua;
-                graphic.render(sb, new Vector2((world as LevelScreen).width + pos.X, pos.Y));
-            }
-            graphic.color = c;
+            spgraphic.render(sb, pos);
+            Color c = spgraphic.color;
+            spgraphic.color = c;
 
             sb.DrawString(game.gameFont, debugText, new Vector2(x, y - 8), Colors.white);
         }
 
         public bool isFlipped()
         {
-            return graphic.flipped;
+            return spgraphic.flipped;
         }
 
         /* IWeaponHolder implementation */
@@ -741,7 +724,7 @@ namespace AXE.Game.Entities
         {
             Vector2 hand = new Vector2(x, y);
 
-            int curFrame = graphic.currentAnim.frame;
+            int curFrame = spgraphic.currentAnim.frame;
 
             // Right and Left direction hotspots for the current frame
             if (!hotspotContainer.hotspots.ContainsKey(curFrame))
@@ -782,7 +765,7 @@ namespace AXE.Game.Entities
             switch (state)
             {
                 case MovementState.Walk:
-                    int currentFrame = graphic.currentAnim.frame;
+                    int currentFrame = spgraphic.currentAnim.frame;
                     if (currentFrame == 2 && !playedStepEffect)
                     {
                         playedStepEffect = true;

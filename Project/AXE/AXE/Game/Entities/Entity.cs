@@ -17,7 +17,21 @@ namespace AXE.Game.Entities
 
         public bool visible = true;
         public Vector2 previousPosition;
+        public Dir showWrapEffect;
         public Dir facing;
+
+        public bGraphic _graphic;
+        public virtual bGraphic graphic
+        {
+            get { return _graphic; }
+            set { _graphic = value; }
+        }
+
+        public override bMask mask
+        {
+            get { return base.mask; }
+            set { base.mask = value; }
+        }
 
         public virtual int graphicWidth()
         {
@@ -34,6 +48,13 @@ namespace AXE.Game.Entities
         {
         }
 
+        override public void init()
+        {
+            base.init();
+
+            showWrapEffect = Dir.None;
+        }
+
         public virtual void onUpdateBegin()
         {
             previousPosition = pos;
@@ -45,6 +66,16 @@ namespace AXE.Game.Entities
 
         public virtual void onUpdateEnd()
         {
+            // Wrap (effect)
+            if (graphic != null)
+            {
+                if (x < 0)
+                    showWrapEffect = Dir.Right;
+                else if (x + graphic.width > (world as LevelScreen).width)
+                    showWrapEffect = Dir.Left;
+                else
+                    showWrapEffect = Dir.None;
+            }
         }
 
         public override void update()
@@ -157,6 +188,25 @@ namespace AXE.Game.Entities
 
         public virtual void onHit(Entity other)
         {
+        }
+
+        public override void render(GameTime dt, Microsoft.Xna.Framework.Graphics.SpriteBatch sb)
+        {
+            base.render(dt, sb);
+
+            if (graphic != null)
+            {
+                if (showWrapEffect == Dir.Left)
+                {
+                    //graphic.color = Color.Aqua;
+                    graphic.render(sb, new Vector2(0 + (pos.X - (world as LevelScreen).width), pos.Y));
+                }
+                else if (showWrapEffect == Dir.Right)
+                {
+                    //graphic.color = Color.Aqua;
+                    graphic.render(sb, new Vector2((world as LevelScreen).width + pos.X, pos.Y));
+                }
+            }
         }
     }
 }

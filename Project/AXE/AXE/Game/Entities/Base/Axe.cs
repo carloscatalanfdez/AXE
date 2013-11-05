@@ -22,7 +22,11 @@ namespace AXE.Game.Entities
 
         public MovementState state;
 
-        public bSpritemap graphic;
+        public bSpritemap spgraphic
+        {
+            get { return (_graphic as bSpritemap); }
+            set { _graphic = value; }
+        }
 
         // When grabbed
         public IWeaponHolder holder;
@@ -77,33 +81,33 @@ namespace AXE.Game.Entities
 
         protected virtual void initGraphic()
         {
-            graphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/stick-sheet"), 14, 14);
+            spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/stick-sheet"), 14, 14);
             loadAnims();
         }
 
         protected virtual void loadAnims()
         {
             int[] fs = { 0 };
-            graphic.add(new bAnim("grabbed", fs, 0.0f));
+            spgraphic.add(new bAnim("grabbed", fs, 0.0f));
             int[] fss = { 4, 5, 6, 7 };
-            graphic.add(new bAnim("cw-rotation", fss, 0.7f));
+            spgraphic.add(new bAnim("cw-rotation", fss, 0.7f));
             int[] fsss = { 8, 9, 10, 11 };
-            graphic.add(new bAnim("ccw-rotation", fsss, 0.7f));
+            spgraphic.add(new bAnim("ccw-rotation", fsss, 0.7f));
             int[] fssss = { 12 };
-            graphic.add(new bAnim("idle", fssss, 0.0f));
+            spgraphic.add(new bAnim("idle", fssss, 0.0f));
         }
 
         protected virtual void initHolderState()
         {
             if (holder == null)
             {
-                graphic.play("idle");
+                spgraphic.play("idle");
                 facing = Player.Dir.None;
                 state = MovementState.Idle;
             }
             else
             {
-                graphic.play("grabbed");
+                spgraphic.play("grabbed");
                 facing = holder.getFacing();
                 state = MovementState.Grabbed;
             }
@@ -240,46 +244,46 @@ namespace AXE.Game.Entities
             {
                 case MovementState.Stuck:
                 case MovementState.Idle:
-                    graphic.play("idle");
+                    spgraphic.play("idle");
                     if (facing == Player.Dir.Left)
-                        graphic.flipped = true;
+                        spgraphic.flipped = true;
                     else if (facing == Player.Dir.Right)
-                        graphic.flipped = false;
+                        spgraphic.flipped = false;
 
                     break;
                 case MovementState.Grabbed:
-                    graphic.play("grabbed");
+                    spgraphic.play("grabbed");
                     if (facing == Player.Dir.Left)
-                        graphic.flipped = true;
+                        spgraphic.flipped = true;
                     else if (facing == Player.Dir.Right)
-                        graphic.flipped = false;
+                        spgraphic.flipped = false;
 
                     break;
                 case MovementState.Flying:
                 case MovementState.Bouncing:
                     if (facing == Player.Dir.Left)
                     {
-                        graphic.play("ccw-rotation");
+                        spgraphic.play("ccw-rotation");
                     }
                     else if (facing == Player.Dir.Right)
                     {
-                        graphic.play("cw-rotation");
+                        spgraphic.play("cw-rotation");
                     }
                     else
                     {
-                        graphic.play("idle");
+                        spgraphic.play("idle");
                     }
 
                     break;
             }
 
-            graphic.update();
+            spgraphic.update();
         }
 
         override public void render(GameTime dt, SpriteBatch sb)
         {
             base.render(dt, sb);
-            graphic.render(sb, pos);
+            spgraphic.render(sb, pos);
         }
 
         /* IWeapon implementation */
@@ -292,7 +296,7 @@ namespace AXE.Game.Entities
         {
             sfxGrab.Play();
             holder.setWeapon(this);
-            graphic.play("grabbed");
+            spgraphic.play("grabbed");
             facing = holder.getFacing();
             state = MovementState.Grabbed;
             this.holder = holder;
@@ -318,7 +322,10 @@ namespace AXE.Game.Entities
         public virtual void onHitSolid(bEntity entity)
         {
             // notify other entity
-            (entity as Entity).onHit(this);
+            if (entity != null && (entity is Entity))
+            {
+                (entity as Entity).onHit(this);
+            }
             onBounce();
         }
 
