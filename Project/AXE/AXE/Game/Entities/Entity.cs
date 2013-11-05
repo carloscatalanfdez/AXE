@@ -189,7 +189,29 @@ namespace AXE.Game.Entities
             if (me is Entity)
             {
                 Entity p = me as Entity;
-                return (p.previousPosition.Y + p.mask.offsety + me.mask.h <= other.mask.y);
+
+                if (me.mask is bMaskList)
+                {
+                    // Get mask at previous position
+                    Vector2 oldPos = pos;
+                    pos = previousPosition;
+                    bMaskList masks = me.mask as bMaskList;
+                    pos = oldPos;
+                    
+                    // Check if any mask is above the solid
+                    bool collides = false;
+                    foreach (bMask m in masks.masks)
+                    {
+                        collides = (m.y + m.offsety + m.h <= other.mask.y);
+                        if (collides)
+                            break;
+                    }
+                    return collides;
+                }
+                else
+                {
+                    return (p.previousPosition.Y + p.mask.offsety + me.mask.h <= other.mask.y);
+                }
             }
             else
                 return true;

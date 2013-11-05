@@ -218,7 +218,6 @@ namespace AXE.Game.Entities.Enemies
         public override void onUpdate()
         {
             base.onUpdate();
-            return;
 
             spgraphic.update();
 
