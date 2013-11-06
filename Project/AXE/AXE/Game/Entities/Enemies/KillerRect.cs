@@ -4,16 +4,21 @@ using System.Linq;
 using System.Text;
 
 using Microsoft.Xna.Framework;
+using AXE.Game.Entities.Base;
 
 namespace AXE.Game.Entities.Enemies
 {
-    class KillerRect : Entity
+    class KillerRect : Entity, IHazard
     {
-        public KillerRect(int x, int y, int w, int h)
+        public Player.DeathState type;
+        public IHazardProvider owner;
+
+        public KillerRect(int x, int y, int w, int h, Player.DeathState type)
             : base(x, y)
         {
             mask.w = w;
             mask.h = h;
+            this.type = type;
         }
 
         public override void init()
@@ -34,6 +39,21 @@ namespace AXE.Game.Entities.Enemies
         public override int graphicHeight()
         {
             return mask.h;
+        }
+
+        public void setOwner(IHazardProvider owner)
+        {
+            this.owner = owner;
+        }
+
+        public IHazardProvider getOwner()
+        {
+            return this.owner;
+        }
+
+        public Player.DeathState getType()
+        {
+            return type;
         }
 
         public override void render(Microsoft.Xna.Framework.GameTime dt, Microsoft.Xna.Framework.Graphics.SpriteBatch sb)

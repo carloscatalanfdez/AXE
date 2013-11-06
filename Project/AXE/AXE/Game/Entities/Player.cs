@@ -29,11 +29,13 @@ namespace AXE.Game.Entities
 
         // Some declarations
         public enum MovementState { Idle, Walk, Jump, Ladder, Death, Attacking, Attacked, Exit };
+        public enum DeathState { None, Generic, Fall, ForceHit };
         public enum ActionState { None, Squid };
         public const int EXIT_ANIM_TIMER = 1;
         public const int EXIT_TRANSITION_TIMER = 2;
         public int exitTransitionWaitTime;
         public int exitAnimationWaitTime;
+
         // Data
         public PlayerData data;
 
@@ -56,6 +58,7 @@ namespace AXE.Game.Entities
         public Dir jumpedFacing;
         public float jumpMaxSpeed;
         public bool falling;
+        public bool onair;
 
         // State params
         public int deathDelayTime;
@@ -65,6 +68,7 @@ namespace AXE.Game.Entities
         public MovementState previousState;
         public MovementState state;
         public ActionState action;
+        public DeathState deathCause;
 
         // Step variables
         public Vector2 stepInitialPosition;
@@ -106,6 +110,7 @@ namespace AXE.Game.Entities
             spgraphic.add(new bAnim("walk", new int[] { 1, 2, 3, 2 }, 0.2f));
             spgraphic.add(new bAnim("jump", new int[] { 8 }, 0.0f));
             spgraphic.add(new bAnim("death", new int[] { 8 }));
+            spgraphic.add(new bAnim("death-forcehit", new int[] { 10, 11, 10, 11, 10, 11, 10, 11, 10, 11, 10, 11 }, 0.4f, false));
             spgraphic.add(new bAnim("squid", new int[] { 9 }));
             spgraphic.add(new bAnim("fall", new int[] { 8 }, 0.4f));
             spgraphic.add(new bAnim("ladder", new int[] { 10, 11 }, 0.1f));
@@ -137,6 +142,7 @@ namespace AXE.Game.Entities
             state = MovementState.Idle;
             action = ActionState.None;
             facing = Dir.Right;
+            deathCause = DeathState.None;
 
             debugText = "";
             floater = false;
@@ -190,14 +196,14 @@ namespace AXE.Game.Entities
             // Check for outside playfield death
             if (state != MovementState.Death && y + mask.h / 2 > (world as LevelScreen).height)
             {
-                onDeath("fall");
+                onDeath(DeathState.Fall);
             }
 
             Stairs ladder = (Stairs) instancePlace(x, y, "stairs");
             bool onladder = ladder != null;
             bool toLadder = false;
 
-            bool onair = !placeMeeting(x, y + 1, "solid");
+            onair = !placeMeeting(x, y + 1, "solid");
             if (onair)
                 onair = !placeMeeting(x, y + 1, "onewaysolid", onewaysolidCondition);
             switch (state)
@@ -325,8 +331,7 @@ namespace AXE.Game.Entities
                     }
                     break;
                 case MovementState.Death:
-
-                    bool deathAnimationFinished = true; // TODO
+                    bool deathAnimationFinished = spgraphic.currentAnim.finished; // TODO
                     if (deathAnimationFinished)
                     {
                         // Animation end, restart...
@@ -391,6 +396,8 @@ namespace AXE.Game.Entities
 
             moveTo.Y += vspeed;
 
+            handleActionButton();
+
             if (state == MovementState.Death || toLadder)
                 pos = moveTo;
             else
@@ -438,39 +445,46 @@ namespace AXE.Game.Entities
                 }
             }
 
+        }
+
+        public void handleActionButton()
+        {
             // Handle axe
-            if (mginput.pressed(PadButton.b))
+            if (state != MovementState.Death)
             {
-                if (weapon != null)
+                if (mginput.pressed(PadButton.b))
                 {
-                    if (!onair)
+                    if (weapon != null)
                     {
-                        if (state != MovementState.Attacking && state != MovementState.Attacked)
+                        if (!onair)
                         {
-                            state = MovementState.Attacking;
-                            spgraphic.play("readyweapon");
-                            sfxCharge.Play();
+                            if (state != MovementState.Attacking && state != MovementState.Attacked)
+                            {
+                                state = MovementState.Attacking;
+                                spgraphic.play("readyweapon");
+                                sfxCharge.Play();
+                            }
+                        }
+                        else
+                        {
+                            if (state != MovementState.Attacking && state != MovementState.Attacked)
+                            {
+                                state = MovementState.Attacking;
+                                spgraphic.play("air-readyweapon");
+                                sfxCharge.Play();
+                            }
+                            // weapon.onThrow(10, facing);
                         }
                     }
                     else
                     {
                         if (state != MovementState.Attacking && state != MovementState.Attacked)
                         {
-                            state = MovementState.Attacking;
-                            spgraphic.play("air-readyweapon");
-                            sfxCharge.Play();
-                        }
-                        // weapon.onThrow(10, facing);
-                    }
-                }
-                else
-                {
-                    if (state != MovementState.Attacking && state != MovementState.Attacked)
-                    {
-                        bEntity entity = instancePlace(pos, "axe");
-                        if (entity != null)
-                        {
-                            (entity as Axe).onGrab(this);
+                            bEntity entity = instancePlace(pos, "axe");
+                            if (entity != null)
+                            {
+                                (entity as Axe).onGrab(this);
+                            }
                         }
                     }
                 }
@@ -520,9 +534,9 @@ namespace AXE.Game.Entities
 
                     break;
                 case MovementState.Death:
-                    spgraphic.currentAnim.pause();
+                    /*spgraphic.currentAnim.pause();
                     if (playDeathAnim)
-                        spgraphic.play("death");
+                        spgraphic.play("death");*/
                     break;
                 case MovementState.Exit:
                     spgraphic.play("exit");
@@ -693,8 +707,7 @@ namespace AXE.Game.Entities
 
             if (type == "solid")
                 color = Color.Turquoise;
-
-            if (type == "enemy")
+            else if (type == "enemy")
             {
                 // First, reposition
                 pos.X = stepInitialPosition.X;
@@ -729,14 +742,37 @@ namespace AXE.Game.Entities
                     }
                 }
             }
+            else if (type == "hazard")
+            {
+                if (other != null && other is IHazard)
+                {
+                    IHazard hazard = (other as IHazard);
+                    IHazardProvider killer = hazard.getOwner();
+                    killer.onSuccessfulHit(this);
+                    onDeath(hazard.getType());
+                }
+            }
         }
 
-        public void onDeath(String type = "")
+        public void onDeath(DeathState type = DeathState.Generic)
         {
             if (state != MovementState.Death)
             {
-                // TODO: Use type to change anim?
                 state = MovementState.Death;
+                // TODO: Use type to change anim
+                switch (type)
+                {
+                    case DeathState.None:
+                    case DeathState.Generic:
+                        spgraphic.play("death");
+                        break;
+                    case DeathState.Fall:
+                        spgraphic.play("death");
+                        break;
+                    case DeathState.ForceHit:
+                        spgraphic.play("death-forcehit");
+                        break;
+                }
             }
         }
 

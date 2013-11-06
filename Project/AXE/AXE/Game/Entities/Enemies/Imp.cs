@@ -20,7 +20,7 @@ using AXE.Common;
 
 namespace AXE.Game.Entities.Enemies
 {
-    class Imp : Enemy
+    class Imp : Enemy, IHazardProvider
     {
         public enum State { None, Idle, Turn, Walk, Chase, ChaseRunning, Attacking, Attacked }
         public State state;
@@ -34,6 +34,7 @@ namespace AXE.Game.Entities.Enemies
         Vector2 moveTo;
         bMask watchMask;
 
+        bool tamed;
         bool beginChase;
         int chaseReactionTime;
 
@@ -93,6 +94,7 @@ namespace AXE.Game.Entities.Enemies
             else
                 facing = Dir.Left;
 
+            tamed = false;
             beginChase = false;
             chaseReactionTime = 15;
 
@@ -136,24 +138,46 @@ namespace AXE.Game.Entities.Enemies
                         timer[0] = turnBaseTime + Tools.random.Next(turnOptionalTime) - turnOptionalTime;
                         break;
                     case State.Chase:
+                        if (tamed)
+                        {
+                            performChange = false;
+                            changeState(State.Idle);
+                        }
                         beginChase = false;
                         timer[1] = chaseReactionTime;
                         break;
                     case State.ChaseRunning:
+                        if (tamed)
+                        {
+                            performChange = false;
+                            changeState(State.Idle);
+                        }
                         beginChase = false;
                         timer[1] = (int) (chaseReactionTime * 1.5f);
                         break;
                     case State.Attacking:
+                        if (tamed)
+                        {
+                            performChange = false;
+                            changeState(State.Idle);
+                        }
                         timer[0] = attackChargeTime;
                         break;
                     case State.Attacked:
+                        if (tamed)
+                        {
+                            performChange = false;
+                            changeState(State.Idle);
+                        }
+
                         int xx, yy = 4;
                         if (facing == Dir.Right)
                             xx = 20;
                         else
                             xx = -10;
-                        weaponHitZone = new KillerRect(x+xx, y+yy, 20, 27);
-                        world.add(weaponHitZone, "enemy");
+                        weaponHitZone = new KillerRect(x+xx, y+yy, 20, 27, Player.DeathState.ForceHit);
+                        weaponHitZone.setOwner(this);
+                        world.add(weaponHitZone, "hazard");
                         timer[0] = attackTime;
                         break;
                 }
@@ -448,6 +472,11 @@ namespace AXE.Game.Entities.Enemies
                 else facing = Dir.Right;
                 changeState(State.ChaseRunning);
             }
+        }
+
+        public void onSuccessfulHit(Player other)
+        {
+            tamed = true;
         }
     }
 }

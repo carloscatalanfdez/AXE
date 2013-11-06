@@ -111,6 +111,8 @@
     <Compile Include="Game\Entities\Axes\NormalAxe.cs" />
     <Compile Include="Game\Entities\Base\Axe.cs" />
     <Compile Include="Game\Entities\Base\Enemy.cs" />
+    <Compile Include="Game\Entities\Base\IHazard.cs" />
+    <Compile Include="Game\Entities\Base\IHazardProvider.cs" />
     <Compile Include="Game\Entities\Base\IWeapon.cs" />
     <Compile Include="Game\Entities\Enemies\Imp.cs" />
     <Compile Include="Game\Entities\Enemies\KillerRect.cs" />
@@ -119,6 +121,7 @@
     <Compile Include="Game\Entities\Door.cs" />
     <Compile Include="Game\Entities\OneWayPlatform.cs" />
     <Compile Include="Game\Entities\Stairs.cs" />
+    <Compile Include="Game\Screens\GameOverScreen.cs" />
     <Compile Include="Game\Screens\WinScreen.cs" />
     <Compile Include="Game\Utils\Colors.cs" />
     <Compile Include="Game\Control\Controller.cs" />

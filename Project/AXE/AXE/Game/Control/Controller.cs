@@ -60,7 +60,7 @@ namespace AXE.Game.Control
         {
             GameData.get().initPlayData();
             // Go to first screen
-            game.changeWorld(new LevelScreen(data.level), new FadeToColor(game, Colors.clear, 10));
+            game.changeWorld(new LevelScreen(data.level), new FadeToColor(game, Color.Black, 10));
         }
 
         public void onGameEnd()
@@ -91,6 +91,7 @@ namespace AXE.Game.Control
 
         public void handlePlayerDeath()
         {
+            game.changeWorld(new GameOverScreen());
         }
     }
 }
