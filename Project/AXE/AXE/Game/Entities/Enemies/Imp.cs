@@ -15,6 +15,8 @@ using AXE.Game.Screens;
 using AXE.Game.Entities.Base;
 using AXE.Game.Utils;
 using AXE.Game.Entities.Axes;
+using AXE.Game.Control;
+using AXE.Common;
 
 namespace AXE.Game.Entities.Enemies
 {
@@ -298,7 +300,10 @@ namespace AXE.Game.Entities.Enemies
                     watchMask.offsetx = graphicWidth();
                 watchMask.offsety = (graphicHeight() - watchMask.h);
 
-                bMask holdMyMaskPlease = mask;
+                // VERY IMPORTANT
+                // When holding the mask, we need to hold the original _mask, since
+                // mask itself is a property and will return a hacked wrapped mask sometimes
+                bMask holdMyMaskPlease = _mask;
                 mask = watchMask;
 
                 bool sawYou = placeMeeting(x, y, "player");
@@ -350,14 +355,6 @@ namespace AXE.Game.Entities.Enemies
                 {
                 }
 
-                // Wrap (effect)
-                if (x < 0)
-                    showWrapEffect = Dir.Right;
-                else if (x + (spgraphic.width) > (world as LevelScreen).width)
-                    showWrapEffect = Dir.Left;
-                else
-                    showWrapEffect = Dir.None;
-
                 /*// The y movement was stopped
                 if (remnant.Y != 0 && vspeed < 0)
                 {
@@ -399,15 +396,6 @@ namespace AXE.Game.Entities.Enemies
                     weaponHitImage.flipped = false;
                     weaponHitImage.render(sb, new Vector2(x + graphicWidth(), y));
                 }
-
-            if (showWrapEffect == Dir.Left)
-            {
-                spgraphic.render(sb, new Vector2(0 + (pos.X - (world as LevelScreen).width), pos.Y));
-            }
-            else if (showWrapEffect == Dir.Right)
-            {
-                spgraphic.render(sb, new Vector2((world as LevelScreen).width + pos.X, pos.Y));
-            }
 
             if (bConfig.DEBUG)
                 sb.DrawString(game.gameFont, state.ToString() + " [" + timer[0] + "]", new Vector2(x, y - 8), Color.White);
