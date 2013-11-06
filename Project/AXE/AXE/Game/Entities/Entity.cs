@@ -19,7 +19,6 @@ namespace AXE.Game.Entities
         public bool visible = true;
         public Vector2 previousPosition;
         public Dir showWrapEffect;
-        public bool wrapMask = false;
         public Dir facing;
 
         public bGraphic _graphic;
@@ -36,23 +35,20 @@ namespace AXE.Game.Entities
         {
             get 
             {
-                if (wrappable && wrapMask)
+                if (wrappable)
                 {
-                    return _wrappedMask;
+                    bool wrapMask = generateWrappedMask();
+                    if (wrapMask)
+                    {
+                        return _wrappedMask;
+                    }
                 }
 
                 return _mask;
             }
             set 
             {
-                if (wrappable && wrapMask && value is bMaskList)
-                {
-                    _wrappedMask = value as bMaskList;
-                }
-                else
-                {
-                    base.mask = value;
-                }
+                base.mask = value;
             }
         }
 
@@ -90,6 +86,7 @@ namespace AXE.Game.Entities
         public virtual void onUpdateBegin()
         {
             previousPosition = pos;
+            generateWrappedMask();
         }
 
         public virtual void onUpdate()
@@ -104,17 +101,14 @@ namespace AXE.Game.Entities
                 if (x < 0)
                 {
                     showWrapEffect = Dir.Right;
-                    generateWrappedMask();
                 }
                 else if (x + graphic.width > (world as LevelScreen).width)
                 {
                     showWrapEffect = Dir.Left;
-                    generateWrappedMask();
                 }
                 else
                 {
                     showWrapEffect = Dir.None;
-                    wrapMask = false;
                 }
             }
         }
@@ -247,7 +241,7 @@ namespace AXE.Game.Entities
             }
         }
 
-        protected void generateWrappedMask()
+        protected bool generateWrappedMask()
         {
             _mask.update(x, y);
             if (showWrapEffect == Dir.Left)
@@ -264,7 +258,8 @@ namespace AXE.Game.Entities
                     // Starts at the beginning of the screen (taking into account mask offset)
                     oppositeMask.w = oppositeMaskSize;
                     oppositeMask.h = _mask.h;
-                    oppositeMask.offsetx = -Math.Min(_mask.x, (world as LevelScreen).width) + _mask.offsetx;
+                    //old //oppositeMask.offsetx = -Math.Min(_mask.x, (world as LevelScreen).width) + _mask.offsetx;
+                    oppositeMask.offsetx = -(world as LevelScreen).width + _mask.offsetx + _mask.w - oppositeMaskSize;
                     oppositeMask.offsety = _mask.offsety;
                     // Mask on current side will have decreasing width as we wrap
                     currentClippedMask.w = _mask.w - clippedSize;
@@ -273,11 +268,8 @@ namespace AXE.Game.Entities
                     currentClippedMask.offsety = _mask.offsety;
 
                     _wrappedMask.update(x, y);
-                    wrapMask = true;
-                }
-                else
-                {
-                    wrapMask = false; // Not yet!!
+
+                    return true;
                 }
             }
             else if (showWrapEffect == Dir.Right)
@@ -300,18 +292,16 @@ namespace AXE.Game.Entities
                     // Mask on current side will have decreasing width as we wrap
                     currentClippedMask.w = _mask.w - clippedOffset;
                     currentClippedMask.h = _mask.h;
-                    currentClippedMask.offsetx = currentMaskOffset + clippedOffset;
+                    currentClippedMask.offsetx = clippedOffset + _mask.offsetx;//old//currentMaskOffset + clippedOffset;
                     currentClippedMask.offsety = _mask.offsety;
 
                     _wrappedMask.update(x, y);
 
-                    wrapMask = true;
-                }
-                else
-                {
-                    wrapMask = false;
+                    return true;
                 }
             }
+
+            return false;
         }
 
         public virtual void onHit(Entity other)
