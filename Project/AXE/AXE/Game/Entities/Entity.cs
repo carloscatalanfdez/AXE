@@ -15,6 +15,7 @@ namespace AXE.Game.Entities
     {
         public enum Dir { None, Left, Right };
 
+        public bool wrappable = true;
         public bool visible = true;
         public Vector2 previousPosition;
         public Dir showWrapEffect;
@@ -33,45 +34,48 @@ namespace AXE.Game.Entities
         {
             get 
             {
-                if (showWrapEffect == Dir.Left)
+                if (wrappable)
                 {
-                    _mask.update(x, y);
-                    int clippedSize =_mask.x + _mask.w - (world as LevelScreen).width;
-
-                    if (clippedSize > 0)
+                    if (showWrapEffect == Dir.Left)
                     {
-                        int oppositeMaskSize = Math.Min(clippedSize, _mask.h);
-                        // Mask on the other side will have increasing width as we wrap
-                        // Starts at the beginning of the screen (taking into account mask offset)
-                        bMask oppositeMask = new bMask(x, y, oppositeMaskSize, _mask.h, -Math.Min(_mask.x, (world as LevelScreen).width) + _mask.offsetx, _mask.offsety);
-                        oppositeMask.game = game;
-                        // Mask on current side will have decreasing width as we wrap
-                        bMask currentClippedMask = new bMask(x, y, _mask.w - clippedSize, _mask.h, _mask.offsetx, _mask.offsety);
-                        currentClippedMask.game = game;
-                        bMask wrappedMask = new bMaskList(new bMask[] { currentClippedMask, oppositeMask }, x, y, false /* not connected */);
-                        wrappedMask.game = game;
-                        return wrappedMask;
+                        _mask.update(x, y);
+                        int clippedSize = _mask.x + _mask.w - (world as LevelScreen).width;
+
+                        if (clippedSize > 0)
+                        {
+                            int oppositeMaskSize = Math.Min(clippedSize, _mask.h);
+                            // Mask on the other side will have increasing width as we wrap
+                            // Starts at the beginning of the screen (taking into account mask offset)
+                            bMask oppositeMask = new bMask(x, y, oppositeMaskSize, _mask.h, -Math.Min(_mask.x, (world as LevelScreen).width) + _mask.offsetx, _mask.offsety);
+                            oppositeMask.game = game;
+                            // Mask on current side will have decreasing width as we wrap
+                            bMask currentClippedMask = new bMask(x, y, _mask.w - clippedSize, _mask.h, _mask.offsetx, _mask.offsety);
+                            currentClippedMask.game = game;
+                            bMask wrappedMask = new bMaskList(new bMask[] { currentClippedMask, oppositeMask }, x, y, false /* not connected */);
+                            wrappedMask.game = game;
+                            return wrappedMask;
+                        }
                     }
-                }
-                else if (showWrapEffect == Dir.Right)
-                {
-                    _mask.update(x, y);
-                    int clippedOffset = -_mask.x;
-
-                    if (clippedOffset > 0)
+                    else if (showWrapEffect == Dir.Right)
                     {
-                        // Mask on the other side will have increasing width as we wrap
-                        // Starts at the end of the screen (taking into account mask offset)
-                        int currentMaskOffset = _mask.x >= 0 ? 0 : _mask.offsetx;
-                        int oppositeMaskSize = Math.Min(clippedOffset, _mask.w);
-                        bMask oppositeMask = new bMask(x, y, oppositeMaskSize, _mask.h, _mask.offsetx + (world as LevelScreen).width, _mask.offsety);
-                        oppositeMask.game = game;
-                        // Mask on current side will have decreasing width as we wrap
-                        bMask currentClippedMask = new bMask(0, y, _mask.w - clippedOffset, _mask.h, currentMaskOffset + clippedOffset, _mask.offsety);
-                        currentClippedMask.game = game;
-                        bMask wrappedMask = new bMaskList(new bMask[] { currentClippedMask, oppositeMask }, x, y, false /* not connected */);
-                        wrappedMask.game = game;
-                        return wrappedMask;
+                        _mask.update(x, y);
+                        int clippedOffset = -_mask.x;
+
+                        if (clippedOffset > 0)
+                        {
+                            // Mask on the other side will have increasing width as we wrap
+                            // Starts at the end of the screen (taking into account mask offset)
+                            int currentMaskOffset = _mask.x >= 0 ? 0 : _mask.offsetx;
+                            int oppositeMaskSize = Math.Min(clippedOffset, _mask.w);
+                            bMask oppositeMask = new bMask(x, y, oppositeMaskSize, _mask.h, _mask.offsetx + (world as LevelScreen).width, _mask.offsety);
+                            oppositeMask.game = game;
+                            // Mask on current side will have decreasing width as we wrap
+                            bMask currentClippedMask = new bMask(0, y, _mask.w - clippedOffset, _mask.h, currentMaskOffset + clippedOffset, _mask.offsety);
+                            currentClippedMask.game = game;
+                            bMask wrappedMask = new bMaskList(new bMask[] { currentClippedMask, oppositeMask }, x, y, false /* not connected */);
+                            wrappedMask.game = game;
+                            return wrappedMask;
+                        }
                     }
                 }
 
@@ -264,15 +268,18 @@ namespace AXE.Game.Entities
 
             if (graphic != null)
             {
-                if (showWrapEffect == Dir.Left)
+                if (wrappable)
                 {
-                    //graphic.color = Color.Aqua;
-                    graphic.render(sb, new Vector2(0 + (pos.X - (world as LevelScreen).width), pos.Y));
-                }
-                else if (showWrapEffect == Dir.Right)
-                {
-                    //graphic.color = Color.Aqua;
-                    graphic.render(sb, new Vector2((world as LevelScreen).width + pos.X, pos.Y));
+                    if (showWrapEffect == Dir.Left)
+                    {
+                        //graphic.color = Color.Aqua;
+                        graphic.render(sb, new Vector2(0 + (pos.X - (world as LevelScreen).width), pos.Y));
+                    }
+                    else if (showWrapEffect == Dir.Right)
+                    {
+                        //graphic.color = Color.Aqua;
+                        graphic.render(sb, new Vector2((world as LevelScreen).width + pos.X, pos.Y));
+                    }
                 }
             }
 

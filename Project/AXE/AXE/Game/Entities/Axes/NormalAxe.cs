@@ -27,6 +27,9 @@ namespace AXE.Game.Entities.Axes
             gravity = 0.8f;
 
             layer = 10;
+
+            wrapCount = 0;
+            wrapLimit = 1;
         }
 
         protected override void initGraphic()

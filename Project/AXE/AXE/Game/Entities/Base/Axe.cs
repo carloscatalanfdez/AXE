@@ -148,7 +148,6 @@ namespace AXE.Game.Entities
             base.onUpdate();
 
             // Prepare step
-            Vector2 initialPos = pos;
             Vector2 moveTo = pos;
 
             if (holder != null)
@@ -158,6 +157,7 @@ namespace AXE.Game.Entities
             {
                 case MovementState.Grabbed:
                     wrapCount = 0;
+                    wrappable = true;
 
                     pos = holder.getHandPosition() - getGrabPosition();
                     break;
@@ -176,6 +176,7 @@ namespace AXE.Game.Entities
                     break;
                 case MovementState.Bouncing:
                     wrapCount = 0;
+                    wrappable = true;
 
                     current_vspeed += gravity;
 
@@ -213,6 +214,7 @@ namespace AXE.Game.Entities
                     break;
                 case MovementState.Stuck:
                     wrapCount = 0;
+                    wrappable = true;
                     if (stuckTo != null)
                     {
                         if (stuckToSide == stuckTo.facing)
@@ -245,9 +247,9 @@ namespace AXE.Game.Entities
 
             int w = (world as LevelScreen).width;
             bool justWrapped =
-                (initialPos.X > w / 2 && (pos.X < w / 2/* || pos.X > w*/)
+                (previousPosition.X > w / 2 && (pos.X < w / 2/* || pos.X > w*/)
                     && facing == Dir.Right) ||
-                (initialPos.X < w / 2 && (pos.X > w / 2/* || pos.X < 0*/)
+                (previousPosition.X < w / 2 && (pos.X > w / 2/* || pos.X < 0*/)
                     && facing == Dir.Left);
 
             if (justWrapped)
@@ -255,6 +257,12 @@ namespace AXE.Game.Entities
                 wrapCount++;
                 if (wrapCount > wrapLimit)
                     world.remove(this);
+                else if (wrapCount == wrapLimit)
+                {
+                    // you're close, buddy, next time don't wrap or you'll be out
+                    wrappable = false;
+                    // unless someone stops you, that is
+                }
             }
         }
 
