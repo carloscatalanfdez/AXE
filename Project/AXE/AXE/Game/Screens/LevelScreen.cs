@@ -70,6 +70,7 @@ namespace AXE.Game.Screens
             entities.Add("hazard", new List<bEntity>());
             entities.Add("enemy", new List<bEntity>());
             entities.Add("stairs", new List<bEntity>());
+            entities.Add("coins", new List<bEntity>());
 
             // Load level
             if (id < Controller.getInstance().data.maxLevels)
@@ -170,6 +171,13 @@ namespace AXE.Game.Screens
                         {
                             h.onCollision("player", p);
                             p.onCollision("hazard", h);
+                        }
+
+                    foreach (bEntity c in entities["coins"])
+                        if (p != c && p.collides(c))
+                        {
+                            c.onCollision("player", p);
+                            p.onCollision("coins", c);
                         }
                 }
 
@@ -301,6 +309,8 @@ namespace AXE.Game.Screens
                     _add(e, "items");
                 else if (e is AXE.Game.Entities.Base.Enemy)
                     _add(e, "enemy");
+                else if (e is Coin)
+                    _add(e, "coins");
             }
         }
 

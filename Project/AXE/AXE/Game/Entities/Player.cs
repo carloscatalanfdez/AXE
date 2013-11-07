@@ -870,5 +870,10 @@ namespace AXE.Game.Entities
         void handleDebugRoutines()
         {
         }
+
+        public void onCollectCoin()
+        {
+            data.collectedCoins++;
+        }
     }
 }

@@ -133,5 +133,12 @@
     <OneWayPlatform id="60" x="320" y="184" />
     <Imp id="68" x="200" y="208" />
     <OneWayPlatform id="59" x="72" y="72" />
+    <Coin id="69" x="16" y="112" />
+    <Coin id="70" x="280" y="104" />
+    <Coin id="71" x="312" y="32" />
+    <Coin id="72" x="272" y="224" />
+    <Coin id="73" x="24" y="56" />
+    <Coin id="74" x="72" y="56" />
+    <Coin id="75" x="48" y="32" />
   </Entities>
 </level>

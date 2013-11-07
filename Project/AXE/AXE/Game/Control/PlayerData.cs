@@ -12,10 +12,13 @@ namespace AXE.Game.Control
     public class PlayerData
     {
         public PlayerIndex id;
+        // Coins collected on this session
+        public int collectedCoins;
 
         public PlayerData(PlayerIndex id)
         {
             this.id = id;
+            this.collectedCoins = 0;
         }
     }
 }

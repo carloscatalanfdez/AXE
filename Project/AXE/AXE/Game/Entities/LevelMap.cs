@@ -155,6 +155,9 @@ namespace AXE.Game.Entities
                 case "Imp":
                     ge = new Enemies.Imp(x, y);
                     break;
+                case "Coin":
+                    ge = new Coin(x, y);
+                    break;
             }
 
             if (ge != null)
