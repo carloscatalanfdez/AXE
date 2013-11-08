@@ -14,6 +14,7 @@ using AXE.Common;
 using AXE.Game.Entities;
 using AXE.Game.Control;
 using AXE.Game.Entities.Axes;
+using AXE.Game.Entities.Contraptions;
 
 namespace AXE.Game.Screens
 {
@@ -71,6 +72,8 @@ namespace AXE.Game.Screens
             entities.Add("enemy", new List<bEntity>());
             entities.Add("stairs", new List<bEntity>());
             entities.Add("coins", new List<bEntity>());
+            entities.Add("contraptions", new List<bEntity>());
+            entities.Add("rewarders", new List<bEntity>());
 
             // Load level
             if (id < Controller.getInstance().data.maxLevels)
@@ -311,6 +314,10 @@ namespace AXE.Game.Screens
                     _add(e, "enemy");
                 else if (e is Coin)
                     _add(e, "coins");
+                else if (e is IContraption)
+                    _add(e, "contraptions");
+                else if (e is IRewarder)
+                    _add(e, "rewarders");
             }
         }
 

@@ -51,6 +51,10 @@ namespace AXE.Game.Entities.Axes
 
         public override void onHitSolid(bEntity entity)
         {
+            if (entity != null && (entity is Entity))
+            {
+                (entity as Entity).onHit(this);
+            }
             onStuck(entity);
         }
     }
