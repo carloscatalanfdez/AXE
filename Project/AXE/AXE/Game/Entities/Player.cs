@@ -275,7 +275,7 @@ namespace AXE.Game.Entities
                                 if (door is Door)
                                 {
                                     Door exitDoor = (door as Door);
-                                    if (exitDoor.type == Door.Type.Exit)
+                                    if (exitDoor.type == Door.Type.ExitOpen)
                                     {
                                         state = MovementState.Exit;
                                         timer[EXIT_ANIM_TIMER] = exitAnimationWaitTime;

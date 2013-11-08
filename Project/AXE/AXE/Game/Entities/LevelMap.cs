@@ -11,6 +11,7 @@ using bEngine;
 using bEngine.Graphics;
 
 using AXE.Game.Entities;
+using AXE.Game.Entities.Contraptions;
 
 namespace AXE.Game.Entities
 {
@@ -25,6 +26,8 @@ namespace AXE.Game.Entities
         public bTilemap tilemap;
         public List<bEntity> entities;
 
+        public List<IContraption> linkedContraptions;
+
         public String name;
         public Vector2 playerStart;
 
@@ -32,6 +35,7 @@ namespace AXE.Game.Entities
             : base(0, 0)
         {
             entities = new List<bEntity>();
+            linkedContraptions = new List<IContraption>();
             playerStart = Vector2.Zero;
             mapName = fname;
         }
@@ -109,6 +113,25 @@ namespace AXE.Game.Entities
                 }
             }
 
+            // Link contraptions with their entities
+            foreach (IContraption contraption in linkedContraptions)
+            {
+                // No ids means no worth trying
+                ContraptionRewardData contraptionRewardData = contraption.getContraptionRewardData();
+                foreach (bEntity entity in entities)
+                {
+                    if (entity.id == contraptionRewardData.rewarderId
+                        && entity is IRewarder)
+                    {
+                        contraption.setRewarder(entity as IRewarder);
+                    }
+                    else if (entity.id == contraptionRewardData.targetId)
+                    {
+                        contraptionRewardData.target = entity;
+                    }
+                }
+            }
+
             tsetFilename = "basic";
 
             tilemap = new bTilemap(w, h, tileWidth, tileHeight, game.Content.Load<Texture2D>("Assets/Tilesets/" + tsetFilename));
@@ -138,7 +161,8 @@ namespace AXE.Game.Entities
                     // TODO: handle entry
                     break;
                 case "ExitDoor":
-                    ge = new Door(x, y, Door.Type.Exit);
+                    bool open = bool.Parse(element.GetAttribute("open"));
+                    ge = new Door(x, y, open ? Door.Type.ExitOpen : Door.Type.ExitClose);
                     break;
                 case "PlayerStart":
                     playerStart = new Vector2(x, y);
@@ -158,6 +182,38 @@ namespace AXE.Game.Entities
                 case "Coin":
                     ge = new Coin(x, y);
                     break;
+                case "FinishLevelContraption":
+                    ge = new FinishLevelContraption();
+                    break;
+                case "ItemGenerator":
+                    string type = element.GetAttribute("type");
+                    ge = new ItemGenerator(type);
+                    break;
+            }
+
+            try
+            {
+                int rewarder = int.Parse(element.GetAttribute("rewarder"));
+                if (rewarder != 0)
+                {
+                    // Entity is linked to another entity
+                    IContraption contraption = ge as IContraption;
+                    ContraptionRewardData contraptionRewardData = contraption.getContraptionRewardData();
+                    contraptionRewardData.rewarderId = rewarder;
+                    contraptionRewardData.targetId = int.Parse(element.GetAttribute("target"));
+                    int targetX = int.Parse(element.GetAttribute("targetX"));
+                    int targetY = int.Parse(element.GetAttribute("targetY"));
+                    contraptionRewardData.targetPos = new Vector2(targetX, targetY);
+                    contraptionRewardData.value = int.Parse(element.GetAttribute("value"));
+                    contraption.setContraptionRewardData(contraptionRewardData);
+
+                    // If they don't link to any entity then we won't bother
+                    linkedContraptions.Add(contraption);
+                }
+            }
+            catch (ArgumentNullException e)
+            {
+                // ignore it
             }
 
             if (ge != null)

@@ -8,10 +8,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 using bEngine;
 using bEngine.Graphics;
+using AXE.Game.Entities.Contraptions;
 
 namespace AXE.Game.Entities
 {
-    class Door : Entity
+    class Door : Entity, IRewarder
     {
         public bSpritemap spgraphic
         {
@@ -22,7 +23,7 @@ namespace AXE.Game.Entities
         public Vector2 signPosition;
         protected Random random;
 
-        public enum Type { Entry, Exit };
+        public enum Type { Entry, ExitOpen, ExitClose };
         public Type type;
 
         public Door(int x, int y, Type type)
@@ -35,20 +36,20 @@ namespace AXE.Game.Entities
         {
             base.init();
 
-            spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/door-sheet"), 24, 32);
-            spgraphic.add(new bAnim("closed", new int[] { 0 }));
-            spgraphic.add(new bAnim("open", new int[] { 1 }));
-            if (type == Type.Entry)
-                spgraphic.play("closed");
-            else
-                spgraphic.play("open");
-
             mask.w = 8;
             mask.h = 8;
             mask.offsetx = 8;
             mask.offsety = 8;
 
-            if (type == Type.Exit)
+            spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/door-sheet"), 24, 32);
+            spgraphic.add(new bAnim("closed", new int[] { 0 }));
+            spgraphic.add(new bAnim("open", new int[] { 1 }));
+            if (type == Type.Entry || type == Type.ExitClose)
+                spgraphic.play("closed");
+            else
+                spgraphic.play("open");
+
+            if (isExit())
             {
                 sign = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/sign-sheet"), 32, 24);
                 sign.add(new bAnim("idle", new int[] { 0 }));
@@ -78,7 +79,7 @@ namespace AXE.Game.Entities
             base.onUpdate();
             spgraphic.update();
 
-            if (type == Type.Exit)
+            if (isExit())
             {
                 sign.update();
 
@@ -93,8 +94,42 @@ namespace AXE.Game.Entities
 
             spgraphic.render(sb, pos);
 
-            if (type == Type.Exit)
+            if (isExit())
                 sign.render(sb, signPosition);
+        }
+
+        public void onReward(IContraption contraption)
+        {
+            if (isOpen())
+            {
+                close();
+            }
+            else
+            {
+                open();
+            }
+        }
+
+        public void open()
+        {
+            spgraphic.play("open");
+            type = Type.ExitOpen;
+        }
+
+        public void close()
+        {
+            spgraphic.play("closed");
+            type = Type.ExitClose;
+        }
+
+        public bool isOpen()
+        {
+            return type == Type.ExitOpen;
+        }
+
+        public bool isExit()
+        {
+            return type == Type.ExitOpen || type == Type.ExitClose;
         }
     }
 }

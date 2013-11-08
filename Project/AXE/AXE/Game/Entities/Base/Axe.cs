@@ -35,6 +35,9 @@ namespace AXE.Game.Entities
         // When grabbed
         public IWeaponHolder holder;
 
+        // When thrown
+        public IWeaponHolder thrower;
+
         // When stuck
         public Entity stuckTo;  // Entity the axe is stuck to
         public Vector2 stuckOffset;  // Offset at (in stuckTo's coordinates) which the axe is stuck
@@ -336,10 +339,14 @@ namespace AXE.Game.Entities
             facing = holder.getFacing();
             state = MovementState.Grabbed;
             this.holder = holder;
+            thrower = null;
         }
 
         public virtual void onThrow(int force, Player.Dir dir)
         {
+            // Holder is stored during flight
+            thrower = holder;
+
             wrapCount = 0;
             sfxThrow.Play();
             state = MovementState.Flying;

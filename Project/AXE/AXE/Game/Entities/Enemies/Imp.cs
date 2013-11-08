@@ -17,6 +17,7 @@ using AXE.Game.Utils;
 using AXE.Game.Entities.Axes;
 using AXE.Game.Control;
 using AXE.Common;
+using AXE.Game.Entities.Contraptions;
 
 namespace AXE.Game.Entities.Enemies
 {
@@ -153,7 +154,7 @@ namespace AXE.Game.Entities.Enemies
                             changeState(State.Idle);
                         }
                         beginChase = false;
-                        timer[1] = (int) (chaseReactionTime * 1.5f);
+                        timer[1] = (int)(chaseReactionTime * 1.5f);
                         break;
                     case State.Attacking:
                         if (tamed)
@@ -175,7 +176,7 @@ namespace AXE.Game.Entities.Enemies
                             xx = 20;
                         else
                             xx = -10;
-                        weaponHitZone = new KillerRect(x+xx, y+yy, 20, 27, Player.DeathState.ForceHit);
+                        weaponHitZone = new KillerRect(x + xx, y + yy, 20, 27, Player.DeathState.ForceHit);
                         weaponHitZone.setOwner(this);
                         world.add(weaponHitZone, "hazard");
                         timer[0] = attackTime;
@@ -231,11 +232,11 @@ namespace AXE.Game.Entities.Enemies
 
                             break;
                     }
-                break;
+                    break;
                 case 1:
                     if (state == State.Chase || state == State.ChaseRunning)
                         beginChase = true;
-                break;
+                    break;
             }
         }
 
@@ -258,11 +259,11 @@ namespace AXE.Game.Entities.Enemies
 
                     Vector2 nextPosition = new Vector2(x + directionToSign(facing) * hspeed, y);
                     bool wontFall = checkForGround(
-                            (int) (nextPosition.X + directionToSign(facing) * graphicWidth()/2), 
-                            (int) nextPosition.Y);
+                            (int)(nextPosition.X + directionToSign(facing) * graphicWidth() / 2),
+                            (int)nextPosition.Y);
                     bool wontCollide = !placeMeeting(
-                            (int) nextPosition.X, 
-                            (int) nextPosition.Y, new String[] {"player", "solid"});
+                            (int)nextPosition.X,
+                            (int)nextPosition.Y, new String[] { "player", "solid" });
                     if (wontFall && wontCollide)
                         moveTo.X += directionToSign(facing) * hspeed;
                     else if (!wontFall)
@@ -463,17 +464,30 @@ namespace AXE.Game.Entities.Enemies
         {
             base.onHit(other);
 
-            if (other is NormalAxe); // Kill me here or whatuverr
+            if (other is NormalAxe)
+            {
+                if (rewarder != null)
+                {
+                    if (contraptionRewardData.target == null)
+                    {
+                        contraptionRewardData.target = ((other as NormalAxe).thrower as bEntity);
+                    }
+                }
+                onSolved();
+            }
             else if (other is Axe)
             {
                 // Get MaD!
-                if (other.x + other.graphicWidth() / 2 < x + graphicWidth()/2)
+                if (other.x + other.graphicWidth() / 2 < x + graphicWidth() / 2)
                     facing = Dir.Left;
                 else facing = Dir.Right;
                 changeState(State.ChaseRunning);
             }
         }
 
+        /**
+         * IHAZARDPROVIDER METHODS
+         */
         public void onSuccessfulHit(Player other)
         {
             tamed = true;
