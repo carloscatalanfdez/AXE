@@ -75,7 +75,7 @@ namespace AXE.Game.Entities
             if (state == State.Taken)
             {
                 pos.Y -= 5;
-                graphic.alpha -= Math.Max(0, graphic.alpha - 0.1f);
+                graphic.color *= 0.8f;
             }
         }
 
