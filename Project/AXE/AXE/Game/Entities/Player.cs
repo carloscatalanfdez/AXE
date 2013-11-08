@@ -57,7 +57,9 @@ namespace AXE.Game.Entities
         public float jumpPower;
         public Dir jumpedFacing;
         public float jumpMaxSpeed;
-        public bool falling;
+        public bool fallingToDeath;
+        public Vector2 fallingFrom;
+        public int deathFallThreshold;
         public bool onair;
 
         // State params
@@ -112,7 +114,7 @@ namespace AXE.Game.Entities
             spgraphic.add(new bAnim("death", new int[] { 8 }));
             spgraphic.add(new bAnim("death-forcehit", new int[] { 10, 11, 10, 11, 10, 11, 10, 11, 10, 11, 10, 11 }, 0.4f, false));
             spgraphic.add(new bAnim("squid", new int[] { 9 }));
-            spgraphic.add(new bAnim("fall", new int[] { 8 }, 0.4f));
+            spgraphic.add(new bAnim("fall", new int[] { 12 } ));
             spgraphic.add(new bAnim("ladder", new int[] { 10, 11 }, 0.1f));
             spgraphic.add(new bAnim("readyweapon", new int[] { 0, 16, 17, 17, 17 }, 0.5f, false));
             spgraphic.add(new bAnim("air-readyweapon", new int[] { 8, 19, 20, 20, 20 }, 0.6f, false));
@@ -138,11 +140,13 @@ namespace AXE.Game.Entities
             jumpMaxSpeed = 0.0f;
             deathDelayTime = 0;
             playDeathAnim = false;
+            deathFallThreshold = 40;
 
             state = MovementState.Idle;
             action = ActionState.None;
             facing = Dir.Right;
             deathCause = DeathState.None;
+            fallingFrom = Vector2.Zero;
 
             debugText = "";
             floater = false;
@@ -212,6 +216,9 @@ namespace AXE.Game.Entities
                 case MovementState.Walk:
                     state = MovementState.Idle;
 
+                    fallingToDeath = false;
+                    fallingFrom = Vector2.Zero;
+
                     handleAcceleratedMovement(ref _haccel, ref _hspeed);
 
                     if (onair)
@@ -223,7 +230,8 @@ namespace AXE.Game.Entities
                         else
                         {
                             state = MovementState.Jump;
-                            falling = true;
+                            fallingToDeath = false;
+                            fallingFrom = pos;
                         }
                     }
                     else
@@ -515,8 +523,8 @@ namespace AXE.Game.Entities
                     break;
                 case MovementState.Jump:
                     spgraphic.color = Color.Red;
-                    if (falling)
-                        spgraphic.play("fall");
+                    if (fallingToDeath)
+                        spgraphic.play("death-forcehit");
                     else
                         spgraphic.play("jump");
                     if (facing == Dir.Right)
@@ -658,10 +666,16 @@ namespace AXE.Game.Entities
                 facing = Dir.Right;
             }
 
-            if (vspeed > 0 && state != MovementState.Attacking && state != MovementState.Attacked)
+            if (vspeed > 0 && state != MovementState.Attacking && state != MovementState.Attacked && fallingFrom == Vector2.Zero)
             {
                 state = MovementState.Jump;
-                falling = true;
+                fallingToDeath = false;
+                fallingFrom = pos;
+            }
+
+            if (vspeed > 0 && pos.Y - fallingFrom.Y >= deathFallThreshold)
+            {
+                fallingToDeath = true;
             }
 
             moveTo.X += current_hspeed;
