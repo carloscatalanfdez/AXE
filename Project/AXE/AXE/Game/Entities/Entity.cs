@@ -338,6 +338,11 @@ namespace AXE.Game.Entities
             }
         }
 
+        public virtual void onActivationEndNotification()
+        {
+            // The activation you requested has completed. Finish your animation or something.
+        }
+
         public override void render(GameTime dt, Microsoft.Xna.Framework.Graphics.SpriteBatch sb)
         {
             base.render(dt, sb);

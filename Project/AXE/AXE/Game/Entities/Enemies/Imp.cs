@@ -23,7 +23,7 @@ namespace AXE.Game.Entities.Enemies
 {
     class Imp : Enemy, IHazardProvider
     {
-        public enum State { None, Idle, Turn, Walk, Chase, ChaseRunning, Attacking, Attacked }
+        public enum State { None, Idle, Turn, Walk, Chase, ChaseRunning, Attacking, Attacked, Falling }
         public State state;
 
         public bSpritemap spgraphic
@@ -31,6 +31,13 @@ namespace AXE.Game.Entities.Enemies
             get { return (_graphic as bSpritemap); }
             set { _graphic = value; }
         }
+
+        // gravity things
+        bool fallingToDeath;
+        int deathFallThreshold;
+        Vector2 fallingFrom;
+        float gravity;
+        float vspeed;
 
         Vector2 moveTo;
         bMask watchMask;
@@ -82,6 +89,9 @@ namespace AXE.Game.Entities.Enemies
             watchMask = new bMask(x, y, 90, 24);
 
             hspeed = 1;
+            vspeed = 0f;
+            gravity = 0.5f;
+            deathFallThreshold = 40;
 
             idleBaseTime = 80;
             idleOptionalTime = 80;
@@ -137,7 +147,7 @@ namespace AXE.Game.Entities.Enemies
                         break;
                     case State.Turn:
                         timer[0] = turnBaseTime + Tools.random.Next(turnOptionalTime) - turnOptionalTime;
-                        break;
+                        break;    
                     case State.Chase:
                         if (tamed)
                         {
@@ -249,6 +259,13 @@ namespace AXE.Game.Entities.Enemies
             moveTo = pos;
             bool onAir = !checkForGround(x, y);
 
+            if (onAir)
+            {
+                state = State.Falling;
+                fallingFrom = pos;
+                fallingToDeath = false;
+            }
+
             switch (state)
             {
                 case State.Idle:
@@ -274,6 +291,33 @@ namespace AXE.Game.Entities.Enemies
                     break;
                 case State.Turn:
                     spgraphic.play("turn");
+                    break;
+                case State.Falling:
+                    if (onAir)
+                    {
+                        vspeed += gravity;
+                        if (vspeed > 0 && fallingFrom == Vector2.Zero)
+                        {
+                            fallingToDeath = false;
+                            fallingFrom = pos;
+                        }
+
+                        if (vspeed > 0 && pos.Y - fallingFrom.Y >= deathFallThreshold)
+                        {
+                            fallingToDeath = true;
+                        }
+                    }
+                    else
+                    {
+                        if (fallingToDeath)
+                            ; // You'd be death, buddy!
+                        changeState(State.Idle);
+                    }
+
+                    moveTo.Y += vspeed;
+
+                    spgraphic.play("jump");
+
                     break;
                 case State.Chase:
                 case State.ChaseRunning:
@@ -353,7 +397,7 @@ namespace AXE.Game.Entities.Enemies
 
             }
 
-            if (state == State.Walk || state == State.Chase || state == State.ChaseRunning)
+            if (state == State.Walk || state == State.Chase || state == State.ChaseRunning || state == State.Falling)
             {
                 Vector2 remnant;
                 // Check wether we collide first with a solid or a onewaysolid,
@@ -380,20 +424,19 @@ namespace AXE.Game.Entities.Enemies
                 {
                 }
 
-                /*// The y movement was stopped
+                // The y movement was stopped
                 if (remnant.Y != 0 && vspeed < 0)
                 {
                     // Touched ceiling
-                    if (!handleJumpHit())
-                        vspeed = 0;
+                    vspeed = 0;
                 }
                 else if (remnant.Y != 0 && vspeed > 0)
                 {
                     // Landed
-                    isLanding = true;
+                    /*isLanding = true;
                     sfxSteps[0].Play();
-                    sfxSteps[1].Play();
-                }*/
+                    sfxSteps[1].Play();*/
+                }
             }
 
             spgraphic.flipped = (facing == Dir.Left);

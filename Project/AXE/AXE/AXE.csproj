@@ -111,6 +111,7 @@
     <Compile Include="Game\Entities\Axes\NormalAxe.cs" />
     <Compile Include="Game\Entities\Base\Axe.cs" />
     <Compile Include="Game\Entities\Base\Enemy.cs" />
+    <Compile Include="Game\Entities\Base\IActivable.cs" />
     <Compile Include="Game\Entities\Base\IHazard.cs" />
     <Compile Include="Game\Entities\Base\IHazardProvider.cs" />
     <Compile Include="Game\Entities\Base\IWeapon.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="Game\Entities\Base\IContraption.cs" />
     <Compile Include="Game\Entities\Base\IRewarder.cs" />
     <Compile Include="Game\Entities\Contraptions\FinishLevelContraption.cs" />
+    <Compile Include="Game\Entities\Contraptions\Lever.cs" />
     <Compile Include="Game\Entities\Contraptions\TrapDoor.cs" />
     <Compile Include="Game\Entities\Enemies\Imp.cs" />
     <Compile Include="Game\Entities\Enemies\KillerRect.cs" />

@@ -29,11 +29,12 @@ namespace AXE.Game.Entities
         Random random;
 
         // Some declarations
-        public enum MovementState { Idle, Walk, Jump, Ladder, Death, Attacking, Attacked, Exit };
+        public enum MovementState { Idle, Walk, Jump, Ladder, Death, Attacking, Attacked, Activate, Exit };
         public enum DeathState { None, Generic, Fall, ForceHit };
         public enum ActionState { None, Squid };
         public const int EXIT_ANIM_TIMER = 1;
         public const int EXIT_TRANSITION_TIMER = 2;
+        public const int ACTIVATION_TIME_TIMER = 3;
         public int exitTransitionWaitTime;
         public int exitAnimationWaitTime;
 
@@ -87,6 +88,9 @@ namespace AXE.Game.Entities
         protected SoundEffect sfxLanded;
         protected SoundEffect sfxCharge;
 
+        // Timers
+        public int activationTime;
+
         // Debug
         String debugText;
         bool floater;
@@ -113,6 +117,7 @@ namespace AXE.Game.Entities
             spgraphic.add(new bAnim("idle", new int[] { 0 }, 0.1f));
             spgraphic.add(new bAnim("walk", new int[] { 1, 2, 3, 2 }, 0.2f));
             spgraphic.add(new bAnim("jump", new int[] { 8 }, 0.0f));
+            spgraphic.add(new bAnim("activate", new int[] { 5 }));
             spgraphic.add(new bAnim("death", new int[] { 24, 25, 26, 27, 27, 27, 28, 28, 29, 29, 29, 29, 29 }, 0.2f, false));
             spgraphic.add(new bAnim("death-forcehit", new int[] { 24, 25, 26, 27, 27, 27, 28, 28, 29, 29, 29, 29, 29}, 0.2f, false));
             spgraphic.add(new bAnim("squid", new int[] { 9 }));
@@ -156,6 +161,7 @@ namespace AXE.Game.Entities
 
             exitTransitionWaitTime = 15;
             exitAnimationWaitTime = 15;
+            activationTime = 15;
 
             loadSoundEffects();
         }
@@ -425,6 +431,9 @@ namespace AXE.Game.Entities
                     }
 
                     break;
+                case MovementState.Activate:
+                    spgraphic.play("activate");
+                    break;
             }
 
             moveTo.Y += vspeed;
@@ -509,14 +518,30 @@ namespace AXE.Game.Entities
                             // weapon.onThrow(10, facing);
                         }
                     }
-                    else
+                    else // No weapon, pick / activate
                     {
-                        if (state != MovementState.Attacking && state != MovementState.Attacked)
+                        bool pickedWeapon = false;
+                        if (state != MovementState.Attacking && state != MovementState.Attacked && state != MovementState.Activate)
                         {
                             bEntity entity = instancePlace(pos, "axe");
                             if (entity != null)
                             {
                                 (entity as Axe).onGrab(this);
+                                pickedWeapon = true;
+                            }
+                        }
+
+                        if (!pickedWeapon)
+                        {
+                            IActivable activable = (instancePlace(x, y, "contraptions", null, activableCondition) as IActivable);
+                            if (activable != null)
+                            {
+                                if (activable.activate(this))
+                                {
+                                    state = MovementState.Activate;
+                                    // Will wait for end notification
+                                    // timer[ACTIVATION_TIME_TIMER] = activationTime;
+                                }
                             }
                         }
                     }
@@ -692,9 +717,11 @@ namespace AXE.Game.Entities
                 }
             }
 
-            if (vspeed > 0 && state != MovementState.Attacking && state != MovementState.Attacked && fallingFrom == Vector2.Zero)
+            if (vspeed > 0 
+                /*&& state != MovementState.Attacking && state != MovementState.Attacked */
+                && fallingFrom == Vector2.Zero)
             {
-                state = MovementState.Jump;
+                //state = MovementState.Jump;
                 fallingToDeath = false;
                 fallingFrom = pos;
             }
@@ -736,6 +763,9 @@ namespace AXE.Game.Entities
                     break;
                 case EXIT_TRANSITION_TIMER:
                     Controller.getInstance().goToNextLevel();
+                    break;
+                case ACTIVATION_TIME_TIMER:
+                    state = MovementState.Idle;
                     break;
             }
         }
@@ -848,6 +878,16 @@ namespace AXE.Game.Entities
         public bool isFlipped()
         {
             return spgraphic.flipped;
+        }
+
+        public bool activableCondition(bEntity me, bEntity other)
+        {
+            return (other is IActivable);
+        }
+
+        public override void onActivationEndNotification()
+        {
+            state = MovementState.Idle;
         }
 
         /* IWeaponHolder implementation */

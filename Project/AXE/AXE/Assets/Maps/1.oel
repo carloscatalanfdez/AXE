@@ -91,5 +91,6 @@
     <OneWayPlatform id="24" x="24" y="56" />
     <OneWayPlatform id="25" x="272" y="56" />
     <OneWayPlatform id="26" x="288" y="176" />
+    <Lever id="27" x="72" y="40" rewarder="19" />
   </Entities>
 </level>

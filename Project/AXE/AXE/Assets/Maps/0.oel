@@ -130,7 +130,7 @@
     <Imp id="66" x="40" y="40" rewarder="65" target="0" targetX="0" targetY="0" value="0" />
     <Imp id="67" x="248" y="152" rewarder="77" target="0" targetX="0" targetY="0" value="0" />
     <OneWayPlatform id="60" x="320" y="184" />
-    <Imp id="68" x="200" y="208" rewarder="35" target="0" targetX="0" targetY="0" value="0" />
+    <Imp id="68" x="128" y="96" rewarder="35" target="0" targetX="0" targetY="0" value="0" />
     <OneWayPlatform id="59" x="72" y="72" />
     <Coin id="69" x="16" y="112" />
     <Coin id="70" x="280" y="104" />
@@ -142,5 +142,6 @@
     <FinishLevelContraption id="76" x="0" y="0" rewarder="77" target="0" targetX="0" targetY="0" value="1" />
     <ItemGenerator id="77" x="16" y="0" type="coins" />
     <TrapDoor id="35" x="112" y="128" open="False" rewarder="35" />
+    <Lever id="78" x="200" y="224" rewarder="35" />
   </Entities>
 </level>

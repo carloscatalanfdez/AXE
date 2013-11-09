@@ -193,6 +193,9 @@ namespace AXE.Game.Entities
                     bool trapdoorOpen = bool.Parse(element.GetAttribute("open"));
                     ge = new TrapDoor(x, y, trapdoorOpen);
                     break;
+                case "Lever":
+                    ge = new Lever(x, y);
+                    break;
             }
 
             string rewarderElement = element.GetAttribute("rewarder");
