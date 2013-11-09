@@ -37,7 +37,7 @@ namespace AXE.Game.Entities
             base.init();
 
             mask.w = 8;
-            mask.h = 8;
+            mask.h = 24;
             mask.offsetx = 8;
             mask.offsety = 8;
 
@@ -90,12 +90,12 @@ namespace AXE.Game.Entities
 
         public override void render(GameTime dt, SpriteBatch sb)
         {
-            base.render(dt, sb);
-
             spgraphic.render(sb, pos);
 
             if (isExit())
                 sign.render(sb, signPosition);
+
+            base.render(dt, sb);
         }
 
         public void onReward(IContraption contraption)
@@ -130,6 +130,12 @@ namespace AXE.Game.Entities
         public bool isExit()
         {
             return type == Type.ExitOpen || type == Type.ExitClose;
+        }
+
+        public override void onClick()
+        {
+            if (isExit())
+                onReward(null);
         }
     }
 }

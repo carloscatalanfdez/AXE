@@ -35,8 +35,8 @@ namespace AXE
         protected override void Initialize()
         {
             Controller.getInstance().setGame(this);
-
-            changeWorld(new LogoScreen());
+            Controller.getInstance().onMenuStart();
+            /*changeWorld(new LogoScreen());*/
             base.Initialize();
         }
 

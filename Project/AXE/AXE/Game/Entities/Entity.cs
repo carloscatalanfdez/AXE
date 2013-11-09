@@ -29,6 +29,9 @@ namespace AXE.Game.Entities
         }
 
         public bool mouseHover;
+        public bool draggable = false;
+        protected bool beingDragged;
+        public Vector2 dragOffset;
 
         public bMaskList _wrappedMask;
         public override bMask mask
@@ -119,12 +122,29 @@ namespace AXE.Game.Entities
             {
                 onUpdateBegin();
 
-                mouseHover = mask.rect.Contains(bGame.input.mouseX, bGame.input.mouseY);
+                if (bConfig.DEBUG)
+                {
+                    mouseHover = mask.rect.Contains(bGame.input.mouseX, bGame.input.mouseY);
+                    if (mouseHover && bGame.input.pressed(0))
+                        onClick();
+                }
 
                 onUpdate();
                 base.update();
 
                 onUpdateEnd();
+
+                if (draggable && beingDragged)
+                {
+                    if (input.released(0))
+                    {
+                        beingDragged = false;
+                        dragOffset = Vector2.Zero;
+                    }
+                    else
+                        pos = bGame.input.mousePosition - dragOffset;
+                }
+
             }
         }
 
@@ -306,6 +326,16 @@ namespace AXE.Game.Entities
 
         public virtual void onHit(Entity other)
         {
+        }
+
+        public virtual void onClick()
+        {
+            // This entity was clicked by the left mouse button
+            if (draggable)
+            {
+                dragOffset = input.mousePosition - pos;
+                beingDragged = true;
+            }
         }
 
         public override void render(GameTime dt, Microsoft.Xna.Framework.Graphics.SpriteBatch sb)

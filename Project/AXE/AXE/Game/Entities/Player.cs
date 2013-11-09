@@ -18,6 +18,7 @@ using AXE.Game.Control;
 using AXE.Game.Screens;
 using AXE.Game.Entities.Base;
 using AXE.Game.Utils;
+using Microsoft.Xna.Framework.Media;
 
 namespace AXE.Game.Entities
 {
@@ -65,6 +66,7 @@ namespace AXE.Game.Entities
         // State params
         public int deathDelayTime;
         public bool playDeathAnim;
+        public bool waitingLanding;
         
         // State vars
         public MovementState previousState;
@@ -111,8 +113,8 @@ namespace AXE.Game.Entities
             spgraphic.add(new bAnim("idle", new int[] { 0 }, 0.1f));
             spgraphic.add(new bAnim("walk", new int[] { 1, 2, 3, 2 }, 0.2f));
             spgraphic.add(new bAnim("jump", new int[] { 8 }, 0.0f));
-            spgraphic.add(new bAnim("death", new int[] { 8 }));
-            spgraphic.add(new bAnim("death-forcehit", new int[] { 10, 11, 10, 11, 10, 11, 10, 11, 10, 11, 10, 11 }, 0.4f, false));
+            spgraphic.add(new bAnim("death", new int[] { 24, 25, 26, 27, 27, 27, 28, 28, 29, 29, 29, 29, 29 }, 0.2f, false));
+            spgraphic.add(new bAnim("death-forcehit", new int[] { 24, 25, 26, 27, 27, 27, 28, 28, 29, 29, 29, 29, 29}, 0.2f, false));
             spgraphic.add(new bAnim("squid", new int[] { 9 }));
             spgraphic.add(new bAnim("fall", new int[] { 12 } ));
             spgraphic.add(new bAnim("ladder", new int[] { 10, 11 }, 0.1f));
@@ -150,6 +152,7 @@ namespace AXE.Game.Entities
 
             debugText = "";
             floater = false;
+            draggable = true;
 
             exitTransitionWaitTime = 15;
             exitAnimationWaitTime = 15;
@@ -335,15 +338,37 @@ namespace AXE.Game.Entities
                     // the player is moving through a one way platform
                     else if (vspeed >= 0)
                     {
-                        state = MovementState.Idle;
+                        if (fallingToDeath)
+                        {
+                            vspeed = 0;
+                            onDeath(DeathState.Fall);
+                        }
+                        else
+                            state = MovementState.Idle;
                     }
                     break;
                 case MovementState.Death:
-                    bool deathAnimationFinished = spgraphic.currentAnim.finished; // TODO
-                    if (deathAnimationFinished)
+                    if (!waitingLanding)
                     {
-                        // Animation end, restart...
-                        Controller.getInstance().handlePlayerDeath();
+                        bool deathAnimationFinished = spgraphic.currentAnim.finished; // TODO
+                        if (deathAnimationFinished)
+                        {
+                            // Animation end, restart...
+                            Controller.getInstance().handlePlayerDeath();
+                        }
+                    }
+                    else
+                    {
+                        if (onair)
+                        {
+                            handleOnAirMovement(/*false*/);
+                            fallingToDeath = false;
+                        }
+                        else if (vspeed >= 0)
+                        {
+                            waitingLanding = false;
+                            setDeathAnim(deathCause);
+                        }
                     }
 
                     break;
@@ -406,7 +431,7 @@ namespace AXE.Game.Entities
 
             handleActionButton();
 
-            if (state == MovementState.Death || toLadder)
+            if (toLadder)
                 pos = moveTo;
             else
             {
@@ -524,7 +549,7 @@ namespace AXE.Game.Entities
                 case MovementState.Jump:
                     spgraphic.color = Color.Red;
                     if (fallingToDeath)
-                        spgraphic.play("death-forcehit");
+                        spgraphic.play("fall");
                     else
                         spgraphic.play("jump");
                     if (facing == Dir.Right)
@@ -542,9 +567,6 @@ namespace AXE.Game.Entities
 
                     break;
                 case MovementState.Death:
-                    /*spgraphic.currentAnim.pause();
-                    if (playDeathAnim)
-                        spgraphic.play("death");*/
                     break;
                 case MovementState.Exit:
                     spgraphic.play("exit");
@@ -624,46 +646,50 @@ namespace AXE.Game.Entities
             }   
         }
 
-        public void handleOnAirMovement()
+        public void handleOnAirMovement(bool controlAvailable = true)
         {
-            if (mginput.released(PadButton.a) && vspeed < 0)
+            
+            if (controlAvailable && mginput.released(PadButton.a) && vspeed < 0)
                 vspeed /= 2;
 
             if (!floater)
                 vspeed += gravity;
 
-            if (mginput.check(PadButton.left))
+            if (controlAvailable)
             {
-                // Going right - squid
-                if (current_hspeed > 0)
+                if (mginput.check(PadButton.left))
                 {
-                    action = ActionState.Squid;
-                    current_hspeed -= air_haccel;
-                    if (jumpedFacing == Dir.Right)
-                        current_hspeed = Math.Max(current_hspeed, 0);
+                    // Going right - squid
+                    if (current_hspeed > 0)
+                    {
+                        action = ActionState.Squid;
+                        current_hspeed -= air_haccel;
+                        if (jumpedFacing == Dir.Right)
+                            current_hspeed = Math.Max(current_hspeed, 0);
+                    }
+                    else
+                    {
+                        action = ActionState.None;
+                        current_hspeed = Math.Max(current_hspeed - air_haccel, -jumpMaxSpeed);
+                    }
+                    facing = Dir.Left;
                 }
-                else
+                else if (mginput.check(PadButton.right))
                 {
-                    action = ActionState.None;
-                    current_hspeed = Math.Max(current_hspeed - air_haccel, -jumpMaxSpeed);
+                    if (current_hspeed < 0)
+                    {
+                        action = ActionState.Squid;
+                        current_hspeed += air_haccel/* * 2*/;
+                        if (jumpedFacing == Dir.Left)
+                            current_hspeed = Math.Min(current_hspeed, 0);
+                    }
+                    else
+                    {
+                        action = ActionState.None;
+                        current_hspeed = Math.Min(current_hspeed + air_haccel, jumpMaxSpeed);
+                    }
+                    facing = Dir.Right;
                 }
-                facing = Dir.Left;
-            }
-            else if (mginput.check(PadButton.right))
-            {
-                if (current_hspeed < 0)
-                {
-                    action = ActionState.Squid;
-                    current_hspeed += air_haccel/* * 2*/;
-                    if (jumpedFacing == Dir.Left)
-                        current_hspeed = Math.Min(current_hspeed, 0);
-                }
-                else
-                {
-                    action = ActionState.None;
-                    current_hspeed = Math.Min(current_hspeed + air_haccel, jumpMaxSpeed);
-                }
-                facing = Dir.Right;
             }
 
             if (vspeed > 0 && state != MovementState.Attacking && state != MovementState.Attacked && fallingFrom == Vector2.Zero)
@@ -768,6 +794,22 @@ namespace AXE.Game.Entities
             }
         }
 
+        /** Used when waiting for landing to play anim! **/
+        public void setDeathAnim(DeathState type)
+        {
+            switch (type)
+            {
+                case DeathState.None:
+                case DeathState.Generic:
+                case DeathState.Fall:
+                    spgraphic.play("death");
+                    break;
+                case DeathState.ForceHit:
+                    spgraphic.play("death-forcehit");
+                    break;
+            }
+        }
+
         public void onDeath(DeathState type = DeathState.Generic)
         {
             if (state != MovementState.Death)
@@ -778,13 +820,16 @@ namespace AXE.Game.Entities
                 {
                     case DeathState.None:
                     case DeathState.Generic:
-                        spgraphic.play("death");
-                        break;
                     case DeathState.Fall:
-                        spgraphic.play("death");
-                        break;
                     case DeathState.ForceHit:
-                        spgraphic.play("death-forcehit");
+                        deathCause = type;
+                        if (onair)
+                            waitingLanding = true;
+                        else
+                        {
+                            waitingLanding = false;
+                            setDeathAnim(type);
+                        }
                         break;
                 }
             }
@@ -883,6 +928,12 @@ namespace AXE.Game.Entities
 
         void handleDebugRoutines()
         {
+            if (beingDragged)
+            {
+                state = MovementState.Jump;
+                fallingToDeath = false;
+                vspeed = 0;
+            }
         }
 
         public void onCollectCoin()

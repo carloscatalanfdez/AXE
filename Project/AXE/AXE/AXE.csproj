@@ -188,6 +188,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="Assets\Maps\1.oel">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Assets\Maps\axe.oep">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

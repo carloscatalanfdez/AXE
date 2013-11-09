@@ -46,6 +46,7 @@ namespace AXE.Game.Screens
 
         // Debug
         // String msg;
+        public bStamp cursor;
         
         public LevelScreen(int id, int lastCheckpoint = -1)
             : base()
@@ -60,6 +61,7 @@ namespace AXE.Game.Screens
 
             paused = false;
 
+            cursor = new bStamp(game.Content.Load<Texture2D>("Assets/Sprites/cursor"));
             state = State.Enter;
 
             // Init entity collections
@@ -210,6 +212,8 @@ namespace AXE.Game.Screens
             // Debug: R for restart
             if (bGame.input.pressed(Microsoft.Xna.Framework.Input.Keys.R))
                 game.changeWorld(new LevelScreen(id));
+            if (bGame.input.pressed(Microsoft.Xna.Framework.Input.Keys.N))
+                Controller.getInstance().goToNextLevel();
         }
 
         public override void render(GameTime dt, SpriteBatch sb, Matrix matrix)
@@ -243,7 +247,7 @@ namespace AXE.Game.Screens
             foreach (bEntity entity in renderQueue)
                 entity.render(dt, sb);
 
-            sb.Draw(bDummyRect.sharedDummyRect(game), bGame.input.mousePosition, Color.WhiteSmoke);
+            cursor.render(sb, bGame.input.mousePosition);
 
             sb.DrawString(game.gameFont, "STAGE " + (id+1), new Vector2(8, 8), Color.White);
             String coinsStr = "CREDITS: " + (GameData.get().credits) + " - COINS: " + (GameData.get().coins);

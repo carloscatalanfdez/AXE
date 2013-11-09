@@ -45,7 +45,7 @@ namespace AXE.Game.Control
 
         public void initPlayData()
         {
-            maxLevels = 1;
+            maxLevels = 2;
             // credits = 0;
 
             // DEBUG

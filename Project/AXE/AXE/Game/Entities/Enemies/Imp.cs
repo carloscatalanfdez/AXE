@@ -331,7 +331,7 @@ namespace AXE.Game.Entities.Enemies
                 bMask holdMyMaskPlease = _mask;
                 mask = watchMask;
 
-                bool sawYou = placeMeeting(x, y, "player");
+                bool sawYou = placeMeeting(x, y, "player", alivePlayerCondition);
                 mask = holdMyMaskPlease; // thank you!
 
                 if (sawYou)
@@ -345,7 +345,7 @@ namespace AXE.Game.Entities.Enemies
                 Player[] players = (world as LevelScreen).players;
                 foreach (Player player in players)
                 {
-                    if (player != null && (player.pos - pos).Length() < attackThreshold)
+                    if (player != null && player.state != Player.MovementState.Death && (player.pos - pos).Length() < attackThreshold)
                     {
                         changeState(State.Attacking);
                     }
@@ -491,6 +491,14 @@ namespace AXE.Game.Entities.Enemies
         public void onSuccessfulHit(Player other)
         {
             tamed = true;
+        }
+
+        bool alivePlayerCondition(bEntity me, bEntity other)
+        {
+            if (other is Player)
+                return (other as Player).state != Player.MovementState.Death;
+            else
+                return false;
         }
     }
 }
