@@ -189,31 +189,43 @@ namespace AXE.Game.Entities
                     string type = element.GetAttribute("type");
                     ge = new ItemGenerator(type);
                     break;
+                case "TrapDoor":
+                    bool trapdoorOpen = bool.Parse(element.GetAttribute("open"));
+                    ge = new TrapDoor(x, y, trapdoorOpen);
+                    break;
             }
 
-            try
+            string rewarderElement = element.GetAttribute("rewarder");
+            int rewarder = 0;
+            if (rewarderElement != null)
+                rewarder = int.Parse(rewarderElement);
+            if (rewarder != 0)
             {
-                int rewarder = int.Parse(element.GetAttribute("rewarder"));
-                if (rewarder != 0)
+                // Entity is linked to another entity
+                IContraption contraption = ge as IContraption;
+                ContraptionRewardData contraptionRewardData = contraption.getContraptionRewardData();
+                contraptionRewardData.rewarderId = rewarder;
+                string targetElement = element.GetAttribute("target");
+                if (targetElement != null)
+                    contraptionRewardData.targetId = int.Parse(targetElement);
+                    
+                string targetXPos = element.GetAttribute("targetX");
+                string targetYPos = element.GetAttribute("targetY");
+                if (targetXPos != null && targetYPos != null)
                 {
-                    // Entity is linked to another entity
-                    IContraption contraption = ge as IContraption;
-                    ContraptionRewardData contraptionRewardData = contraption.getContraptionRewardData();
-                    contraptionRewardData.rewarderId = rewarder;
-                    contraptionRewardData.targetId = int.Parse(element.GetAttribute("target"));
-                    int targetX = int.Parse(element.GetAttribute("targetX"));
-                    int targetY = int.Parse(element.GetAttribute("targetY"));
+                    int targetX = int.Parse(targetXPos);
+                    int targetY = int.Parse(targetYPos);
                     contraptionRewardData.targetPos = new Vector2(targetX, targetY);
-                    contraptionRewardData.value = int.Parse(element.GetAttribute("value"));
-                    contraption.setContraptionRewardData(contraptionRewardData);
-
-                    // If they don't link to any entity then we won't bother
-                    linkedContraptions.Add(contraption);
                 }
-            }
-            catch (ArgumentNullException e)
-            {
-                // ignore it
+
+                string valueElement = element.GetAttribute("value");
+                if (targetElement != null)
+                    contraptionRewardData.value = int.Parse(valueElement);
+
+                contraption.setContraptionRewardData(contraptionRewardData);
+
+                // If they don't link to any entity then we won't bother
+                linkedContraptions.Add(contraption);
             }
 
             if (ge != null)

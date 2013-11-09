@@ -314,6 +314,10 @@ namespace AXE.Game.Screens
                     _add(e, "enemy");
                 else if (e is Coin)
                     _add(e, "coins");
+                else if (e is TrapDoor)
+                    _add(e, "solid");
+                // Contraptions and rewarders may be added before, but if they are not,
+                // we'll add them to these categories
                 else if (e is IContraption)
                     _add(e, "contraptions");
                 else if (e is IRewarder)
