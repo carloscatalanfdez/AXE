@@ -29,7 +29,7 @@ namespace AXE.Game.Entities
         Random random;
 
         // Some declarations
-        public enum MovementState { Idle, Walk, Jump, Ladder, Death, Attacking, Attacked, Activate, Exit };
+        public enum MovementState { Idle, Walk, Jump, Ladder, Death, Attacking, Attacked, Activate, Exit, Revive };
         public enum DeathState { None, Generic, Fall, ForceHit };
         public enum ActionState { None, Squid };
         public const int EXIT_ANIM_TIMER = 1;
@@ -106,13 +106,15 @@ namespace AXE.Game.Entities
         {
             base.init();
 
-            random = new Random();
+            /* Definitions & loads */
+            // Fetch global random
+            random = Utils.Tools.random;
 
-            mask = new bMask(0, 0, 16, 24, 7, 8);
-            mask.game = game;
+            // Set attributes (for collisions & location in world)
             attributes.Add("player");
             attributes.Add("moveable");
 
+            // Load graphic & setup
             spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/knight-sheet"), 30, 32);
             spgraphic.add(new bAnim("idle", new int[] { 0 }, 0.1f));
             spgraphic.add(new bAnim("walk", new int[] { 1, 2, 3, 2 }, 0.2f));
@@ -120,6 +122,7 @@ namespace AXE.Game.Entities
             spgraphic.add(new bAnim("activate", new int[] { 5 }));
             spgraphic.add(new bAnim("death", new int[] { 24, 25, 26, 27, 27, 27, 28, 28, 29, 29, 29, 29, 29 }, 0.2f, false));
             spgraphic.add(new bAnim("death-forcehit", new int[] { 24, 25, 26, 27, 27, 27, 28, 28, 29, 29, 29, 29, 29}, 0.2f, false));
+            spgraphic.add(new bAnim("revive", new int[] { 29, 28, 27, 26, 25, 24 }, 0.1f, false));
             spgraphic.add(new bAnim("squid", new int[] { 9 }));
             spgraphic.add(new bAnim("fall", new int[] { 12 } ));
             spgraphic.add(new bAnim("ladder", new int[] { 10, 11 }, 0.1f));
@@ -128,42 +131,61 @@ namespace AXE.Game.Entities
             spgraphic.add(new bAnim("thrownweapon", new int[] { 18, 18 }, 0.2f, false));
             spgraphic.add(new bAnim("air-thrownweapon", new int[] { 18, 18 }, 0.2f, false));
             spgraphic.add(new bAnim("exit", new int[] { 4 }));
-
+            // Hotspot config for anim frames
             hotspotContainer = new HotspotContainer("Assets/SpriteConfs/knight-hotspots.cfg");
-
-            spgraphic.play("idle");
+            // Rendering layer
             layer = 0;
+            
+            // Load sound effects
+            loadSoundEffects();
 
-            hspeed = 1.5f;
-            vspeed = 0f;
-            gravity = 0.5f;
-
-            current_hspeed = 0;
-            haccel = 0.2f;
-            air_haccel = 0f;
-            isLanding = false;
-            runSpeedFactor = 2;
-            jumpPower = 5.5f;
-            jumpMaxSpeed = 0.0f;
-            deathDelayTime = 0;
-            playDeathAnim = false;
-            deathFallThreshold = 40;
-
-            state = MovementState.Idle;
-            action = ActionState.None;
-            facing = Dir.Right;
-            deathCause = DeathState.None;
-            fallingFrom = Vector2.Zero;
-
-            debugText = "";
+            // Debug defs
             floater = false;
             draggable = true;
 
+            /* Paremter defs */
+            loadParameters();
+
+            /* Parameter inits */
+            initParameters();
+
+            /* Init */
+            facing = Dir.Right;
+            spgraphic.play("idle");
+        }
+
+        protected void loadParameters()
+        {
             exitTransitionWaitTime = 15;
             exitAnimationWaitTime = 15;
             activationTime = 15;
+            hspeed = 1.5f;
+            gravity = 0.5f;
+            haccel = 0.2f;
+            air_haccel = 0f;
+            runSpeedFactor = 2;
+            jumpPower = 5.5f;
+            deathFallThreshold = 40;
+        }
 
-            loadSoundEffects();
+        protected void initParameters()
+        {
+            mask.w = 16; 
+            mask.h = 24; 
+            mask.offsetx = 7;
+            mask.offsety = 8;
+
+            current_hspeed = 0;
+            vspeed = 0f;
+            isLanding = false;
+            deathDelayTime = 0;
+            playDeathAnim = false;
+            state = MovementState.Idle;
+            action = ActionState.None;
+            deathCause = DeathState.None;
+            fallingFrom = Vector2.Zero;
+            jumpMaxSpeed = 0.0f;
+            debugText = "";
         }
 
         protected void loadSoundEffects()
@@ -356,11 +378,17 @@ namespace AXE.Game.Entities
                 case MovementState.Death:
                     if (!waitingLanding)
                     {
-                        bool deathAnimationFinished = spgraphic.currentAnim.finished; // TODO
-                        if (deathAnimationFinished)
+                        if (data.alive)
                         {
-                            // Animation end, restart...
-                            Controller.getInstance().handlePlayerDeath();
+                            mask.w = 0;
+                            mask.h = 0;
+                            vspeed = 0;
+                            bool deathAnimationFinished = spgraphic.currentAnim.finished; // TODO
+                            if (deathAnimationFinished)
+                            {
+                                // Animation end, restart...
+                                Controller.getInstance().handlePlayerDeath(data);
+                            }
                         }
                     }
                     else
@@ -434,6 +462,13 @@ namespace AXE.Game.Entities
                     break;
                 case MovementState.Activate:
                     spgraphic.play("activate");
+                    break;
+                case MovementState.Revive:
+                    if (spgraphic.currentAnim.finished)
+                    {
+                        // Restart!
+                        initParameters();
+                    }
                     break;
             }
 
@@ -980,6 +1015,12 @@ namespace AXE.Game.Entities
         public void onCollectCoin()
         {
             data.collectedCoins++;
+        }
+
+        public void revive()
+        {
+            spgraphic.play("revive");
+            state = MovementState.Revive;
         }
     }
 }

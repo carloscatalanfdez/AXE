@@ -44,6 +44,17 @@ namespace AXE.Game.Screens
         public Player playerA, playerB;
         public Player[] players { get { return new Player[] {playerA, playerB}; } }
 
+        // Screen text
+        public string stageLabel;
+        public string player1Label;
+        public string player2Label;
+        public string infoLabel;
+
+        public const int PLAYER_TIMER_DURATION = 10;
+        public const int PLAYER_TIMER_STEPSPERSECOND = 30;
+        public int player1Timer;
+        public int player2Timer;
+
         // Debug
         // String msg;
         public bStamp cursor;
@@ -155,17 +166,20 @@ namespace AXE.Game.Screens
             state = State.Gameplay;
 
             renderQueue = new List<bEntity>();
+
+            player1Timer = -1;
+            player2Timer = -1;
         }
 
         public override void update(GameTime dt)
         {
             base.update(dt);
 
-            if (GameData.get().level < GameData.get().maxLevels)
+            /*if (GameData.get().level < GameData.get().maxLevels)
                 if (GameInput.getInstance(PlayerIndex.One).pressed(PadButton.start))
                 {
                     handlePause();
-                }
+                }*/
 
             foreach (String key in entities.Keys)
                 foreach (bEntity entity in entities[key])
@@ -224,13 +238,59 @@ namespace AXE.Game.Screens
             {
                 // Camera follows player?
             }
-
-
+            
             // Debug: R for restart
             if (bGame.input.pressed(Microsoft.Xna.Framework.Input.Keys.R))
                 game.changeWorld(new LevelScreen(id));
             if (bGame.input.pressed(Microsoft.Xna.Framework.Input.Keys.N))
                 Controller.getInstance().goToNextLevel();
+
+            if (GameData.get().playerAData.playing)
+            {
+                if (GameData.get().playerAData.alive)
+                    player1Label = "1UP";
+                else
+                {
+                    player1Timer--;
+                    player1Label = "CONTINUE? " + (player1Timer / PLAYER_TIMER_STEPSPERSECOND*1f);
+                    if (player1Timer < 0)
+                        Controller.getInstance().handleCountdownEnd(playerA.data.id);
+                    else if (Controller.getInstance().playerAInput.pressed(PadButton.start))
+                    {
+                        if (Controller.getInstance().playerStart(PlayerIndex.One))
+                            playerA.revive();
+                    }
+                }
+            }
+            else
+            {
+                player1Label = "1P PRESS START";
+            }
+
+            if (GameData.get().playerBData.playing)
+            {
+                if (GameData.get().playerBData.alive)
+                    player2Label = "2UP";
+                else
+                {
+                    player2Timer--;
+                    player2Label = "CONTINUE? " + (player2Timer / PLAYER_TIMER_STEPSPERSECOND * 1f);
+                    if (player2Timer < 0)
+                        Controller.getInstance().handleCountdownEnd(playerB.data.id);
+                    else if (Controller.getInstance().playerBInput.pressed(PadButton.start))
+                    {
+                        if (Controller.getInstance().playerStart(PlayerIndex.Two))
+                            playerB.revive();
+                    }
+                }
+            }
+            else
+            {
+                player2Label = "2P PRESS START";
+            }
+
+            stageLabel = "STAGE " + (id + 1);
+            infoLabel = "CREDITS: " + (GameData.get().credits) + " - COINS: " + (GameData.get().coins);
         }
 
         public override void render(GameTime dt, SpriteBatch sb, Matrix matrix)
@@ -266,9 +326,10 @@ namespace AXE.Game.Screens
 
             cursor.render(sb, bGame.input.mousePosition);
 
-            sb.DrawString(game.gameFont, "STAGE " + (id+1), new Vector2(8, 8), Color.White);
-            String coinsStr = "CREDITS: " + (GameData.get().credits) + " - COINS: " + (GameData.get().coins);
-            sb.DrawString(game.gameFont, coinsStr, new Vector2(game.getWidth()/2-coinsStr.Length*8/2, game.getHeight()-8), Color.White);
+            sb.DrawString(game.gameFont, player1Label, new Vector2(0, 0), Color.White);
+            sb.DrawString(game.gameFont, stageLabel, new Vector2(game.getWidth() / 2 - stageLabel.Length * 8 / 2, 0), Color.White);
+            sb.DrawString(game.gameFont, player2Label, new Vector2(width-player2Label.Length * 8, 0), Color.White);
+            sb.DrawString(game.gameFont, infoLabel, new Vector2(game.getWidth()/2-infoLabel.Length*8/2, game.getHeight()-8), Color.White);
 
             // Pause!
             if (paused)
@@ -359,6 +420,14 @@ namespace AXE.Game.Screens
         public int layerSelector(bEntity a, bEntity b)
         {
             return a.layer - b.layer;
+        }
+
+        public void displayPlayerCountdown(PlayerIndex who)
+        {
+            if (who == PlayerIndex.One)
+                player1Timer = PLAYER_TIMER_DURATION * PLAYER_TIMER_STEPSPERSECOND;
+            else
+                player2Timer = PLAYER_TIMER_DURATION * PLAYER_TIMER_STEPSPERSECOND;
         }
     }
 }

@@ -45,11 +45,14 @@ namespace AXE.Game.Screens
 
             if (GameInput.getInstance(PlayerIndex.One).pressed(PadButton.start))
             {
-                if (GameData.get().credits > 0)
-                {
-                    GameData.get().credits--;
+                if (Controller.getInstance().playerStart(PlayerIndex.One))
                     Controller.getInstance().onGameStart();
-                }
+            }
+
+            if (GameInput.getInstance(PlayerIndex.Two).pressed(PadButton.start))
+            {
+                if (Controller.getInstance().playerStart(PlayerIndex.Two))
+                    Controller.getInstance().onGameStart();
             }
         }
 

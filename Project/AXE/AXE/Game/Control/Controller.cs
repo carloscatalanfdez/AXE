@@ -27,6 +27,7 @@ namespace AXE.Game.Control
         AxeGame game;
         public GameData data;
 
+        public int activePlayers;
         public GameInput playerAInput;
         public GameInput playerBInput;
 
@@ -58,7 +59,16 @@ namespace AXE.Game.Control
 
         public void onGameStart()
         {
-            GameData.get().initPlayData();
+            GameData data = GameData.get();
+            // Init data
+            data.initPlayData();
+            
+            // Set alive the playing characters
+            if (data.playerAData.playing)
+                data.playerAData.alive = true;
+            if (data.playerBData.playing)
+                data.playerBData.alive = true;
+
             // Go to first screen
             game.changeWorld(new LevelScreen(data.level), new FadeToColor(game, Color.Black, 10));
         }
@@ -89,9 +99,47 @@ namespace AXE.Game.Control
             return data.level;
         }
 
-        public void handlePlayerDeath()
+        public void handlePlayerDeath(PlayerData who)
         {
-            game.changeWorld(new GameOverScreen());
+            who.alive = false;
+            (game.world as LevelScreen).displayPlayerCountdown(who.id);
+        }
+
+        public void handleCountdownEnd(PlayerIndex who)
+        {
+            if (who == PlayerIndex.One)
+                data.playerAData.playing = false;
+            else if (who == PlayerIndex.Two)
+                data.playerBData.playing = false;
+
+            activePlayers--;
+            if (activePlayers <= 0)
+                game.changeWorld(new GameOverScreen());
+            else
+                ; // Someone is still alive, so do nothing
+        }
+
+        /** Returns true if valid start press **/
+        public bool playerStart(PlayerIndex who)
+        {
+            if (GameData.get().credits > 0)
+            {
+                GameData.get().credits--;
+                if (who == PlayerIndex.One)
+                {
+                    GameData.get().playerAData.playing = true;
+                    GameData.get().playerAData.alive = true;
+                }
+                else if (who == PlayerIndex.Two)
+                {
+                    GameData.get().playerBData.playing = true;
+                    GameData.get().playerBData.alive = true;
+                }
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

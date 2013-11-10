@@ -42,7 +42,7 @@ namespace AXE.Game.Entities.Enemies
         Vector2 moveTo;
         bMask watchMask;
 
-        bool tamed;
+        // bool tamed;
         bool beginChase;
         int chaseReactionTime;
 
@@ -105,7 +105,7 @@ namespace AXE.Game.Entities.Enemies
             else
                 facing = Dir.Left;
 
-            tamed = false;
+            // tamed = false;
             beginChase = false;
             chaseReactionTime = 15;
 
@@ -149,37 +149,37 @@ namespace AXE.Game.Entities.Enemies
                         timer[0] = turnBaseTime + Tools.random.Next(turnOptionalTime) - turnOptionalTime;
                         break;    
                     case State.Chase:
-                        if (tamed)
+                        /*if (tamed)
                         {
                             performChange = false;
                             changeState(State.Idle);
-                        }
+                        }*/
                         beginChase = false;
                         timer[1] = chaseReactionTime;
                         break;
                     case State.ChaseRunning:
-                        if (tamed)
+                        /*if (tamed)
                         {
                             performChange = false;
                             changeState(State.Idle);
-                        }
+                        }*/
                         beginChase = false;
                         timer[1] = (int)(chaseReactionTime * 1.5f);
                         break;
                     case State.Attacking:
-                        if (tamed)
+                        /*if (tamed)
                         {
                             performChange = false;
                             changeState(State.Idle);
-                        }
+                        }*/
                         timer[0] = attackChargeTime;
                         break;
                     case State.Attacked:
-                        if (tamed)
+                        /*if (tamed)
                         {
                             performChange = false;
                             changeState(State.Idle);
-                        }
+                        }*/
 
                         int xx, yy = 4;
                         if (facing == Dir.Right)
@@ -533,13 +533,14 @@ namespace AXE.Game.Entities.Enemies
          */
         public void onSuccessfulHit(Player other)
         {
-            tamed = true;
+            // tamed = true;
         }
 
         bool alivePlayerCondition(bEntity me, bEntity other)
         {
             if (other is Player)
-                return (other as Player).state != Player.MovementState.Death;
+                return (other as Player).state != Player.MovementState.Death && 
+                    (other as Player).state != Player.MovementState.Revive;
             else
                 return false;
         }

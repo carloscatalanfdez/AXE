@@ -12,6 +12,8 @@ namespace AXE.Game.Control
     public class PlayerData
     {
         public PlayerIndex id;
+        public bool playing;
+        public bool alive;
         // Coins collected on this session
         public int collectedCoins;
         public enum Weapons { None, Stick, Axe };
@@ -22,6 +24,8 @@ namespace AXE.Game.Control
             this.id = id;
             this.collectedCoins = 0;
             this.weapon = Weapons.None;
+            this.playing = false;
+            this.alive = false;
         }
     }
 }
