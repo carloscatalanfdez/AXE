@@ -125,29 +125,10 @@ namespace AXE.Game.Screens
                 int playerX = (int)levelMap.playerStart.X;
                 int playerY = (int)levelMap.playerStart.Y;
                 playerA = new Player(playerX, playerY, GameData.get().playerAData);
+                
                 // Adding axe based on GameData
-                Axe currentWeapon = null;
-                switch (GameData.get().playerAData.weapon)
-                {
-                    case PlayerData.Weapons.None:
-                        break;
-                    case PlayerData.Weapons.Stick:
-                        currentWeapon = new Axe(playerX, playerY, playerA);
-                        break;
-                    case PlayerData.Weapons.Axe:
-                        currentWeapon = new NormalAxe(playerX, playerY, playerA);
-                        break;
-                }
-                if (currentWeapon != null)
-                {
-                    playerA.setWeapon(currentWeapon);
-                    _add(currentWeapon, "axe");
-                }
-
+                spawnPlayerWeapon(playerA.data, playerA);
                 _add(playerA, "player");
-                /* Debug */
-                /*Axe stick = new Axe(playerX, playerY, playerA);
-                NormalAxe axe = new NormalAxe(playerX + 40, playerY, null);*/
             }
             else
             {
@@ -208,12 +189,17 @@ namespace AXE.Game.Screens
                             h.onCollision("player", p);
                             p.onCollision("hazard", h);
                         }
-
                     foreach (bEntity c in entities["coins"])
                         if (p != c && p.collides(c))
                         {
                             c.onCollision("player", p);
                             p.onCollision("coins", c);
+                        }
+                    foreach (bEntity a in entities["axe"])
+                        if (p != a && p.collides(a))
+                        {
+                            a.onCollision("player", p);
+                            p.onCollision("axe", a);
                         }
                 }
 
@@ -428,6 +414,27 @@ namespace AXE.Game.Screens
                 player1Timer = PLAYER_TIMER_DURATION * PLAYER_TIMER_STEPSPERSECOND;
             else
                 player2Timer = PLAYER_TIMER_DURATION * PLAYER_TIMER_STEPSPERSECOND;
+        }
+
+        public void spawnPlayerWeapon(PlayerData data, Player player)
+        {
+            Axe currentWeapon = null;
+            switch (data.weapon)
+            {
+                case PlayerData.Weapons.None:
+                    break;
+                case PlayerData.Weapons.Stick:
+                    currentWeapon = new Axe(player.x, player.y, player);
+                    break;
+                case PlayerData.Weapons.Axe:
+                    currentWeapon = new NormalAxe(player.x, player.y, player);
+                    break;
+            }
+            if (currentWeapon != null)
+            {
+                player.setWeapon(currentWeapon);
+                _add(currentWeapon, "axe");
+            }
         }
     }
 }

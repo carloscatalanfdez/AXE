@@ -38,6 +38,7 @@ namespace AXE.Game.Entities
         public IWeaponHolder holder;
 
         // When thrown
+        public bool justLaunched;
         public IWeaponHolder thrower;
 
         // When stuck
@@ -169,6 +170,9 @@ namespace AXE.Game.Entities
                     pos = holder.getHandPosition() - getGrabPosition();
                     break;
                 case MovementState.Flying:
+                    if (justLaunched && !collides(thrower as bEntity))
+                        justLaunched = false;
+
                     moveTo.X += current_hspeed;
                     moveTo.Y += current_vspeed;
                     Vector2 remnant = moveToContact(moveTo, "solid");
@@ -350,7 +354,7 @@ namespace AXE.Game.Entities
         {
             // Holder is stored during flight
             thrower = holder;
-
+            justLaunched = true;
             wrapCount = 0;
             sfxThrow.Play();
             state = MovementState.Flying;

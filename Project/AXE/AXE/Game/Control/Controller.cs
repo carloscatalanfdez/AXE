@@ -125,17 +125,19 @@ namespace AXE.Game.Control
             if (GameData.get().credits > 0)
             {
                 GameData.get().credits--;
+                PlayerData pdata;
                 if (who == PlayerIndex.One)
-                {
-                    GameData.get().playerAData.playing = true;
-                    GameData.get().playerAData.alive = true;
-                }
+                    pdata = GameData.get().playerAData;
                 else if (who == PlayerIndex.Two)
-                {
-                    GameData.get().playerBData.playing = true;
-                    GameData.get().playerBData.alive = true;
-                }
+                    pdata = GameData.get().playerBData;
+                else
+                    return false;
 
+                pdata.playing = true;
+                pdata.alive = true;
+                if (pdata.weapon == PlayerData.Weapons.None)
+                    pdata.weapon = PlayerData.Weapons.Axe;
+                
                 return true;
             }
 

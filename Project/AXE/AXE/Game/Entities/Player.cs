@@ -35,8 +35,10 @@ namespace AXE.Game.Entities
         public const int EXIT_ANIM_TIMER = 1;
         public const int EXIT_TRANSITION_TIMER = 2;
         public const int ACTIVATION_TIME_TIMER = 3;
+        public const int AXE_GRAB_TIMER = 4;
         public int exitTransitionWaitTime;
         public int exitAnimationWaitTime;
+        public int axeGrabTime;
 
         // Data
         public PlayerData data;
@@ -82,11 +84,13 @@ namespace AXE.Game.Entities
         // Weapon holding variables
         protected IWeapon weapon;
         protected HotspotContainer hotspotContainer;
+        protected bMask weaponCatchMask;
         
         // Sound effects
         protected List<SoundEffect> sfxSteps;
         protected SoundEffect sfxLanded;
         protected SoundEffect sfxCharge;
+        protected SoundEffect sfxHit;
 
         // Timers
         public int activationTime;
@@ -159,6 +163,7 @@ namespace AXE.Game.Entities
             exitTransitionWaitTime = 15;
             exitAnimationWaitTime = 15;
             activationTime = 15;
+            axeGrabTime = 2;
             hspeed = 1.5f;
             gravity = 0.5f;
             haccel = 0.2f;
@@ -166,6 +171,12 @@ namespace AXE.Game.Entities
             runSpeedFactor = 2;
             jumpPower = 5.5f;
             deathFallThreshold = 40;
+
+            weaponCatchMask = new bMask(x, y, 
+                (int)(graphicWidth() * 1.5f),
+                (int)(graphicHeight() * 1f), 
+                -(int)(graphicWidth()*0.25f), 
+                -(int)(graphicHeight()*0.25f));
         }
 
         protected void initParameters()
@@ -196,11 +207,17 @@ namespace AXE.Game.Entities
 
             sfxLanded = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-land");
             sfxCharge = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-charge");
+            sfxHit = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-playerhit");
         }
 
         public override int graphicWidth()
         {
             return spgraphic.width;
+        }
+
+        public override int graphicHeight()
+        {
+            return spgraphic.height;
         }
 
         public override void onUpdateBegin()
@@ -213,6 +230,8 @@ namespace AXE.Game.Entities
         override public void onUpdate()
         {
             base.onUpdate();
+
+            weaponCatchMask.update(x, y);
 
             // Prepare step
             color = Color.White;
@@ -468,13 +487,12 @@ namespace AXE.Game.Entities
                     {
                         // Restart!
                         initParameters();
+                        (world as LevelScreen).spawnPlayerWeapon(data, this);
                     }
                     break;
             }
 
             moveTo.Y += vspeed;
-
-            handleActionButton();
 
             if (toLadder)
                 pos = moveTo;
@@ -558,9 +576,10 @@ namespace AXE.Game.Entities
                         bool pickedWeapon = false;
                         if (state != MovementState.Attacking && state != MovementState.Attacked && state != MovementState.Activate)
                         {
-                            bEntity entity = instancePlace(pos, "axe");
+                            bEntity entity = instancePlace(weaponCatchMask, "axe");
                             if (entity != null)
                             {
+                                timer[AXE_GRAB_TIMER] = -1;
                                 (entity as Axe).onGrab(this);
                                 GameData.get().playerAData.weapon = (entity as Axe).type;
                                 pickedWeapon = true;
@@ -588,6 +607,8 @@ namespace AXE.Game.Entities
         public override void onUpdateEnd()
         {
             base.onUpdateEnd();
+
+            handleActionButton();
 
             switch (state)
             {
@@ -803,6 +824,9 @@ namespace AXE.Game.Entities
                 case ACTIVATION_TIME_TIMER:
                     state = MovementState.Idle;
                     break;
+                case AXE_GRAB_TIMER:
+                    onDeath(DeathState.Generic);
+                    break;
             }
         }
 
@@ -858,6 +882,16 @@ namespace AXE.Game.Entities
                     onDeath(hazard.getType());
                 }
             }
+            else if (type == "axe")
+            {
+                Axe axe = (other as Axe);
+                if (axe.state == Axe.MovementState.Flying && !axe.justLaunched)
+                    /*if (timer[AXE_GRAB_TIMER] < 0)
+                        onDeath(DeathState.ForceHit);
+                    else*/
+                    if (timer[AXE_GRAB_TIMER] < 0)
+                        timer[AXE_GRAB_TIMER] = axeGrabTime;
+            }
         }
 
         /** Used when waiting for landing to play anim! **/
@@ -888,6 +922,7 @@ namespace AXE.Game.Entities
                     case DeathState.Generic:
                     case DeathState.Fall:
                     case DeathState.ForceHit:
+                        sfxHit.Play();
                         deathCause = type;
                         if (onair)
                             waitingLanding = true;
@@ -903,12 +938,13 @@ namespace AXE.Game.Entities
 
         override public void render(GameTime dt, SpriteBatch sb)
         {
+            if (bConfig.DEBUG)
+                sb.Draw(bDummyRect.sharedDummyRect(game), weaponCatchMask.rect, new Color(0.2f, 0.2f, 0.2f, 0.2f));
             base.render(dt, sb);
             spgraphic.render(sb, pos);
             Color c = spgraphic.color;
             spgraphic.color = c;
-
-            sb.DrawString(game.gameFont, debugText, new Vector2(x, y - 8), Colors.white);
+            // sb.DrawString(game.gameFont, debugText, new Vector2(x, y - 8), Colors.white);
         }
 
         public bool isFlipped()
