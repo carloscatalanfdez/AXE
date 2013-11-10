@@ -7,6 +7,7 @@ using bEngine;
 using bEngine.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using AXE.Game.Control;
 
 namespace AXE.Game.Entities.Axes
 {
@@ -30,6 +31,8 @@ namespace AXE.Game.Entities.Axes
 
             wrapCount = 0;
             wrapLimit = 1;
+
+            type = PlayerData.Weapons.Axe;
         }
 
         protected override void initGraphic()

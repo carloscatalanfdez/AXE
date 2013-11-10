@@ -310,7 +310,7 @@ namespace AXE.Game.Entities.Enemies
                     else
                     {
                         if (fallingToDeath)
-                            ; // You'd be death, buddy!
+                            ; // You'd be dead, buddy!
                         changeState(State.Idle);
                     }
 

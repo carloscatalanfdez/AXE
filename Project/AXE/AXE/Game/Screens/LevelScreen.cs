@@ -114,12 +114,29 @@ namespace AXE.Game.Screens
                 int playerX = (int)levelMap.playerStart.X;
                 int playerY = (int)levelMap.playerStart.Y;
                 playerA = new Player(playerX, playerY, GameData.get().playerAData);
-                Axe stick = new Axe(playerX, playerY, playerA);
-                NormalAxe axe = new NormalAxe(playerX + 40, playerY, null);
-                playerA.setWeapon(stick);
+                // Adding axe based on GameData
+                Axe currentWeapon = null;
+                switch (GameData.get().playerAData.weapon)
+                {
+                    case PlayerData.Weapons.None:
+                        break;
+                    case PlayerData.Weapons.Stick:
+                        currentWeapon = new Axe(playerX, playerY, playerA);
+                        break;
+                    case PlayerData.Weapons.Axe:
+                        currentWeapon = new NormalAxe(playerX, playerY, playerA);
+                        break;
+                }
+                if (currentWeapon != null)
+                {
+                    playerA.setWeapon(currentWeapon);
+                    _add(currentWeapon, "axe");
+                }
+
                 _add(playerA, "player");
-                _add(stick, "axe");
-                _add(axe, "axe");
+                /* Debug */
+                /*Axe stick = new Axe(playerX, playerY, playerA);
+                NormalAxe axe = new NormalAxe(playerX + 40, playerY, null);*/
             }
             else
             {

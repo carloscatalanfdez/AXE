@@ -14,11 +14,14 @@ namespace AXE.Game.Control
         public PlayerIndex id;
         // Coins collected on this session
         public int collectedCoins;
+        public enum Weapons { None, Stick, Axe };
+        public Weapons weapon;
 
         public PlayerData(PlayerIndex id)
         {
             this.id = id;
             this.collectedCoins = 0;
+            this.weapon = Weapons.None;
         }
     }
 }

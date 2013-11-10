@@ -384,6 +384,7 @@ namespace AXE.Game.Entities
                         if (weapon != null)
                         {
                             weapon.onThrow(10, facing);
+                            GameData.get().playerAData.weapon = PlayerData.Weapons.None;
                             state = MovementState.Attacked;
                             if (!onair)
                                 spgraphic.play("thrownweapon");
@@ -515,7 +516,6 @@ namespace AXE.Game.Entities
                                 spgraphic.play("air-readyweapon");
                                 sfxCharge.Play();
                             }
-                            // weapon.onThrow(10, facing);
                         }
                     }
                     else // No weapon, pick / activate
@@ -527,6 +527,7 @@ namespace AXE.Game.Entities
                             if (entity != null)
                             {
                                 (entity as Axe).onGrab(this);
+                                GameData.get().playerAData.weapon = (entity as Axe).type;
                                 pickedWeapon = true;
                             }
                         }

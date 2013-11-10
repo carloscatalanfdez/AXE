@@ -13,13 +13,13 @@ using bEngine.Graphics;
 using AXE.Game.Screens;
 using AXE.Game.Entities;
 using AXE.Game.Entities.Base;
+using AXE.Game.Control;
 
 namespace AXE.Game.Entities
 {
     class Axe : Entity, IWeapon
     {
         public enum MovementState { Idle, Grabbed, Flying, Stuck, Bouncing };
-
         public MovementState state;
 
         public bSpritemap spgraphic
@@ -27,6 +27,8 @@ namespace AXE.Game.Entities
             get { return (_graphic as bSpritemap); }
             set { _graphic = value; }
         }
+
+        public PlayerData.Weapons type;
 
         // Misc
         public int wrapCount;
@@ -85,6 +87,8 @@ namespace AXE.Game.Entities
 
             wrapCount = 0;
             wrapLimit = 1;
+
+            type = PlayerData.Weapons.Stick;
 
             layer = 10;
         }

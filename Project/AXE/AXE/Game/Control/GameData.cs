@@ -46,10 +46,8 @@ namespace AXE.Game.Control
         public void initPlayData()
         {
             maxLevels = 2;
-            // credits = 0;
-
-            // DEBUG
             level = 0;
+            playerAData.weapon = PlayerData.Weapons.Axe;
         }
 
         public static void saveGame()
