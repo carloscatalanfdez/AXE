@@ -96,7 +96,6 @@ namespace AXE.Game.Entities
         public int activationTime;
 
         // Debug
-        String debugText;
         bool floater;
 
         public Player(int x, int y, PlayerData data)
@@ -170,11 +169,11 @@ namespace AXE.Game.Entities
             air_haccel = 0f;
             runSpeedFactor = 2;
             jumpPower = 5.5f;
-            deathFallThreshold = 40;
+            deathFallThreshold = 48;
 
             weaponCatchMask = new bMask(x, y, 
                 (int)(graphicWidth() * 1.5f),
-                (int)(graphicHeight() * 1f), 
+                (int)(graphicHeight() * 1.25f), 
                 -(int)(graphicWidth()*0.25f), 
                 -(int)(graphicHeight()*0.25f));
         }
@@ -196,7 +195,6 @@ namespace AXE.Game.Entities
             deathCause = DeathState.None;
             fallingFrom = Vector2.Zero;
             jumpMaxSpeed = 0.0f;
-            debugText = "";
         }
 
         protected void loadSoundEffects()
@@ -449,7 +447,11 @@ namespace AXE.Game.Entities
                         // the player is moving through a one way platform
                         else if (vspeed > 0)
                         {
-                            // state = MovementState.Idle; // WUT??
+                            if (fallingToDeath)
+                            {
+                                vspeed = 0;
+                                onDeath(DeathState.Fall);
+                            }
                         }
                     }
 
@@ -487,7 +489,8 @@ namespace AXE.Game.Entities
                     {
                         // Restart!
                         initParameters();
-                        (world as LevelScreen).spawnPlayerWeapon(data, this);
+                        if (weapon == null)
+                            (world as LevelScreen).spawnPlayerWeapon(data, this);
                     }
                     break;
             }
@@ -577,6 +580,11 @@ namespace AXE.Game.Entities
                         if (state != MovementState.Attacking && state != MovementState.Attacked && state != MovementState.Activate)
                         {
                             bEntity entity = instancePlace(weaponCatchMask, "axe");
+                            if (entity == null)
+                            {
+                                bMask wrappedMask = generateWrappedMask(weaponCatchMask);
+                                entity = instancePlace(wrappedMask, "axe");
+                            }
                             if (entity != null)
                             {
                                 timer[AXE_GRAB_TIMER] = -1;
@@ -588,14 +596,17 @@ namespace AXE.Game.Entities
 
                         if (!pickedWeapon)
                         {
-                            IActivable activable = (instancePlace(x, y, "contraptions", null, activableCondition) as IActivable);
-                            if (activable != null)
+                            if (state == MovementState.Idle || state == MovementState.Walk)
                             {
-                                if (activable.activate(this))
+                                IActivable activable = (instancePlace(x, y, "contraptions", null, activableCondition) as IActivable);
+                                if (activable != null)
                                 {
-                                    state = MovementState.Activate;
-                                    // Will wait for end notification
-                                    // timer[ACTIVATION_TIME_TIMER] = activationTime;
+                                    if (activable.activate(this))
+                                    {
+                                        state = MovementState.Activate;
+                                        // Will wait for end notification
+                                        // timer[ACTIVATION_TIME_TIMER] = activationTime;
+                                    }
                                 }
                             }
                         }

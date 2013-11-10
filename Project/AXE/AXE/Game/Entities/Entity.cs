@@ -324,6 +324,50 @@ namespace AXE.Game.Entities
             return false;
         }
 
+        protected bMask generateWrappedMask(bMask target)
+        {
+            // target.update(x, y);
+
+            bMask oppositeMask = new bMask(target.x, target.y, target.w, target.h, target.offsetx, target.offsety);
+
+            if (showWrapEffect == Dir.Left)
+            {
+                int clippedSize = target.x + target.w - (world as LevelScreen).width;
+
+                if (clippedSize > 0)
+                {
+                    int oppositeMaskSize = Math.Min(clippedSize, target.h);
+
+                    // Mask on the other side will have increasing width as we wrap
+                    // Starts at the beginning of the screen (taking into account mask offset)
+                    oppositeMask.w = oppositeMaskSize;
+                    oppositeMask.h = target.h;
+                    oppositeMask.offsetx = -(world as LevelScreen).width + target.offsetx + target.w - oppositeMaskSize;
+                    oppositeMask.offsety = target.offsety;
+                }
+            }
+            else if (showWrapEffect == Dir.Right)
+            {
+                int clippedOffset = -target.x;
+
+                if (clippedOffset > 0)
+                {
+                    int currentMaskOffset = target.x >= 0 ? 0 : target.offsetx;
+                    int oppositeMaskSize = Math.Min(clippedOffset, target.w);
+
+                    // Mask on the other side will have increasing width as we wrap
+                    // Starts at the end of the screen (taking into account mask offset)
+                    oppositeMask.w = oppositeMaskSize;
+                    oppositeMask.h = target.h;
+                    oppositeMask.offsetx = target.offsetx + (world as LevelScreen).width;
+                    oppositeMask.offsety = target.offsety;
+                    _wrappedMask.update(x, y);
+                }
+            }
+
+            return oppositeMask;
+        }
+
         public virtual void onHit(Entity other)
         {
         }
