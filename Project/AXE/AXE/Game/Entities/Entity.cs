@@ -326,10 +326,10 @@ namespace AXE.Game.Entities
 
         protected bMask generateWrappedMask(bMask target)
         {
-            // target.update(x, y);
+            int maskX = target.x - target.offsetx;
+            int maskY = target.y - target.offsety;
 
-            bMask oppositeMask = new bMask(target.x, target.y, target.w, target.h, target.offsetx, target.offsety);
-
+            bMask wrappedMask = null;
             if (showWrapEffect == Dir.Left)
             {
                 int clippedSize = target.x + target.w - (world as LevelScreen).width;
@@ -340,10 +340,24 @@ namespace AXE.Game.Entities
 
                     // Mask on the other side will have increasing width as we wrap
                     // Starts at the beginning of the screen (taking into account mask offset)
-                    oppositeMask.w = oppositeMaskSize;
-                    oppositeMask.h = target.h;
-                    oppositeMask.offsetx = -(world as LevelScreen).width + target.offsetx + target.w - oppositeMaskSize;
-                    oppositeMask.offsety = target.offsety;
+                    bMask oppositeMask = new bMask(
+                        maskX, 
+                        maskY, 
+                        oppositeMaskSize,
+                        target.h,
+                        -(world as LevelScreen).width + target.offsetx + target.w - oppositeMaskSize,
+                        target.offsety);
+
+                    // Mask on current side will have decreasing width as we wrap
+                    bMask currentMask = new bMask(
+                        maskX,
+                        maskY,
+                        target.w - clippedSize,
+                        target.h,
+                        target.offsetx,
+                        target.offsety);
+
+                    wrappedMask = new bMaskList(new bMask[] { oppositeMask, currentMask }, maskX, maskY, false);
                 }
             }
             else if (showWrapEffect == Dir.Right)
@@ -357,15 +371,31 @@ namespace AXE.Game.Entities
 
                     // Mask on the other side will have increasing width as we wrap
                     // Starts at the end of the screen (taking into account mask offset)
-                    oppositeMask.w = oppositeMaskSize;
-                    oppositeMask.h = target.h;
-                    oppositeMask.offsetx = target.offsetx + (world as LevelScreen).width;
-                    oppositeMask.offsety = target.offsety;
-                    _wrappedMask.update(x, y);
+                    bMask oppositeMask = new bMask(
+                        maskX,
+                        maskY,
+                        oppositeMaskSize,
+                        target.h,
+                        target.offsetx + (world as LevelScreen).width,
+                        target.offsety);
+
+                    // Mask on current side will have decreasing width as we wrap
+                    bMask currentMask = new bMask(
+                        maskX,
+                        maskY,
+                        target.w - clippedOffset,
+                        target.h,
+                        clippedOffset + target.offsetx,
+                        target.offsety);
+
+                    wrappedMask = new bMaskList(new bMask[] { oppositeMask, currentMask }, maskX, maskY, false);
                 }
             }
 
-            return oppositeMask;
+            if (wrappedMask == null)
+                return target;
+            else
+                return wrappedMask;
         }
 
         public virtual void onHit(Entity other)

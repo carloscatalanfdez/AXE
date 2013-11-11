@@ -950,7 +950,9 @@ namespace AXE.Game.Entities
         override public void render(GameTime dt, SpriteBatch sb)
         {
             if (bConfig.DEBUG)
+            {
                 sb.Draw(bDummyRect.sharedDummyRect(game), weaponCatchMask.rect, new Color(0.2f, 0.2f, 0.2f, 0.2f));
+            }
             base.render(dt, sb);
             spgraphic.render(sb, pos);
             Color c = spgraphic.color;
