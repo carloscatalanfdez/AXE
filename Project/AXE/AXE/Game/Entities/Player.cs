@@ -70,6 +70,7 @@ namespace AXE.Game.Entities
         public int deathDelayTime;
         public bool playDeathAnim;
         public bool waitingLanding;
+        public Axe axeToCatch;
         
         // State vars
         public MovementState previousState;
@@ -201,6 +202,7 @@ namespace AXE.Game.Entities
             deathCause = DeathState.None;
             fallingFrom = Vector2.Zero;
             jumpMaxSpeed = 0.0f;
+            axeToCatch = null;
         }
 
         protected void loadSoundEffects()
@@ -859,9 +861,25 @@ namespace AXE.Game.Entities
                     state = MovementState.Idle;
                     break;
                 case AXE_GRAB_TIMER:
+                    axeToCatch.onHitSolid(this);
                     onDeath(DeathState.Generic);
                     break;
             }
+        }
+
+        public override bool onHit(Entity other)
+        {
+            if (other == axeToCatch)
+            {
+                if (other.facing == Dir.Left)
+                    other.facing = Dir.Right;
+                else
+                    other.facing = Dir.Left;
+
+                return true;
+            }
+
+            return false;
         }
 
         public override void onCollision(string type, bEntity other)
@@ -924,7 +942,10 @@ namespace AXE.Game.Entities
                         onDeath(DeathState.ForceHit);
                     else*/
                     if (timer[AXE_GRAB_TIMER] < 0)
+                    {
+                        axeToCatch = (other as Axe);
                         timer[AXE_GRAB_TIMER] = axeGrabTime;
+                    }
             }
         }
 

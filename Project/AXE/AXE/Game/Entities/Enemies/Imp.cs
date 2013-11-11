@@ -23,8 +23,10 @@ namespace AXE.Game.Entities.Enemies
 {
     class Imp : Enemy, IHazardProvider
     {
-        public enum State { None, Idle, Turn, Walk, Chase, ChaseRunning, Attacking, Attacked, Falling }
-        public State state;
+        public enum State { None, Idle, Turn, Walk, Chase, ChaseRunning, Attacking, Attacked, Falling, Dead }
+        const int CHANGE_STATE_TIMER = 0;
+        const int CHASE_REACTION_TIMER = 1;
+        const int DEAD_ANIM_TIMER = 2;
 
         public bSpritemap spgraphic
         {
@@ -42,7 +44,7 @@ namespace AXE.Game.Entities.Enemies
         Vector2 moveTo;
         bMask watchMask;
 
-        // bool tamed;
+        public State state;
         bool beginChase;
         int chaseReactionTime;
 
@@ -53,11 +55,15 @@ namespace AXE.Game.Entities.Enemies
         bStamp weaponHitImage;
 
         int hspeed;
+        
         int idleBaseTime, idleOptionalTime;
         int walkBaseTime, walkOptionalTime;
         int turnBaseTime, turnOptionalTime;
 
+        int deathAnimDuration;
+
         List<SoundEffect> sfxSteps;
+        SoundEffect sfxHit;
 
         public Imp(int x, int y)
             : base(x, y)
@@ -79,6 +85,7 @@ namespace AXE.Game.Entities.Enemies
             spgraphic.add(new bAnim("attack-charge", new int[] { 16, 17, 17, 17 }, 0.4f, false));
             spgraphic.add(new bAnim("attacked", new int[] { 18 }));
             spgraphic.add(new bAnim("jump", new int[] { 8 }));
+            spgraphic.add(new bAnim("death", new int[] { 24 }));
             spgraphic.play("idle");
 
             mask.w = 16;
@@ -99,6 +106,7 @@ namespace AXE.Game.Entities.Enemies
             walkOptionalTime = 30;
             turnBaseTime = 60;
             turnOptionalTime = 60;
+            deathAnimDuration = 50;
 
             if (Tools.random.Next(2) < 1)
                 facing = Dir.Right;
@@ -118,6 +126,7 @@ namespace AXE.Game.Entities.Enemies
             sfxSteps.Add(game.Content.Load<SoundEffect>("Assets/Sfx/sfx-dirtstep.1"));
             sfxSteps.Add(game.Content.Load<SoundEffect>("Assets/Sfx/sfx-dirtstep.2"));
             sfxSteps.Add(game.Content.Load<SoundEffect>("Assets/Sfx/sfx-dirtstep.3"));
+            sfxHit = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-playerhit");
 
             state = State.None;
             changeState(State.Idle);
@@ -202,7 +211,7 @@ namespace AXE.Game.Entities.Enemies
         {
             switch (n)
             {
-                case 0:
+                case CHANGE_STATE_TIMER:
                     switch (state)
                     {
                         case State.Idle:
@@ -243,9 +252,11 @@ namespace AXE.Game.Entities.Enemies
                             break;
                     }
                     break;
-                case 1:
+                case CHASE_REACTION_TIMER:
                     if (state == State.Chase || state == State.ChaseRunning)
                         beginChase = true;
+                    break;
+                case DEAD_ANIM_TIMER:
                     break;
             }
         }
@@ -355,6 +366,15 @@ namespace AXE.Game.Entities.Enemies
                 case State.Attacked:
                     spgraphic.play("attacked");
                     break;
+                case State.Dead:
+                    spgraphic.play("death");
+                    float factor = (timer[DEAD_ANIM_TIMER] / (deathAnimDuration * 1f));
+                    color *= factor;
+                    if (color.A <= 0)
+                    {
+                        world.remove(this);
+                    }
+                    break;
             }
 
             if (state == State.Idle || state == State.Walk || state == State.Turn)
@@ -451,7 +471,7 @@ namespace AXE.Game.Entities.Enemies
         public override void render(GameTime dt, SpriteBatch sb)
         {
             base.render(dt, sb);
-
+            spgraphic.color = color;
             spgraphic.render(sb, pos);
             if (state == State.Attacked)
                 if (facing == Dir.Left)
@@ -503,12 +523,25 @@ namespace AXE.Game.Entities.Enemies
             }
         }
 
-        public override void onHit(Entity other)
+        public void onDeath()
+        {
+            if (state != State.Dead)
+            {
+                sfxHit.Play();
+                state = State.Dead;
+                color = new Color(164, 0, 0, 255);
+                timer[DEAD_ANIM_TIMER] = deathAnimDuration;
+            }
+        }
+
+        public override bool onHit(Entity other)
         {
             base.onHit(other);
 
             if (other is NormalAxe)
             {
+                onDeath();
+
                 if (rewarder != null)
                 {
                     if (contraptionRewardData.target == null)
@@ -517,6 +550,8 @@ namespace AXE.Game.Entities.Enemies
                     }
                 }
                 onSolved();
+
+                return true;
             }
             else if (other is Axe)
             {
@@ -525,7 +560,11 @@ namespace AXE.Game.Entities.Enemies
                     facing = Dir.Left;
                 else facing = Dir.Right;
                 changeState(State.ChaseRunning);
+
+                return false;
             }
+
+            return false;
         }
 
         /**

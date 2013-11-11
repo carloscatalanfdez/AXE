@@ -363,12 +363,13 @@ namespace AXE.Game.Entities
             holder = null;
         }
 
-        public virtual void onBounce()
+        public virtual void onBounce(bool playYourSound = true)
         {
             current_hspeed = -current_hspeed / 10;
             current_vspeed = -2;
             state = MovementState.Bouncing;
-            sfxHit.Play();
+            if (playYourSound)
+                sfxHit.Play();
         }
 
         public virtual void onHitSolid(bEntity entity)

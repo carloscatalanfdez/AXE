@@ -398,8 +398,10 @@ namespace AXE.Game.Entities
                 return wrappedMask;
         }
 
-        public virtual void onHit(Entity other)
+        // Returns wether the hit was successful or not
+        public virtual bool onHit(Entity other)
         {
+            return false;
         }
 
         public virtual void onClick()

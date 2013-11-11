@@ -56,9 +56,21 @@ namespace AXE.Game.Entities.Axes
         {
             if (entity != null && (entity is Entity))
             {
-                (entity as Entity).onHit(this);
+                if ((entity as Entity).onHit(this))
+                {
+                    onHit(entity as Entity);
+                    onBounce(false);
+                }
+                else
+                {
+                    onStuck(entity);
+                }
             }
-            onStuck(entity);
+            else
+            {
+                // Stuck on others
+                onStuck(entity);
+            }
         }
     }
 }
