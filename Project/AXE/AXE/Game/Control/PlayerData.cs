@@ -18,6 +18,7 @@ namespace AXE.Game.Control
         public int collectedCoins;
         public enum Weapons { None, Stick, Axe };
         public Weapons weapon;
+        public int powerUps;
 
         public PlayerData(PlayerIndex id)
         {
@@ -26,6 +27,7 @@ namespace AXE.Game.Control
             this.weapon = Weapons.None;
             this.playing = false;
             this.alive = false;
+            this.powerUps = 0;
         }
     }
 }

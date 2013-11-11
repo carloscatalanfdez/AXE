@@ -92,7 +92,11 @@ namespace AXE.Game.Entities
         protected SoundEffect sfxCharge;
         protected SoundEffect sfxHit;
 
-        public int powerUps;
+        public int powerUps
+        {
+            get { return data.powerUps; }
+            set { data.powerUps = value; }
+        }
 
         // Timers
         public int activationTime;
@@ -197,8 +201,6 @@ namespace AXE.Game.Entities
             deathCause = DeathState.None;
             fallingFrom = Vector2.Zero;
             jumpMaxSpeed = 0.0f;
-
-            powerUps = 0;
         }
 
         protected void loadSoundEffects()

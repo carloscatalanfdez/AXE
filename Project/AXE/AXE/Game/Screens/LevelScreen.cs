@@ -234,11 +234,18 @@ namespace AXE.Game.Screens
             if (GameData.get().playerAData.playing)
             {
                 if (GameData.get().playerAData.alive)
+                {
                     player1Label = "1UP";
+
+                    if ((GameData.get().playerAData.powerUps & PowerUpPickable.HIGHFALLGUARD_EFFECT) != 0)
+                    {
+                        player1Label += " HF";
+                    }
+                }
                 else
                 {
                     player1Timer--;
-                    player1Label = "CONTINUE? " + (player1Timer / PLAYER_TIMER_STEPSPERSECOND*1f);
+                    player1Label = "CONTINUE? " + (player1Timer / PLAYER_TIMER_STEPSPERSECOND * 1f);
                     if (player1Timer < 0)
                         Controller.getInstance().handleCountdownEnd(playerA.data.id);
                     else if (Controller.getInstance().playerAInput.pressed(PadButton.start))
