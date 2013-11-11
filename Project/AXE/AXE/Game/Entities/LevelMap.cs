@@ -12,6 +12,7 @@ using bEngine.Graphics;
 
 using AXE.Game.Entities;
 using AXE.Game.Entities.Contraptions;
+using AXE.Game.Entities.Base;
 
 namespace AXE.Game.Entities
 {
@@ -195,6 +196,9 @@ namespace AXE.Game.Entities
                     break;
                 case "Lever":
                     ge = new Lever(x, y);
+                    break;
+                case "HighGuardFallPowerUp":
+                    ge = new PowerUpPickable(x, y, PowerUpPickable.Type.HighFallGuard);
                     break;
             }
 

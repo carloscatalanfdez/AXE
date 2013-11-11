@@ -15,6 +15,7 @@ using AXE.Game.Entities;
 using AXE.Game.Control;
 using AXE.Game.Entities.Axes;
 using AXE.Game.Entities.Contraptions;
+using AXE.Game.Entities.Base;
 
 namespace AXE.Game.Screens
 {
@@ -84,7 +85,6 @@ namespace AXE.Game.Screens
             entities.Add("hazard", new List<bEntity>());
             entities.Add("enemy", new List<bEntity>());
             entities.Add("stairs", new List<bEntity>());
-            entities.Add("coins", new List<bEntity>());
             entities.Add("contraptions", new List<bEntity>());
             entities.Add("rewarders", new List<bEntity>());
 
@@ -189,11 +189,11 @@ namespace AXE.Game.Screens
                             h.onCollision("player", p);
                             p.onCollision("hazard", h);
                         }
-                    foreach (bEntity c in entities["coins"])
+                    foreach (bEntity c in entities["items"])
                         if (p != c && p.collides(c))
                         {
                             c.onCollision("player", p);
-                            p.onCollision("coins", c);
+                            p.onCollision("items", c);
                         }
                     foreach (bEntity a in entities["axe"])
                         if (p != a && p.collides(a))
@@ -380,8 +380,8 @@ namespace AXE.Game.Screens
                     _add(e, "items");
                 else if (e is AXE.Game.Entities.Base.Enemy)
                     _add(e, "enemy");
-                else if (e is Coin)
-                    _add(e, "coins");
+                else if (e is Item)
+                    _add(e, "items");
                 else if (e is TrapDoor)
                     _add(e, "solid");
                 else if (e is Lever)

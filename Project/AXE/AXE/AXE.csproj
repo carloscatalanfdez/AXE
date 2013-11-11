@@ -114,7 +114,9 @@
     <Compile Include="Game\Entities\Base\IActivable.cs" />
     <Compile Include="Game\Entities\Base\IHazard.cs" />
     <Compile Include="Game\Entities\Base\IHazardProvider.cs" />
+    <Compile Include="Game\Entities\Base\Item.cs" />
     <Compile Include="Game\Entities\Base\IWeapon.cs" />
+    <Compile Include="Game\Entities\PowerUpPickable.cs" />
     <Compile Include="Game\Entities\Coin.cs" />
     <Compile Include="Game\Entities\Base\IContraption.cs" />
     <Compile Include="Game\Entities\Base\IRewarder.cs" />

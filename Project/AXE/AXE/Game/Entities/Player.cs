@@ -92,6 +92,8 @@ namespace AXE.Game.Entities
         protected SoundEffect sfxCharge;
         protected SoundEffect sfxHit;
 
+        public int powerUps;
+
         // Timers
         public int activationTime;
 
@@ -195,6 +197,8 @@ namespace AXE.Game.Entities
             deathCause = DeathState.None;
             fallingFrom = Vector2.Zero;
             jumpMaxSpeed = 0.0f;
+
+            powerUps = 0;
         }
 
         protected void loadSoundEffects()
@@ -383,13 +387,30 @@ namespace AXE.Game.Entities
                     // the player is moving through a one way platform
                     else if (vspeed >= 0)
                     {
+                        bool dead = false;
                         if (fallingToDeath)
+                        {
+                            // Has fall-safe powerup?
+                            if ((powerUps & PowerUpPickable.HIGHFALLGUARD_EFFECT) != 0)
+                            {
+                                // Consume powerup
+                                powerUps &= ~PowerUpPickable.HIGHFALLGUARD_EFFECT;
+                            }
+                            else
+                            {
+                                dead = true;
+                            }
+                        }
+
+                        if (dead)
                         {
                             vspeed = 0;
                             onDeath(DeathState.Fall);
                         }
                         else
+                        {
                             state = MovementState.Idle;
+                        }
                     }
                     break;
                 case MovementState.Death:
@@ -1061,9 +1082,16 @@ namespace AXE.Game.Entities
             }
         }
 
-        public void onCollectCoin()
+        public void onCollectItem(Item item)
         {
-            data.collectedCoins++;
+            if (item is Coin)
+            {
+                data.collectedCoins += (item as Coin).value;
+            }
+            else if (item is PowerUpPickable)
+            {
+                powerUps |= (item as PowerUpPickable).effect;
+            }
         }
 
         public void revive()
