@@ -57,6 +57,8 @@ namespace AXE.Game.Entities
         public SoundEffect sfxGrab;
         public SoundEffect sfxHurt;
 
+        public int traveledFlightDistance; // How long has the axe been flying
+
         public Axe(int x, int y, IWeaponHolder holder) : base(x, y)
         {
             this.holder = holder;  // can be null
@@ -87,6 +89,7 @@ namespace AXE.Game.Entities
             gravity = 0.5f;
 
             wrapCount = 0;
+            traveledFlightDistance = 0;
             wrapLimit = 1;
 
             type = PlayerData.Weapons.Stick;
@@ -144,10 +147,21 @@ namespace AXE.Game.Entities
 
         public override void onCollision(string type, bEntity other)
         {
-            if (type == "enemy" && state == MovementState.Flying)
+            // Do nothing if the previous owner just threw it
+            if ((other is IWeaponHolder) 
+                && ((other as IWeaponHolder) == thrower) 
+                && (traveledFlightDistance < (other as Entity).graphicWidth()))
+            {
+                return;
+            } 
+            else if (type == "enemy" && state == MovementState.Flying)
             {
                 Entity entity = other as Entity;
                 onHitSolid(entity);
+            }
+            else if (type == "axe" && state == MovementState.Flying)
+            {
+                onBounce();
             }
         }
 
@@ -165,6 +179,7 @@ namespace AXE.Game.Entities
             {
                 case MovementState.Grabbed:
                     wrapCount = 0;
+                    traveledFlightDistance = 0;
                     wrappable = true;
 
                     pos = holder.getHandPosition() - getGrabPosition();
@@ -177,6 +192,8 @@ namespace AXE.Game.Entities
                     moveTo.Y += current_vspeed;
                     Vector2 remnant = moveToContact(moveTo, "solid");
 
+                    traveledFlightDistance += (int) Math.Abs(pos.X - moveTo.X);
+
                     // We have been stopped
                     if (remnant.X != 0 || remnant.Y != 0)
                     {
@@ -187,6 +204,7 @@ namespace AXE.Game.Entities
                     break;
                 case MovementState.Bouncing:
                     wrapCount = 0;
+                    traveledFlightDistance = 0;
                     wrappable = true;
 
                     current_vspeed += gravity;
@@ -225,6 +243,7 @@ namespace AXE.Game.Entities
                     break;
                 case MovementState.Stuck:
                     wrapCount = 0;
+                    traveledFlightDistance = 0;
                     wrappable = true;
                     if (stuckTo != null)
                     {
@@ -359,6 +378,14 @@ namespace AXE.Game.Entities
             sfxThrow.Play();
             state = MovementState.Flying;
             current_hspeed = force * holder.getDirectionAsSign(dir);
+            holder.removeWeapon();
+            holder = null;
+        }
+
+        public virtual void onDrop()
+        {
+            state = MovementState.Idle;
+            thrower = holder;
             holder.removeWeapon();
             holder = null;
         }

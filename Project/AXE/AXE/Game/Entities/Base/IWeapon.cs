@@ -12,5 +12,6 @@ namespace AXE.Game.Entities.Base
         Vector2 getGrabPosition();
         void onThrow(int force, Player.Dir dir);
         void onGrab(IWeaponHolder holder);
+        void onDrop();
     }
 }

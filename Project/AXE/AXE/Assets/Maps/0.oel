@@ -144,5 +144,6 @@
     <TrapDoor id="35" x="112" y="128" open="False" rewarder="35" />
     <Lever id="78" x="200" y="224" rewarder="35" />
     <HighGuardFallPowerUp id="79" x="80" y="168" />
+    <EvilAxeHolder id="80" x="40" y="200" rewarder="0" target="0" targetX="0" targetY="0" value="0" />
   </Entities>
 </level>

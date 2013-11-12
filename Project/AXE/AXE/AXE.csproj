@@ -111,6 +111,7 @@
     <Compile Include="Game\Entities\Axes\NormalAxe.cs" />
     <Compile Include="Game\Entities\Base\Axe.cs" />
     <Compile Include="Game\Entities\Base\Enemy.cs" />
+    <Compile Include="Game\Entities\Enemies\EvilAxeHolder.cs" />
     <Compile Include="Game\Entities\Base\IActivable.cs" />
     <Compile Include="Game\Entities\Base\IHazard.cs" />
     <Compile Include="Game\Entities\Base\IHazardProvider.cs" />

@@ -211,6 +211,13 @@ namespace AXE.Game.Screens
                             e.onCollision("axe", w);
                             w.onCollision("enemy", e);
                         }
+
+                    foreach (bEntity e in entities["axe"])
+                        if (w != e && w.collides(e))
+                        {
+                            e.onCollision("axe", w);
+                            w.onCollision("axe", e);
+                        }
                 }
                     
             }
