@@ -15,9 +15,10 @@ namespace AXE.Game.Entities.Base
 {
     class EvilAxeHolder : Enemy, IWeaponHolder
     {
-        public enum State { None, Idle, Walk, Throwing, Falling, Dead }
+        public enum State { None, Idle, Walk, ChasingAxe, GrabbedAxe, Throwing, Falling, Dead }
         const int CHANGE_STATE_TIMER = 0;
-        const int DEAD_ANIM_TIMER = 1;
+        const int CHASE_REACTION_TIMER = 1;
+        const int DEAD_ANIM_TIMER = 2;
 
         public bSpritemap spgraphic
         {
@@ -32,10 +33,14 @@ namespace AXE.Game.Entities.Base
         float gravity;
         float vspeed;
 
+        bool beginChase;
+        int chaseReactionTime;
+
         IWeapon weapon;
 
         Vector2 moveTo;
         bMask watchMask;
+        protected bMask weaponCatchMask;
 
         public State state;
 
@@ -44,6 +49,7 @@ namespace AXE.Game.Entities.Base
         int idleBaseTime, idleOptionalTime;
         int walkBaseTime, walkOptionalTime;
         int throwBaseTime, throwOptionalTime;
+        int grabbedBaseTime, grabbedOptionalTime;
 
         SoundEffect sfxGrab;
         SoundEffect sfxThrow;
@@ -61,9 +67,11 @@ namespace AXE.Game.Entities.Base
 
             spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/axethrower-sheet"), 17, 26);
             spgraphic.add(new bAnim("idle", new int[] { 0 }));
-            spgraphic.add(new bAnim("walk", new int[] { 0, 1 }, 0.3f));
+            spgraphic.add(new bAnim("walk", new int[] { 0, 2, 1 }, 0.3f));
             spgraphic.add(new bAnim("throw", new int[] { 1 }, 1.0f, false));
             spgraphic.add(new bAnim("jump", new int[] { 2 }));
+            spgraphic.add(new bAnim("chase-prepare",  new int[] { 2 }));
+            spgraphic.add(new bAnim("chase-running", new int[] { 5, 6 }, 0.5f));
             spgraphic.add(new bAnim("death", new int[] { 3, 4 }, 0.3f));
             spgraphic.play("idle");
 
@@ -79,6 +87,7 @@ namespace AXE.Game.Entities.Base
             gravity = 0.5f;
             deathFallThreshold = 40;
             deathAnimDuration = 30;
+            beginChase = false;
 
             idleBaseTime = 80;
             idleOptionalTime = 80;
@@ -86,6 +95,8 @@ namespace AXE.Game.Entities.Base
             walkOptionalTime = 30;
             throwBaseTime = 50;
             throwOptionalTime = 20;
+            grabbedBaseTime = 30;
+            grabbedOptionalTime = 10;
 
             if (Tools.random.Next(2) < 1)
                 facing = Dir.Right;
@@ -97,9 +108,16 @@ namespace AXE.Game.Entities.Base
 
             state = State.None;
             changeState(State.Idle);
+            chaseReactionTime = 15;
 
             // Spawn with axe
             spawnAxe();
+
+            weaponCatchMask = new bMask(x, y,
+                (int)(graphicWidth() * 1.5f),
+                (int)(graphicHeight() * 1.25f),
+                -(int)(graphicWidth() * 0.25f),
+                -(int)(graphicHeight() * 0.25f));
         }
 
         protected bool checkForGround(int x, int y)
@@ -119,17 +137,23 @@ namespace AXE.Game.Entities.Base
                 switch (newState)
                 {
                     case State.Idle:
-                        timer[0] = idleBaseTime + Tools.random.Next(idleOptionalTime) - idleOptionalTime;
+                        timer[CHANGE_STATE_TIMER] = idleBaseTime + Tools.random.Next(idleOptionalTime) - idleOptionalTime;
                         break;
                     case State.Walk:
-                        timer[0] = walkBaseTime + Tools.random.Next(walkOptionalTime) - walkOptionalTime;
+                        timer[CHANGE_STATE_TIMER] = walkBaseTime + Tools.random.Next(walkOptionalTime) - walkOptionalTime;
+                        break;
+                    case State.ChasingAxe:
+                        beginChase = false;
+                        timer[CHASE_REACTION_TIMER] = (int)(chaseReactionTime * 1.5f);
                         break;
                     case State.Throwing:
                         sfxThrow.Play();
 
                         weapon.onThrow(3, facing);
-                        timer[0] = throwBaseTime + Tools.random.Next(throwOptionalTime) - throwOptionalTime;
-                        
+                        timer[CHANGE_STATE_TIMER] = throwBaseTime + Tools.random.Next(throwOptionalTime) - throwOptionalTime;
+                        break;
+                    case State.GrabbedAxe:
+                        timer[CHANGE_STATE_TIMER] = grabbedBaseTime + Tools.random.Next(grabbedBaseTime) - grabbedOptionalTime;
                         break;
                 }
 
@@ -162,10 +186,19 @@ namespace AXE.Game.Entities.Base
 
                             changeState(State.Idle);
                             break;
+                        case State.ChasingAxe:
+                            break;
                         case State.Throwing:
                             changeState(State.Idle);
                             break;
+                        case State.GrabbedAxe:
+                            changeState(State.Idle);
+                            break;
                     }
+                    break;
+                case CHASE_REACTION_TIMER:
+                    if (state == State.ChasingAxe)
+                        beginChase = true;
                     break;
                 case DEAD_ANIM_TIMER:
                     break;
@@ -176,7 +209,7 @@ namespace AXE.Game.Entities.Base
         {
             base.onUpdate();
 
-            spgraphic.update();
+            weaponCatchMask.update(x, y);
 
             moveTo = pos;
             bool onAir = !checkForGround(x, y);
@@ -245,6 +278,30 @@ namespace AXE.Game.Entities.Base
                     spgraphic.play("jump");
 
                     break;
+                case State.ChasingAxe:
+                    if (beginChase)
+                    {
+                        spgraphic.play("chase-running");
+
+                        int hsp = (int)(hspeed * 3);
+                        nextPosition = new Vector2(x + directionToSign(facing) * hsp, y);
+                        wontFall = checkForGround(
+                                (int)(nextPosition.X + directionToSign(facing) * graphicWidth() / 2),
+                                (int)nextPosition.Y);
+                        wontCollide = !placeMeeting(
+                                (int)nextPosition.X,
+                                (int)nextPosition.Y, new String[] { "player", "solid" });
+                        if (wontFall && wontCollide)
+                            moveTo.X += directionToSign(facing) * hsp;
+                        else if (!wontFall || !wontCollide)
+                            changeState(State.Idle);
+                    }
+                    else
+                    {
+                        spgraphic.play("chase-prepare");
+                    }
+
+                    break;
                 case State.Throwing:
                     spgraphic.play("throw");
                     break;
@@ -268,25 +325,35 @@ namespace AXE.Game.Entities.Base
                     watchMask.offsetx = graphicWidth();
                 watchMask.offsety = (graphicHeight() - watchMask.h);
 
-                // VERY IMPORTANT
-                // When holding the mask, we need to hold the original _mask, since
-                // mask itself is a property and will return a hacked wrapped mask sometimes
-                bMask holdMyMaskPlease = _mask;
-                mask = watchMask;
+                if (weapon != null)
+                {   // I have an axe and I plan to use it
+                    // VERY IMPORTANT
+                    // When holding the mask, we need to hold the original _mask, since
+                    // mask itself is a property and will return a hacked wrapped mask sometimes
+                    bMask holdMyMaskPlease = _mask;
+                    mask = watchMask;
+                    bool sawYou = placeMeeting(x, y, "player", alivePlayerCondition);
+                    mask = holdMyMaskPlease; // thank you!
 
-                bool sawYou = placeMeeting(x, y, "player", alivePlayerCondition);
-                mask = holdMyMaskPlease; // thank you!
-
-                if (sawYou)
-                {
-                    if (weapon != null)
+                    if (sawYou)
                     {
                         changeState(State.Throwing);
                     }
                 }
+                else
+                {   // I'm looking for an axe
+                    bEntity axeTarget = instancePlace(watchMask, "axe");
+
+                    if (axeTarget != null && axeTarget is Axe)
+                        handleSeeAxe(axeTarget as Axe);
+                }
+            }
+            else if (state == State.ChasingAxe)
+            {
+                tryGrabAnyAxe();
             }
 
-            if (state == State.Walk || state == State.Falling)
+            if (state == State.Walk || state == State.Falling || state == State.ChasingAxe)
             {
                 Vector2 remnant;
                 // Check wether we collide first with a solid or a onewaysolid,
@@ -325,19 +392,8 @@ namespace AXE.Game.Entities.Base
                 }
             }
 
-            // Do this at the end, to make sure we're not going to throw this axe
-            // (init is not called yet and it will to explode)
-            if (state == State.Idle)
-            {
-                // Randomly spawn axe if needed
-                if (Tools.random.Next(80) < 1 && weapon == null)
-                {
-                    sfxGrab.Play();
-                    spawnAxe();
-                }
-            }
-
             spgraphic.flipped = (facing == Dir.Left);
+            spgraphic.update();
 
             handleSoundEffects();
 
@@ -357,7 +413,10 @@ namespace AXE.Game.Entities.Base
             spgraphic.render(sb, pos);
 
             if (bConfig.DEBUG)
+            {
+                sb.Draw(bDummyRect.sharedDummyRect(game), weaponCatchMask.rect, new Color(0.2f, 0.2f, 0.2f, 0.2f));
                 sb.DrawString(game.gameFont, state.ToString() + " [" + timer[0] + "]", new Vector2(x, y - 8), Color.White);
+            }
         }
 
         public override int graphicWidth()
@@ -432,6 +491,58 @@ namespace AXE.Game.Entities.Base
             NormalAxe normalAxe = new NormalAxe((int)axePos.X, (int)axePos.Y, this);
             setWeapon(normalAxe);
             world.add(normalAxe, "axe");
+        }
+
+        public void handleSeeAxe(Axe axeTarget)
+        {
+            bool waitIsItFlying = axeTarget.state == Axe.MovementState.Flying;
+            if (waitIsItFlying)
+            {
+                // try catch
+                if (Tools.random.Next(3) < 1)
+                    tryGrabAnyAxe();
+            }
+            else
+            {
+                bool goForIt;
+                if (axeTarget.holder != null)
+                {   // Steal it?
+                    goForIt = Tools.random.Next(80) < 1;
+                }
+                else
+                {
+                    goForIt = true;
+                }
+
+                if (goForIt)
+                {
+                    changeState(State.ChasingAxe);
+                }
+            }
+        }
+
+        public bool tryGrabAnyAxe()
+        {
+            // Can I grab any axe?
+            bMask wrappedMask = generateWrappedMask(weaponCatchMask);
+            bEntity entity = instancePlace(wrappedMask, "axe");
+            if (entity != null)
+            {
+                if ((entity as Axe).holder != null)
+                {
+                    ((entity as Axe).holder).onAxeStolen();
+                    (entity as Axe).holder = null;
+                }
+                (entity as Axe).onGrab(this);
+                sfxGrab.Play();
+
+                spgraphic.play("idle");
+                changeState(State.GrabbedAxe);
+
+                return true;
+            }
+
+            return false;
         }
 
         /**

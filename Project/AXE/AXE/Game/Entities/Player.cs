@@ -604,12 +604,10 @@ namespace AXE.Game.Entities
                         bool pickedWeapon = false;
                         if (state != MovementState.Attacking && state != MovementState.Attacked && state != MovementState.Activate)
                         {
-                            bEntity entity = instancePlace(weaponCatchMask, "axe");
-                            if (entity == null)
-                            {
-                                bMask wrappedMask = generateWrappedMask(weaponCatchMask);
-                                entity = instancePlace(wrappedMask, "axe");
-                            }
+                            // generateWrappedMask will give us our current mask or the wrapped one, depends on where we are
+                            // TODO: to wrap or not to wrap is reused from the player mask (showWrapEffect var), and not from this one. Should we fix?
+                            bMask wrappedMask = generateWrappedMask(weaponCatchMask);
+                            bEntity entity = instancePlace(wrappedMask, "axe");
                             if (entity != null)
                             {
                                 timer[AXE_GRAB_TIMER] = -1;
@@ -1081,6 +1079,11 @@ namespace AXE.Game.Entities
         public void onAxeStolen()
         {
             weapon = null;
+            if (state == MovementState.Attacking || state == MovementState.Attacked)
+            {
+                // Dude stop it
+                state = MovementState.Idle;
+            }
         }
 
         /* End of IWeaponHolder implementation */
