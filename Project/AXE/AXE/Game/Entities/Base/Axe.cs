@@ -159,7 +159,7 @@ namespace AXE.Game.Entities
                 Entity entity = other as Entity;
                 onHitSolid(entity);
             }
-            else if (type == "axe" && state == MovementState.Flying)
+            else if (type == "axe")
             {
                 onBounce();
             }

@@ -473,5 +473,10 @@ namespace AXE.Game.Entities.Base
                 return new Vector2(x + graphicWidth() + 1, y + 13);
             }
         }
+
+        public void onAxeStolen()
+        {
+            weapon = null;
+        }
     }
 }

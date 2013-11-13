@@ -613,6 +613,11 @@ namespace AXE.Game.Entities
                             if (entity != null)
                             {
                                 timer[AXE_GRAB_TIMER] = -1;
+                                if ((entity as Axe).holder != null)
+                                {
+                                    ((entity as Axe).holder).onAxeStolen();
+                                    (entity as Axe).holder = null;
+                                }
                                 (entity as Axe).onGrab(this);
                                 GameData.get().playerAData.weapon = (entity as Axe).type;
                                 pickedWeapon = true;
@@ -1067,10 +1072,17 @@ namespace AXE.Game.Entities
         }
 
         /** 20131102, RDLH: This should not be in the interface! **/
+        /** Then why the fuck did you add it there D: **/
         public int getDirectionAsSign(Dir dir)
         {
             return directionToSign(dir);
         }
+
+        public void onAxeStolen()
+        {
+            weapon = null;
+        }
+
         /* End of IWeaponHolder implementation */
 
         bool playedStepEffect = false;

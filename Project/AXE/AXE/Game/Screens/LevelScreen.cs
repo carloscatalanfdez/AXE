@@ -215,8 +215,14 @@ namespace AXE.Game.Screens
                     foreach (bEntity e in entities["axe"])
                         if (w != e && w.collides(e))
                         {
-                            e.onCollision("axe", w);
-                            w.onCollision("axe", e);
+                            // Check first, since it depends on the state of the axe and the
+                            // first onCollision will set the other axe to bounce, hence it won't
+                            // be flying on the next on collision and things won't work
+                            if (axeToAxeCollisionCondition(w as Axe, e as Axe)) 
+                            {
+                                e.onCollision("axe", w);
+                                w.onCollision("axe", e);
+                            }
                         }
                 }
                     
@@ -420,6 +426,11 @@ namespace AXE.Game.Screens
         public int layerSelector(bEntity a, bEntity b)
         {
             return a.layer - b.layer;
+        }
+
+        public bool axeToAxeCollisionCondition(Axe a, Axe b)
+        {
+            return a.state == Axe.MovementState.Flying && b.state == Axe.MovementState.Flying;
         }
 
         public void displayPlayerCountdown(PlayerIndex who)
