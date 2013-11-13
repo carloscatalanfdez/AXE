@@ -16,5 +16,6 @@ namespace AXE.Game.Entities.Base
         int getDirectionAsSign(Player.Dir dir);
         Vector2 getPosition();
         Vector2 getHandPosition();
+        void onAxeStolen();
     }
 }

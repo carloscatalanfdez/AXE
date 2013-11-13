@@ -414,7 +414,6 @@ namespace AXE.Game.Entities.Enemies
                         changeState(State.Attacking);
                     }
                 }
-
             }
 
             if (state == State.Walk || state == State.Chase || state == State.ChaseRunning || state == State.Falling)
