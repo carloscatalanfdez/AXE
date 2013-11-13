@@ -159,9 +159,13 @@ namespace AXE.Game.Entities
                 Entity entity = other as Entity;
                 onHitSolid(entity);
             }
-            else if (type == "axe" && state == MovementState.Flying)
+            else if (type == "axe" && state == MovementState.Flying && (other as Axe).state == MovementState.Flying)
             {
                 onBounce();
+                // Make the other bounce so as not to overcome it!
+                // TODO: Implement some kind of axe power checking
+                // (I added the ! to the first phrase to align em)
+                (other as Axe).onBounce();
             }
         }
 
@@ -386,8 +390,11 @@ namespace AXE.Game.Entities
         {
             state = MovementState.Idle;
             thrower = holder;
-            holder.removeWeapon();
-            holder = null;
+            if (holder != null)
+            {
+                holder.removeWeapon();
+                holder = null;
+            }
         }
 
         public virtual void onBounce(bool playYourSound = true)
