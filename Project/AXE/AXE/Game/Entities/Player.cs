@@ -187,10 +187,10 @@ namespace AXE.Game.Entities
 
         protected void initParameters()
         {
-            mask.w = 16; 
-            mask.h = 24; 
-            mask.offsetx = 7;
-            mask.offsety = 8;
+            _mask.w = 16; 
+            _mask.h = 24; 
+            _mask.offsetx = 7;
+            _mask.offsety = 8;
 
             current_hspeed = 0;
             vspeed = 0f;
