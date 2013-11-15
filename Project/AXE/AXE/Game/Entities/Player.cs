@@ -692,6 +692,13 @@ namespace AXE.Game.Entities
                 case MovementState.Exit:
                     spgraphic.play("exit");
                     break;
+                default:
+                    // Assume flipping is needed for any other state
+                    if (facing == Dir.Right)
+                        spgraphic.flipped = false;
+                    else
+                        spgraphic.flipped = true;
+                    break;
             }
 
             if (isLanding)
