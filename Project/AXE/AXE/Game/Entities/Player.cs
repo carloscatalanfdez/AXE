@@ -905,31 +905,39 @@ namespace AXE.Game.Entities
                 pos.X = stepInitialPosition.X;
                 if (placeMeeting(x, y, "enemy"))
                 {
-                    // If it doesn't work (still colliding) jump or something
-                    // Check first if the enemy is on top, so to not jump throw it
-                    if (vspeed < 0 && other.y + (other as Entity).graphicHeight() / 2 < y)
+                    if (state == MovementState.Ladder)
                     {
-                        if (!handleJumpHit())
-                        {
-                            vspeed = 0;
-                            pos.Y = stepInitialPosition.Y;
-                        }
+                        // Just ignore him when you're on a ladder for now
+                        pos = stepInitialPosition;
                     }
                     else
                     {
-                        state = MovementState.Jump;
-                        vspeed = -jumpPower / 2;
-                        if (other.x + (other as Entity).graphicWidth()/2 < x + graphicWidth()/2)
+                        // If it doesn't work (still colliding) jump or something
+                        // Check first if the enemy is on top, so to not jump throw it
+                        if (vspeed < 0 && other.y + (other as Entity).graphicHeight() / 2 < y)
                         {
-                            jumpedFacing = Dir.Right;
-                            facing = Dir.Left;
-                            current_hspeed = getDirectionAsSign(Dir.Right) * hspeed;
+                            if (!handleJumpHit())
+                            {
+                                vspeed = 0;
+                                pos.Y = stepInitialPosition.Y;
+                            }
                         }
-                        else if (other.x + (other as Entity).graphicWidth() / 2 > x + graphicWidth() / 2)
+                        else
                         {
-                            jumpedFacing = Dir.Left;
-                            facing = Dir.Right;
-                            current_hspeed = getDirectionAsSign(Dir.Left) * hspeed;
+                            state = MovementState.Jump;
+                            vspeed = -jumpPower / 2;
+                            if (other.x + (other as Entity).graphicWidth() / 2 < x + graphicWidth() / 2)
+                            {
+                                jumpedFacing = Dir.Right;
+                                facing = Dir.Left;
+                                current_hspeed = getDirectionAsSign(Dir.Right) * hspeed;
+                            }
+                            else if (other.x + (other as Entity).graphicWidth() / 2 > x + graphicWidth() / 2)
+                            {
+                                jumpedFacing = Dir.Left;
+                                facing = Dir.Right;
+                                current_hspeed = getDirectionAsSign(Dir.Left) * hspeed;
+                            }
                         }
                     }
                 }

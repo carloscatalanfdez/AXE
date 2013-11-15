@@ -16,6 +16,8 @@ namespace AXE.Game.Entities.Base
         public Enemy(int x, int y)
             : base(x, y)
         {
+            // Rendering layer
+            layer = 1;
         }
 
         /**
