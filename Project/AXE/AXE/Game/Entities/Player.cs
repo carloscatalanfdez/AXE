@@ -201,7 +201,7 @@ namespace AXE.Game.Entities
             action = ActionState.None;
             deathCause = DeathState.None;
             fallingFrom = Vector2.Zero;
-            jumpMaxSpeed = 0.0f;
+            jumpMaxSpeed = 3.0f;
             axeToCatch = null;
         }
 
