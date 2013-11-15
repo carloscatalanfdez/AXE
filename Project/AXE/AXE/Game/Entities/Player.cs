@@ -260,7 +260,7 @@ namespace AXE.Game.Entities
             }
 
             Stairs ladder = (Stairs) instancePlace(x, y, "stairs");
-            bool onladder = ladder != null;
+            bool onladder = ladder != null && !isLadderBlocked(ladder);
             bool toLadder = false;
 
             onair = !placeMeeting(x, y + 1, "solid");
@@ -1027,6 +1027,31 @@ namespace AXE.Game.Entities
         public override void onActivationEndNotification()
         {
             state = MovementState.Idle;
+        }
+
+        public bool isLadderBlocked(Stairs ladder)
+        {
+            // Compute position of the player after grabbing the ladder
+            int toX;
+            bMask currentMask = mask;
+            if (currentMask is bMaskList)
+            {
+                int maskXOffset = Math.Max((currentMask as bMaskList).masks[0].offsetx, (currentMask as bMaskList).masks[1].offsetx);
+                toX = ladder.x - maskXOffset;
+            }
+            else
+            {
+                toX = ladder.x - mask.offsetx;
+            }
+
+            // is there anything on that pos?
+            if (placeMeeting(new Vector2(toX, pos.Y), new String[] {"enemy", "solid"}))
+            {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
 
         /* IWeaponHolder implementation */
