@@ -25,7 +25,7 @@ namespace AXE.Game.Entities
     class Player : Entity, IWeaponHolder
     {
         // Utilities
-        GameInput mginput;
+        public GameInput mginput;
         Random random;
 
         // Some declarations
@@ -33,10 +33,8 @@ namespace AXE.Game.Entities
         public enum DeathState { None, Generic, Fall, ForceHit };
         public enum ActionState { None, Squid };
         public const int EXIT_ANIM_TIMER = 1;
-        public const int EXIT_TRANSITION_TIMER = 2;
         public const int ACTIVATION_TIME_TIMER = 3;
         public const int AXE_GRAB_TIMER = 4;
-        public int exitTransitionWaitTime;
         public int exitAnimationWaitTime;
         public int axeGrabTime;
 
@@ -125,7 +123,8 @@ namespace AXE.Game.Entities
             attributes.Add("moveable");
 
             // Load graphic & setup
-            spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/knight-sheet"), 30, 32);
+            string filename = "Assets/Sprites/knight-sheet" + (data.id == PlayerIndex.One ? "" : "-alt");
+            spgraphic = new bSpritemap(game.Content.Load<Texture2D>(filename), 30, 32);
             spgraphic.add(new bAnim("idle", new int[] { 0 }, 0.1f));
             spgraphic.add(new bAnim("walk", new int[] { 1, 2, 3, 2 }, 0.2f));
             spgraphic.add(new bAnim("jump", new int[] { 8 }, 0.0f));
@@ -166,7 +165,6 @@ namespace AXE.Game.Entities
 
         protected void loadParameters()
         {
-            exitTransitionWaitTime = 15;
             exitAnimationWaitTime = 15;
             activationTime = 15;
             axeGrabTime = 2;
@@ -315,14 +313,17 @@ namespace AXE.Game.Entities
                         {
                             if (onladder)
                             {
-                                if (input.up() || input.down() && (!input.left() && !input.right()))
+                                if (mginput.check(PadButton.up) || 
+                                    mginput.check(PadButton.down) 
+                                        && !mginput.check(PadButton.left) 
+                                        && !mginput.check(PadButton.right))
                                 {
                                     state = MovementState.Ladder;
                                     isLanding = false;
                                     current_hspeed = 0;
                                 }
                             }
-                            else if (input.down() && placeMeeting(x, y + 1, "stairs"))
+                            else if (mginput.check(PadButton.down) && placeMeeting(x, y + 1, "stairs"))
                             {
                                 moveTo.Y += 2;
                                 bEntity g = (bEntity)instancePlace(moveTo, "stairs");
@@ -333,7 +334,7 @@ namespace AXE.Game.Entities
                                 isLanding = false;
                                 current_hspeed = 0;
                             }
-                            else if (input.up() && placeMeeting(x, y, "items"))
+                            else if (mginput.check(PadButton.up) && placeMeeting(x, y, "items"))
                             {
                                 bEntity door = (bEntity)instancePlace(x, y, "items");
                                 if (door is Door)
@@ -365,18 +366,19 @@ namespace AXE.Game.Entities
                             moveTo.X = ladder.x - mask.offsetx;
                         }
 
-                        if (input.up())
+                        if (mginput.check(PadButton.up))
                             moveTo.Y -= hspeed;
-                        else if (input.down())
+                        else if (mginput.check(PadButton.down))
                             moveTo.Y += hspeed;
-                        if ((input.left() || input.right()) && !(input.down() || input.up()))
+                        if ((mginput.check(PadButton.left) || mginput.check(PadButton.right)) 
+                            && !(mginput.check(PadButton.down) || mginput.check(PadButton.up)))
                             if (placeMeeting(x, y + 1, "solid") || placeMeeting(x, y + 1, "onewaysolid", onewaysolidCondition))
                                 state = MovementState.Idle;
                     }
                     else
                     {
                         state = MovementState.Jump;
-                        if (input.up())
+                        if (mginput.check(PadButton.up))
                             vspeed = -2.0f;
                         else
                             vspeed = 0;
@@ -426,7 +428,7 @@ namespace AXE.Game.Entities
                             mask.h = 0;
                             vspeed = 0;
                             bool deathAnimationFinished = spgraphic.currentAnim.finished; // TODO
-                            if (deathAnimationFinished)
+                            if (deathAnimationFinished && data.alive)
                             {
                                 // Animation end, restart...
                                 Controller.getInstance().handlePlayerDeath(data);
@@ -574,7 +576,8 @@ namespace AXE.Game.Entities
         public void handleActionButton()
         {
             // Handle axe
-            if (state != MovementState.Death)
+            // TODO: Study if substitute this with a canAct
+            if (canDie())
             {
                 if (mginput.pressed(PadButton.b))
                 {
@@ -857,15 +860,14 @@ namespace AXE.Game.Entities
                     Door door = (instancePlace(x, y, "items") as Door);
                     if (door != null)
                     {
-                        door.spgraphic.play("closed");
-                        if (weapon != null)
-                            world.remove((weapon as bEntity));
-                        visible = false;
-                        timer[EXIT_TRANSITION_TIMER] = exitTransitionWaitTime;
+                        if (door.onPlayerExit())
+                        {
+                            if (weapon != null)
+                                world.remove((weapon as bEntity));
+                            collidable = false;
+                            visible = false;
+                        }
                     }
-                    break;
-                case EXIT_TRANSITION_TIMER:
-                    Controller.getInstance().goToNextLevel();
                     break;
                 case ACTIVATION_TIME_TIMER:
                     state = MovementState.Idle;
@@ -894,7 +896,7 @@ namespace AXE.Game.Entities
 
         public override void onCollision(string type, bEntity other)
         {
-            if (state == MovementState.Death)
+            if (!canDie())
                 return;
 
             if (type == "solid")
@@ -985,7 +987,7 @@ namespace AXE.Game.Entities
 
         public void onDeath(DeathState type = DeathState.Generic)
         {
-            if (state != MovementState.Death)
+            if (canDie())
             {
                 state = MovementState.Death;
                 // TODO: Use type to change anim
@@ -1154,9 +1156,12 @@ namespace AXE.Game.Entities
         {
             if (beingDragged)
             {
-                state = MovementState.Jump;
-                fallingToDeath = false;
-                vspeed = 0;
+                if (canDie())
+                {
+                    state = MovementState.Jump;
+                    fallingToDeath = false;
+                    vspeed = 0;
+                }
             }
         }
 
@@ -1175,7 +1180,15 @@ namespace AXE.Game.Entities
         public void revive()
         {
             spgraphic.play("revive");
+            data.alive = true;
             state = MovementState.Revive;
+        }
+
+        public bool canDie()
+        {
+            return (state != MovementState.Death &&
+                state != MovementState.Exit &&
+                state != MovementState.Revive);
         }
     }
 }

@@ -76,16 +76,16 @@ namespace AXE.Common
                 switch (btn)
                 {
                     case PadButton.left:
-                        result = input.left(index);
+                        result = input.joyLeft(index);
                         break;
                     case PadButton.right:
-                        result = input.right(index);
+                        result = input.joyRight(index);
                         break;
                     case PadButton.up:
-                        result = input.up(index);
+                        result = input.joyUp(index);
                         break;
                     case PadButton.down:
-                        result = input.down(index);
+                        result = input.joyDown(index);
                         break;
                 }
             }
@@ -165,24 +165,24 @@ namespace AXE.Common
                     { PadButton.right, new List<Object> { Keys.Right } },
                     { PadButton.up, new List<Object> { Keys.Up } },
                     { PadButton.down, new List<Object> { Keys.Down } },
-                    { PadButton.a, new List<Object> { Buttons.A, Keys.A, Keys.Z } },
-                    { PadButton.b, new List<Object> { Buttons.X, Keys.S, Keys.X } },
-                    { PadButton.start, new List<Object> { Buttons.Start, Keys.Enter, Keys.D1, Keys.D2 } },
-                    { PadButton.coin, new List<Object> { Buttons.B, Keys.Q, Keys.D5, Keys.D6 } },
+                    { PadButton.a, new List<Object> { Buttons.A, Keys.A } },
+                    { PadButton.b, new List<Object> { Buttons.X, Keys.S } },
+                    { PadButton.start, new List<Object> { Buttons.Start, Keys.Enter, Keys.D1 } },
+                    { PadButton.coin, new List<Object> { Buttons.B, Keys.Q, Keys.D5 } },
                     { PadButton.c, new List<Object> { Buttons.Y, Keys.W } },
                     { PadButton.debug, new List<Object> { Buttons.Back, Keys.Tab } }
                 };
             else
                 return new Dictionary<PadButton, List<Object>> 
                 {
-                    { PadButton.left, new List<Object> { Keys.Left } },
-                    { PadButton.right, new List<Object> { Keys.Right } },
-                    { PadButton.up, new List<Object> { Keys.Up } },
-                    { PadButton.down, new List<Object> { Keys.Down } },
-                    { PadButton.a, new List<Object> { Buttons.A, Keys.A, Keys.Z } },
-                    { PadButton.b, new List<Object> { Buttons.X, Keys.S, Keys.X } },
-                    { PadButton.start, new List<Object> { Buttons.Start, Keys.Enter, Keys.D1, Keys.D2 } },
-                    { PadButton.coin, new List<Object> { Buttons.B, Keys.Q, Keys.D5, Keys.D6 } },
+                    { PadButton.left, new List<Object> { Keys.J } },
+                    { PadButton.right, new List<Object> { Keys.L } },
+                    { PadButton.up, new List<Object> { Keys.I } },
+                    { PadButton.down, new List<Object> { Keys.K } },
+                    { PadButton.a, new List<Object> { Buttons.A, Keys.G } },
+                    { PadButton.b, new List<Object> { Buttons.X, Keys.H } },
+                    { PadButton.start, new List<Object> { Buttons.Start, Keys.D2 } },
+                    { PadButton.coin, new List<Object> { Buttons.B, Keys.D6 } },
                     { PadButton.c, new List<Object> { Buttons.Y, Keys.W } },
                     { PadButton.debug, new List<Object> { Buttons.Back, Keys.Tab } }
                 };

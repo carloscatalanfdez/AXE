@@ -74,9 +74,13 @@ namespace AXE.Game.Control
             
             // Set alive the playing characters
             if (data.playerAData.playing)
+            {
                 data.playerAData.alive = true;
+            }
             if (data.playerBData.playing)
+            {
                 data.playerBData.alive = true;
+            }
 
             // Go to first screen
             game.changeWorld(new LevelScreen(data.level), new FadeToColor(game, Color.Black, 10));
@@ -123,9 +127,7 @@ namespace AXE.Game.Control
 
             activePlayers--;
             if (activePlayers <= 0)
-                game.changeWorld(new GameOverScreen());
-            else
-                ; // Someone is still alive, so do nothing
+                game.changeWorld(new GameOverScreen(), new FadeToColor(game, Color.Black, 120));
         }
 
         /** Returns true if valid start press **/
@@ -142,7 +144,11 @@ namespace AXE.Game.Control
                 else
                     return false;
 
-                pdata.playing = true;
+                if (!pdata.playing)
+                {
+                    pdata.playing = true;
+                    activePlayers++;
+                }
                 pdata.alive = true;
                 if (pdata.weapon == PlayerData.Weapons.None)
                     pdata.weapon = PlayerData.Weapons.Axe;

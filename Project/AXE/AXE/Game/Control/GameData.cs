@@ -56,7 +56,6 @@ namespace AXE.Game.Control
         {
             maxLevels = 2;
             level = 0;
-            playerAData.weapon = PlayerData.Weapons.Axe;
         }
 
         public static void saveGame()

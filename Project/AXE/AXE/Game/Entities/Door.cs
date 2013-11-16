@@ -9,11 +9,16 @@ using Microsoft.Xna.Framework.Graphics;
 using bEngine;
 using bEngine.Graphics;
 using AXE.Game.Entities.Contraptions;
+using AXE.Game.Screens;
+using AXE.Game.Control;
 
 namespace AXE.Game.Entities
 {
     class Door : Entity, IRewarder
     {
+        public const int EXIT_TRANSITION_TIMER = 2;
+        public int exitTransitionWaitTime;
+
         public bSpritemap spgraphic
         {
             get { return (_graphic as bSpritemap); }
@@ -62,6 +67,8 @@ namespace AXE.Game.Entities
                 signPosition = new Vector2(x + spgraphic.width / 2 - sign.width / 2, y - 18);
             }
 
+            exitTransitionWaitTime = 15;
+
             layer = 19;
         }
 
@@ -71,6 +78,10 @@ namespace AXE.Game.Entities
             {
                 sign.play("blink");
                 timer[0] = random.Next(60);
+            }
+            else if (n == EXIT_TRANSITION_TIMER)
+            {
+                Controller.getInstance().goToNextLevel();
             }
         }
 
@@ -96,6 +107,18 @@ namespace AXE.Game.Entities
                 sign.render(sb, signPosition);
 
             base.render(dt, sb);
+        }
+
+        public bool onPlayerExit()
+        {
+            (world as LevelScreen).playersThatLeft++;
+            if ((world as LevelScreen).playersThatLeft >= Controller.getInstance().activePlayers)
+            {
+                spgraphic.play("closed");
+                timer[EXIT_TRANSITION_TIMER] = exitTransitionWaitTime;
+            }
+
+            return true;
         }
 
         public void onReward(IContraption contraption)

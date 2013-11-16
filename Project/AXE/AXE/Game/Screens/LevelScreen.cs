@@ -44,6 +44,8 @@ namespace AXE.Game.Screens
         // Players
         public Player playerA, playerB;
         public Player[] players { get { return new Player[] {playerA, playerB}; } }
+        // Exit
+        public int playersThatLeft;
 
         // Screen text
         public string stageLabel;
@@ -115,20 +117,14 @@ namespace AXE.Game.Screens
             // Add player
             if (id < Controller.getInstance().data.maxLevels)
             {
-                // TODO: add logic for positioning and multiplayer
-                int playerX = (int)levelMap.playerStart.X;
-                int playerY = (int)levelMap.playerStart.Y;
-                playerA = new Player(playerX, playerY, GameData.get().playerAData);
-                
-                // Adding axe based on GameData
-                spawnPlayerWeapon(playerA.data, playerA);
-                _add(playerA, "player");
+                foreach (PlayerData pdata in GameData.get().playerData)
+                {
+                    spawnPlayer(pdata);
+                }
             }
             else
             {
                 // Handle ending/nonsense
-                playerA = new Player(width / 2 - 30, height / 2, GameData.get().playerAData);
-                _add(playerA, "player");
             }
 
             // Add loaded entities
@@ -154,17 +150,50 @@ namespace AXE.Game.Screens
                 playerDisplays[i].init();
             }
 
+            playersThatLeft = 0;
+        }
+
+        public Player spawnPlayer(PlayerData pdata)
+        {
+            Player player = null;
+            // TODO: add logic for positioning and multiplayer
+            if (pdata.playing && pdata.alive)
+            {
+                int playerX = (int)levelMap.playerStart.X;
+                int playerY = (int)levelMap.playerStart.Y;
+
+                if (pdata.id == PlayerIndex.One)
+                {
+                    // Removing the old player prevents glitches
+                    // but also removes the corpse and is less funny
+                    if (playerA != null)
+                        remove(playerA);
+                    player = new Player(playerX, playerY, GameData.get().playerData[0]);
+                    playerA = player;
+                    // Adding axe based on GameData
+                    spawnPlayerWeapon(playerA.data, playerA);
+                    _add(playerA, "player");
+                }
+                else if (pdata.id == PlayerIndex.Two)
+                {
+                    // Removing the old player prevents glitches
+                    // but also removes the corpse and is less funny
+                    if (playerB != null)
+                        remove(playerB);
+                    player = new Player(playerX + 32, playerY, GameData.get().playerData[1]);
+                    playerB = player;
+                    // Adding axe based on GameData
+                    spawnPlayerWeapon(playerB.data, playerB);
+                    _add(playerB, "player");
+                }
+            }
+
+            return player;
         }
 
         public override void update(GameTime dt)
         {
             base.update(dt);
-
-            /*if (GameData.get().level < GameData.get().maxLevels)
-                if (GameInput.getInstance(PlayerIndex.One).pressed(PadButton.start))
-                {
-                    handlePause();
-                }*/
 
             foreach (String key in entities.Keys)
                 foreach (bEntity entity in entities[key])
@@ -252,7 +281,7 @@ namespace AXE.Game.Screens
                 playerDisplays[i].update();
 
             stageLabel = buildStageLabel();
-            infoLabel = "CREDITS: " + (GameData.get().credits) + " - COINS: " + (GameData.get().coins);
+            infoLabel = "CREDITS: " + (GameData.get().credits) + " - COINS: " + (GameData.get().coins + " ( " + Controller.getInstance().activePlayers + ")");
         }
 
         public string buildStageLabel()

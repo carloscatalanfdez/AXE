@@ -23,11 +23,13 @@ namespace AXE.Game.Entities.Contraptions
             base.update();
 
             bool solved = false;
-            if ((world as LevelScreen).playerA.state == Player.MovementState.Exit)
+            if ((world as LevelScreen).playerA != null &&
+                (world as LevelScreen).playerA.state == Player.MovementState.Exit)
             {
                 solved = true;
             }
-            else if ((world as LevelScreen).playerB != null && (world as LevelScreen).playerB.state == Player.MovementState.Exit)
+            else if ((world as LevelScreen).playerB != null && 
+                (world as LevelScreen).playerB.state == Player.MovementState.Exit)
             {
                 solved = true;
             }

@@ -7,6 +7,7 @@ using AXE.Game.Entities;
 using AXE.Game.Entities.Base;
 using AXE.Common;
 using bEngine;
+using AXE.Game.Screens;
 
 namespace AXE.Game.Control
 {
@@ -80,11 +81,17 @@ namespace AXE.Game.Control
                 }
                 else
                 {
-                    continueTimer--;
+                    if (player != null && 
+                        (player.mginput.pressed(PadButton.a) ||
+                        player.mginput.pressed(PadButton.b)))
+                        continueTimer = continueTimer / PLAYER_TIMER_STEPSPERSECOND * 
+                            PLAYER_TIMER_STEPSPERSECOND;
+                    else
+                        continueTimer--;
                     renderLine2 = "CONTINUE? " + (continueTimer / PLAYER_TIMER_STEPSPERSECOND * 1f);
                     if (continueTimer < 0)
                         Controller.getInstance().handleCountdownEnd(playerData.id);
-                    else if (Controller.getInstance().playerInput[playerNumber].pressed(PadButton.start))
+                    else if (Controller.getInstance().playerInput[playerNumber-1].pressed(PadButton.start))
                     {
                         if (Controller.getInstance().playerStart(index))
                             player.revive();
@@ -93,7 +100,15 @@ namespace AXE.Game.Control
             }
             else
             {
-                renderLine2 = "PRESS START";
+                if (GameData.get().credits > 0)
+                    renderLine2 = "PRESS START";
+                else
+                    renderLine2 = "INSERT COIN";
+                if (Controller.getInstance().playerInput[playerNumber-1].pressed(PadButton.start))
+                {
+                    if (Controller.getInstance().playerStart(index))
+                        player = (world as LevelScreen).spawnPlayer(playerData);
+                }
             }
         }
 
