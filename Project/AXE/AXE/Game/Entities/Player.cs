@@ -187,10 +187,10 @@ namespace AXE.Game.Entities
 
         protected void initParameters()
         {
-            mask.w = 16; 
-            mask.h = 24; 
-            mask.offsetx = 7;
-            mask.offsety = 8;
+            _mask.w = 16; 
+            _mask.h = 24; 
+            _mask.offsetx = 7;
+            _mask.offsety = 8;
 
             current_hspeed = 0;
             vspeed = 0f;
@@ -201,7 +201,7 @@ namespace AXE.Game.Entities
             action = ActionState.None;
             deathCause = DeathState.None;
             fallingFrom = Vector2.Zero;
-            jumpMaxSpeed = 0.0f;
+            jumpMaxSpeed = 3.0f;
             axeToCatch = null;
         }
 
@@ -260,7 +260,7 @@ namespace AXE.Game.Entities
             }
 
             Stairs ladder = (Stairs) instancePlace(x, y, "stairs");
-            bool onladder = ladder != null;
+            bool onladder = ladder != null && !isLadderBlocked(ladder);
             bool toLadder = false;
 
             onair = !placeMeeting(x, y + 1, "solid");
@@ -692,6 +692,13 @@ namespace AXE.Game.Entities
                 case MovementState.Exit:
                     spgraphic.play("exit");
                     break;
+                default:
+                    // Assume flipping is needed for any other state
+                    if (facing == Dir.Right)
+                        spgraphic.flipped = false;
+                    else
+                        spgraphic.flipped = true;
+                    break;
             }
 
             if (isLanding)
@@ -898,31 +905,39 @@ namespace AXE.Game.Entities
                 pos.X = stepInitialPosition.X;
                 if (placeMeeting(x, y, "enemy"))
                 {
-                    // If it doesn't work (still colliding) jump or something
-                    // Check first if the enemy is on top, so to not jump throw it
-                    if (vspeed < 0 && other.y + (other as Entity).graphicHeight() / 2 < y)
+                    if (state == MovementState.Ladder)
                     {
-                        if (!handleJumpHit())
-                        {
-                            vspeed = 0;
-                            pos.Y = stepInitialPosition.Y;
-                        }
+                        // Just ignore him when you're on a ladder for now
+                        pos = stepInitialPosition;
                     }
                     else
                     {
-                        state = MovementState.Jump;
-                        vspeed = -jumpPower / 2;
-                        if (other.x + (other as Entity).graphicWidth()/2 < x + graphicWidth()/2)
+                        // If it doesn't work (still colliding) jump or something
+                        // Check first if the enemy is on top, so to not jump throw it
+                        if (vspeed < 0 && other.y + (other as Entity).graphicHeight() / 2 < y)
                         {
-                            jumpedFacing = Dir.Right;
-                            facing = Dir.Left;
-                            current_hspeed = getDirectionAsSign(Dir.Right) * hspeed;
+                            if (!handleJumpHit())
+                            {
+                                vspeed = 0;
+                                pos.Y = stepInitialPosition.Y;
+                            }
                         }
-                        else if (other.x + (other as Entity).graphicWidth() / 2 > x + graphicWidth() / 2)
+                        else
                         {
-                            jumpedFacing = Dir.Left;
-                            facing = Dir.Right;
-                            current_hspeed = getDirectionAsSign(Dir.Left) * hspeed;
+                            state = MovementState.Jump;
+                            vspeed = -jumpPower / 2;
+                            if (other.x + (other as Entity).graphicWidth() / 2 < x + graphicWidth() / 2)
+                            {
+                                jumpedFacing = Dir.Right;
+                                facing = Dir.Left;
+                                current_hspeed = getDirectionAsSign(Dir.Right) * hspeed;
+                            }
+                            else if (other.x + (other as Entity).graphicWidth() / 2 > x + graphicWidth() / 2)
+                            {
+                                jumpedFacing = Dir.Left;
+                                facing = Dir.Right;
+                                current_hspeed = getDirectionAsSign(Dir.Left) * hspeed;
+                            }
                         }
                     }
                 }
@@ -1020,6 +1035,31 @@ namespace AXE.Game.Entities
         public override void onActivationEndNotification()
         {
             state = MovementState.Idle;
+        }
+
+        public bool isLadderBlocked(Stairs ladder)
+        {
+            // Compute position of the player after grabbing the ladder
+            int toX;
+            bMask currentMask = mask;
+            if (currentMask is bMaskList)
+            {
+                int maskXOffset = Math.Max((currentMask as bMaskList).masks[0].offsetx, (currentMask as bMaskList).masks[1].offsetx);
+                toX = ladder.x - maskXOffset;
+            }
+            else
+            {
+                toX = ladder.x - mask.offsetx;
+            }
+
+            // is there anything on that pos?
+            if (placeMeeting(new Vector2(toX, pos.Y), new String[] {"enemy", "solid"}))
+            {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
 
         /* IWeaponHolder implementation */

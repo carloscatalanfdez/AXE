@@ -209,7 +209,7 @@ namespace AXE.Game.Entities
             int rewarder = 0;
             if (rewarderElement != null)
                 rewarder = int.Parse(rewarderElement);
-            if (rewarder != 0)
+            if (ge != null && rewarder != 0)
             {
                 // Entity is linked to another entity
                 IContraption contraption = ge as IContraption;
