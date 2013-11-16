@@ -29,13 +29,22 @@ namespace AXE.Game.Control
             set { state.coins = value; }
         }
 
-        public PlayerData playerAData;
-        public PlayerData playerBData;
+        public PlayerData[] playerData;
+        public PlayerData playerAData
+        {
+            get { return playerData[0]; }
+        }
+        public PlayerData playerBData
+        {
+            get { return playerData[1]; }
+        }
 
         public GameData()
         {
-            playerAData = new PlayerData(PlayerIndex.One);
-            playerBData = new PlayerData(PlayerIndex.Two);
+            playerData = new PlayerData[] {
+                new PlayerData(PlayerIndex.One),
+                new PlayerData(PlayerIndex.Two)
+            };
         }
 
         public void startNewGame()

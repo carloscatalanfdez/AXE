@@ -65,7 +65,7 @@ namespace AXE.Game.Screens
 
             if (GameData.get().credits > 0)
             {
-                insertCoinStr = "PRESS 1P START";
+                insertCoinStr = "PRESS " + (GameData.get().credits > 1 ? "1P OR 2P" : "1P") + " START";
                 visible = true;
             }
 

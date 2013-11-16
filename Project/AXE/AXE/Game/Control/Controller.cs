@@ -28,14 +28,23 @@ namespace AXE.Game.Control
         public GameData data;
 
         public int activePlayers;
-        public GameInput playerAInput;
-        public GameInput playerBInput;
+        public GameInput[] playerInput;
+        public GameInput playerAInput
+        {
+            get { return playerInput[0]; }
+        }
+        public GameInput playerBInput
+        {
+            get { return playerInput[1]; }
+        }
 
         Controller()
         {
             data = new GameData();
-            playerAInput = new GameInput(PlayerIndex.One);
-            playerBInput = new GameInput(PlayerIndex.Two);
+            playerInput = new GameInput[] {
+                new GameInput(PlayerIndex.One),
+                new GameInput(PlayerIndex.Two)
+            };
         }
 
         public void setGame(AxeGame game)

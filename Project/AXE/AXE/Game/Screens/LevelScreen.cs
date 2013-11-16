@@ -47,14 +47,8 @@ namespace AXE.Game.Screens
 
         // Screen text
         public string stageLabel;
-        public string player1Label;
-        public string player2Label;
         public string infoLabel;
-
-        public const int PLAYER_TIMER_DURATION = 10;
-        public const int PLAYER_TIMER_STEPSPERSECOND = 30;
-        public int player1Timer;
-        public int player2Timer;
+        PlayerDisplay[] playerDisplays;
 
         // Debug
         // String msg;
@@ -148,8 +142,18 @@ namespace AXE.Game.Screens
 
             renderQueue = new List<bEntity>();
 
-            player1Timer = -1;
-            player2Timer = -1;
+            playerDisplays = new PlayerDisplay[] { 
+                new PlayerDisplay(PlayerIndex.One, GameData.get().playerData[0], playerA),
+                new PlayerDisplay(PlayerIndex.Two, GameData.get().playerData[1], playerB)
+            };
+
+            for (int i = 0; i < playerDisplays.Length; i++)
+            {
+                playerDisplays[i].world = this;
+                playerDisplays[i].game = game;
+                playerDisplays[i].init();
+            }
+
         }
 
         public override void update(GameTime dt)
@@ -244,59 +248,20 @@ namespace AXE.Game.Screens
             if (bGame.input.pressed(Microsoft.Xna.Framework.Input.Keys.N))
                 Controller.getInstance().goToNextLevel();
 
-            if (GameData.get().playerAData.playing)
-            {
-                if (GameData.get().playerAData.alive)
-                {
-                    player1Label = "1UP";
+            for (int i = 0; i < playerDisplays.Length; i++)
+                playerDisplays[i].update();
 
-                    if ((GameData.get().playerAData.powerUps & PowerUpPickable.HIGHFALLGUARD_EFFECT) != 0)
-                    {
-                        player1Label += " HF";
-                    }
-                }
-                else
-                {
-                    player1Timer--;
-                    player1Label = "CONTINUE? " + (player1Timer / PLAYER_TIMER_STEPSPERSECOND * 1f);
-                    if (player1Timer < 0)
-                        Controller.getInstance().handleCountdownEnd(playerA.data.id);
-                    else if (Controller.getInstance().playerAInput.pressed(PadButton.start))
-                    {
-                        if (Controller.getInstance().playerStart(PlayerIndex.One))
-                            playerA.revive();
-                    }
-                }
-            }
-            else
-            {
-                player1Label = "1P PRESS START";
-            }
-
-            if (GameData.get().playerBData.playing)
-            {
-                if (GameData.get().playerBData.alive)
-                    player2Label = "2UP";
-                else
-                {
-                    player2Timer--;
-                    player2Label = "CONTINUE? " + (player2Timer / PLAYER_TIMER_STEPSPERSECOND * 1f);
-                    if (player2Timer < 0)
-                        Controller.getInstance().handleCountdownEnd(playerB.data.id);
-                    else if (Controller.getInstance().playerBInput.pressed(PadButton.start))
-                    {
-                        if (Controller.getInstance().playerStart(PlayerIndex.Two))
-                            playerB.revive();
-                    }
-                }
-            }
-            else
-            {
-                player2Label = "2P PRESS START";
-            }
-
-            stageLabel = "STAGE " + (id + 1);
+            stageLabel = buildStageLabel();
             infoLabel = "CREDITS: " + (GameData.get().credits) + " - COINS: " + (GameData.get().coins);
+        }
+
+        public string buildStageLabel()
+        {
+            string number = "" + (id + 1);
+            while (number.Length < 2)
+                number = " " + number;
+            string label = "STAGE " + number;
+            return label;
         }
 
         public override void render(GameTime dt, SpriteBatch sb, Matrix matrix)
@@ -332,9 +297,9 @@ namespace AXE.Game.Screens
 
             cursor.render(sb, bGame.input.mousePosition);
 
-            sb.DrawString(game.gameFont, player1Label, new Vector2(0, 0), Color.White);
+            for (int i = 0; i < playerDisplays.Length; i++)
+                playerDisplays[i].render(dt, sb);
             sb.DrawString(game.gameFont, stageLabel, new Vector2(game.getWidth() / 2 - stageLabel.Length * 8 / 2, 0), Color.White);
-            sb.DrawString(game.gameFont, player2Label, new Vector2(width-player2Label.Length * 8, 0), Color.White);
             sb.DrawString(game.gameFont, infoLabel, new Vector2(game.getWidth()/2-infoLabel.Length*8/2, game.getHeight()-8), Color.White);
 
             // Pause!
@@ -436,9 +401,11 @@ namespace AXE.Game.Screens
         public void displayPlayerCountdown(PlayerIndex who)
         {
             if (who == PlayerIndex.One)
-                player1Timer = PLAYER_TIMER_DURATION * PLAYER_TIMER_STEPSPERSECOND;
+            {
+                playerDisplays[0].startTimer();
+            }
             else
-                player2Timer = PLAYER_TIMER_DURATION * PLAYER_TIMER_STEPSPERSECOND;
+                playerDisplays[1].startTimer();
         }
 
         public void spawnPlayerWeapon(PlayerData data, Player player)
