@@ -13,6 +13,7 @@ using bEngine.Graphics;
 using AXE.Game.Entities;
 using AXE.Game.Entities.Contraptions;
 using AXE.Game.Entities.Base;
+using AXE.Game.Entities.Enemies;
 
 namespace AXE.Game.Entities
 {
@@ -178,10 +179,13 @@ namespace AXE.Game.Entities
                     ge = new OneWayPlatform(x, y);
                     break;
                 case "Imp":
-                    ge = new Enemies.Imp(x, y);
+                    ge = new Imp(x, y);
                     break;
                 case "EvilAxeHolder":
                     ge = new EvilAxeHolder(x, y);
+                    break;
+                case "FlameSpirit":
+                    ge = new FlameSpirit(x, y);
                     break;
                 case "Coin":
                     ge = new Coin(x, y);

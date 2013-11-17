@@ -130,6 +130,8 @@ namespace AXE.Game.Entities.Enemies
 
             state = State.None;
             changeState(State.Idle);
+            
+            attributes.Add(Enemy.ATTR_SOLID);
         }
 
         protected bool checkForGround(int x, int y)
@@ -321,7 +323,7 @@ namespace AXE.Game.Entities.Enemies
                     else
                     {
                         if (fallingToDeath)
-                            ; // You'd be dead, buddy!
+                            onDeath(); // You'd be dead, buddy!
                         changeState(State.Idle);
                     }
 

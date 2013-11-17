@@ -8,6 +8,7 @@ using bEngine;
 using bEngine.Graphics;
 
 using AXE.Game.Screens;
+using AXE.Game.Utils;
 
 namespace AXE.Game.Entities
 {
@@ -442,6 +443,17 @@ namespace AXE.Game.Entities
 
             if (mouseHover)
                 sb.Draw(bDummyRect.sharedDummyRect(game), mask.rect, Color.Snow);
+        }
+
+        public int setTimer(int timer, int min, int max)
+        {
+            return setTimer(timer, new Range(min, max));
+        }
+
+        public int setTimer(int timer, Range range)
+        {
+            this.timer[timer] = Utils.Tools.random.Next(range.min, range.max);
+            return this.timer[timer];
         }
     }
 }

@@ -30,7 +30,7 @@ namespace AXE.Game.Entities
 
         // Some declarations
         public enum MovementState { Idle, Walk, Jump, Ladder, Death, Attacking, Attacked, Activate, Exit, Revive };
-        public enum DeathState { None, Generic, Fall, ForceHit };
+        public enum DeathState { None, Generic, Fall, ForceHit, Fire };
         public enum ActionState { None, Squid };
         public const int EXIT_ANIM_TIMER = 1;
         public const int ACTIVATION_TIME_TIMER = 3;
@@ -131,6 +131,10 @@ namespace AXE.Game.Entities
             spgraphic.add(new bAnim("activate", new int[] { 5 }));
             spgraphic.add(new bAnim("death", new int[] { 24, 25, 26, 27, 27, 27, 28, 28, 29, 29, 29, 29, 29 }, 0.2f, false));
             spgraphic.add(new bAnim("death-forcehit", new int[] { 24, 25, 26, 27, 27, 27, 28, 28, 29, 29, 29, 29, 29}, 0.2f, false));
+            int[] dissolveDeathFrames = new int[15];
+            for (int i = 32; i < (32 + 15); i++)
+                dissolveDeathFrames[i - 32] = i;
+            spgraphic.add(new bAnim("death-dissolve", dissolveDeathFrames, 0.5f, false));
             spgraphic.add(new bAnim("revive", new int[] { 29, 28, 27, 26, 25, 24 }, 0.1f, false));
             spgraphic.add(new bAnim("squid", new int[] { 9 }));
             spgraphic.add(new bAnim("fall", new int[] { 12 } ));
@@ -183,12 +187,17 @@ namespace AXE.Game.Entities
                 -(int)(graphicHeight()*0.25f));
         }
 
-        protected void initParameters()
+        protected void initMask()
         {
-            _mask.w = 16; 
-            _mask.h = 24; 
+            _mask.w = 16;
+            _mask.h = 24;
             _mask.offsetx = 7;
             _mask.offsety = 8;
+        }
+
+        protected void initParameters()
+        {
+            initMask();
 
             current_hspeed = 0;
             vspeed = 0f;
@@ -418,15 +427,19 @@ namespace AXE.Game.Entities
                             state = MovementState.Idle;
                         }
                     }
+                    else // going up but not on air, wtf dude?
+                    {
+                        handleOnAirMovement();
+                    }
                     break;
                 case MovementState.Death:
                     if (!waitingLanding)
                     {
                         if (data.alive)
                         {
+                            vspeed = 0;
                             mask.w = 0;
                             mask.h = 0;
-                            vspeed = 0;
                             bool deathAnimationFinished = spgraphic.currentAnim.finished; // TODO
                             if (deathAnimationFinished && data.alive)
                             {
@@ -528,26 +541,8 @@ namespace AXE.Game.Entities
                 pos = moveTo;
             else
             {
-                Vector2 remnant;
-                // Check wether we collide first with a solid or a onewaysolid,
-                // and use that data to position the player character.
-                Vector2 oldPos = pos;
-                Vector2 remnantOneWay = moveToContact(moveTo, "onewaysolid", onewaysolidCondition);
-                Vector2 posOneWay = pos;
-                pos = oldPos;
-                Vector2 remnantSolid = moveToContact(moveTo, "solid");
-                Vector2 posSolid = pos;
-                if (remnantOneWay.Length() > remnantSolid.Length())
-                {
-                    remnant = remnantOneWay;
-                    pos = posOneWay;
-                }
-                else
-                {
-                    remnant = remnantSolid;
-                    pos = posSolid;
-                }
-
+                Vector2 remnant = moveToContactSafe(moveTo);
+                
                 // We have been stopped
                 if (remnant.X != 0)
                 {
@@ -571,6 +566,31 @@ namespace AXE.Game.Entities
                 }
             }
 
+        }
+
+        public Vector2 moveToContactSafe(Vector2 targetPosition)
+        {
+            Vector2 remnant;
+            // Check wether we collide first with a solid or a onewaysolid,
+            // and use that data to position the player character.
+            Vector2 oldPos = pos;
+            Vector2 remnantOneWay = moveToContact(targetPosition, "onewaysolid", onewaysolidCondition);
+            Vector2 posOneWay = pos;
+            pos = oldPos;
+            Vector2 remnantSolid = moveToContact(targetPosition, "solid");
+            Vector2 posSolid = pos;
+            if (remnantOneWay.Length() > remnantSolid.Length())
+            {
+                remnant = remnantOneWay;
+                pos = posOneWay;
+            }
+            else
+            {
+                remnant = remnantSolid;
+                pos = posSolid;
+            }
+
+            return remnant;
         }
 
         public void handleActionButton()
@@ -904,41 +924,45 @@ namespace AXE.Game.Entities
             else if (type == "enemy")
             {
                 // First, reposition
-                pos.X = stepInitialPosition.X;
-                if (placeMeeting(x, y, "enemy"))
+                if (other.attributes.Contains(Enemy.ATTR_SOLID))
                 {
-                    if (state == MovementState.Ladder)
+                    // Allow ethereal enemies
+                    if (placeMeeting(x, y, "enemy"))
                     {
-                        // Just ignore him when you're on a ladder for now
-                        pos = stepInitialPosition;
-                    }
-                    else
-                    {
-                        // If it doesn't work (still colliding) jump or something
-                        // Check first if the enemy is on top, so to not jump throw it
-                        if (vspeed < 0 && other.y + (other as Entity).graphicHeight() / 2 < y)
+                        pos.X = stepInitialPosition.X;
+                        if (state == MovementState.Ladder)
                         {
-                            if (!handleJumpHit())
-                            {
-                                vspeed = 0;
-                                pos.Y = stepInitialPosition.Y;
-                            }
+                            // Just ignore him when you're on a ladder for now
+                            pos = stepInitialPosition;
                         }
                         else
                         {
-                            state = MovementState.Jump;
-                            vspeed = -jumpPower / 2;
-                            if (other.x + (other as Entity).graphicWidth() / 2 < x + graphicWidth() / 2)
+                            // If it doesn't work (still colliding) jump or something
+                            // Check first if the enemy is on top, so to not jump throw it
+                            if (vspeed < 0 && other.y + (other as Entity).graphicHeight() / 2 < y)
                             {
-                                jumpedFacing = Dir.Right;
-                                facing = Dir.Left;
-                                current_hspeed = getDirectionAsSign(Dir.Right) * hspeed;
+                                if (!handleJumpHit())
+                                {
+                                    vspeed = 0;
+                                    pos.Y = stepInitialPosition.Y;
+                                }
                             }
-                            else if (other.x + (other as Entity).graphicWidth() / 2 > x + graphicWidth() / 2)
+                            else
                             {
-                                jumpedFacing = Dir.Left;
-                                facing = Dir.Right;
-                                current_hspeed = getDirectionAsSign(Dir.Left) * hspeed;
+                                state = MovementState.Jump;
+                                vspeed = -jumpPower / 2;
+                                if (other.x + (other as Entity).graphicWidth() / 2 < x + graphicWidth() / 2)
+                                {
+                                    jumpedFacing = Dir.Right;
+                                    facing = Dir.Left;
+                                    current_hspeed = getDirectionAsSign(Dir.Right) * hspeed;
+                                }
+                                else if (other.x + (other as Entity).graphicWidth() / 2 > x + graphicWidth() / 2)
+                                {
+                                    jumpedFacing = Dir.Left;
+                                    facing = Dir.Right;
+                                    current_hspeed = getDirectionAsSign(Dir.Left) * hspeed;
+                                }
                             }
                         }
                     }
@@ -982,6 +1006,9 @@ namespace AXE.Game.Entities
                 case DeathState.ForceHit:
                     spgraphic.play("death-forcehit");
                     break;
+                case DeathState.Fire:
+                    spgraphic.play("death-dissolve");
+                    break;
             }
         }
 
@@ -997,14 +1024,23 @@ namespace AXE.Game.Entities
                     case DeathState.Generic:
                     case DeathState.Fall:
                     case DeathState.ForceHit:
+                    case DeathState.Fire:
                         sfxHit.Play();
                         deathCause = type;
-                        if (onair)
+                        if (onair && type != DeathState.Fire)
                             waitingLanding = true;
                         else
                         {
                             waitingLanding = false;
                             setDeathAnim(type);
+                            if (type == DeathState.Fire)
+                            {
+                                if (weapon != null)
+                                {
+                                    weapon.onDrop();
+                                    weapon = null;
+                                }
+                            }
                         }
                         break;
                 }
@@ -1182,6 +1218,11 @@ namespace AXE.Game.Entities
             spgraphic.play("revive");
             data.alive = true;
             state = MovementState.Revive;
+            // Place him on ground
+            initMask();
+            // moveToContactSafe(new Vector2(x, (world as LevelScreen).height));
+            while (!placeMeeting(x, y + 1, new string[] { "onewaysolid", "solid" }))
+                y++;
         }
 
         public bool canDie()

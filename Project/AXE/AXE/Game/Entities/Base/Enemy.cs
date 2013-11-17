@@ -5,19 +5,25 @@ using System.Text;
 using AXE.Game.Entities.Contraptions;
 using bEngine;
 using Microsoft.Xna.Framework;
+using AXE.Game.Utils;
 
 namespace AXE.Game.Entities.Base
 {
     class Enemy : Entity, IContraption
     {
+        public const string ATTR_SOLID = "solid";
+
         public IRewarder rewarder;
         public ContraptionRewardData contraptionRewardData;
+
+        public Random random;
 
         public Enemy(int x, int y)
             : base(x, y)
         {
             // Rendering layer
             layer = 1;
+            random = Tools.random;
         }
 
         /**

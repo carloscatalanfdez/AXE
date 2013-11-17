@@ -118,6 +118,8 @@ namespace AXE.Game.Entities.Base
                 (int)(graphicHeight() * 1.25f),
                 -(int)(graphicWidth() * 0.25f),
                 -(int)(graphicHeight() * 0.25f));
+
+            attributes.Add(Enemy.ATTR_SOLID);
         }
 
         protected bool checkForGround(int x, int y)

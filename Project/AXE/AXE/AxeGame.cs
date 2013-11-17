@@ -58,7 +58,10 @@ namespace AXE
             if (Common.GameInput.getInstance(PlayerIndex.One).pressed(Common.PadButton.debug))
                 bConfig.DEBUG = !bConfig.DEBUG;
             else if (input.pressed(Keys.D0))
-                GameData.get().coins++;
+            {
+                GameData.get().coins += 100;
+                GameData.saveGame();
+            }
 
             base.update(gameTime);
         }
