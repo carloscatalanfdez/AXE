@@ -268,7 +268,7 @@ namespace AXE.Game.Entities.Enemies
                     break;
             }
 
-            if (state == State.IdleTop || state == State.WalkTop || state != State.PrepareFall)
+            if (state == State.IdleTop || state == State.WalkTop)
             {
                 // VERY IMPORTANT
                 // When holding the mask, we need to hold the original _mask, since
@@ -276,12 +276,21 @@ namespace AXE.Game.Entities.Enemies
                 bMask holdMyMaskPlease = _mask;
                 mask = watchMask;
 
-                bool sawYou = placeMeeting(x, y, "player", alivePlayerCondition);
+                bEntity spottedEntity = instancePlace(x, y, "player", null, alivePlayerCondition);
                 mask = holdMyMaskPlease; // thank you!
 
-                if (sawYou)
+                if (spottedEntity != null)
                 {
-                    changeState(State.PrepareFall);
+                    // Nothing stopping me from hitting you?
+                    Vector2 oldPos = pos;
+                    // Check with moveToContact, but move in steps of mask.h to improve performance (we don't need more accuracy anyways)
+                    Vector2 remnantOneWay = moveToContact(new Vector2(mask.x, spottedEntity.y - mask.h), new String[] { "onewaysolid", "solid" }, new Vector2(0, mask.h));
+                    pos = oldPos;
+                    if (remnantOneWay.Y == 0)
+                    {
+                        // Yeah, let's go
+                        changeState(State.PrepareFall);
+                    }
                 }
             }
 

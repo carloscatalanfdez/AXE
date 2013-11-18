@@ -186,13 +186,25 @@ namespace AXE.Game.Entities
 
         override public Vector2 moveToContact(Vector2 to, String category, Func<bEntity, bEntity, bool> condition = null)
         {
+            // Separate method, o that we can still override
+            return moveToContact(to, new String[] { category }, Vector2.One, condition);
+        }
+
+        public Vector2 moveToContact(Vector2 to, String[] categories, Func<bEntity, bEntity, bool> condition = null)
+        {
+            // Separate method, o that we can still override
+            return moveToContact(to, categories, Vector2.One, condition);
+        }
+
+        public Vector2 moveToContact(Vector2 to, String[] categories, Vector2 stepSize, Func<bEntity, bEntity, bool> condition = null)
+        {
             Vector2 remnant = Vector2.Zero;
 
             to.X = (int)Math.Round(to.X);
             to.Y = (int)Math.Round(to.Y);
 
             // Move to contact in the X
-            int s = Math.Sign(to.X - pos.X);
+            int s = Math.Sign(to.X - pos.X) * (int) stepSize.X;
             bool found = false;
             Vector2 tp = pos;
 
@@ -214,28 +226,36 @@ namespace AXE.Game.Entities
                 else
                     xWrapApplied = false;
 
-                if (!placeMeeting(tp, category, condition))
+                if (!placeMeeting(tp, categories, condition))
                 {
                     found = true;
                     break;
                 }
+
+                // If remaining size is smaller than the stepSize, then just do the exact substraction on the next iter
+                // (this way we avoid infinite loops)
+                s = (int) (Math.Sign(s) * Math.Min(Math.Abs(pos.X - i), stepSize.X));
             }
 
             if (found)
                 pos.X = tp.X;
 
             // Move to contact in the Y
-            s = Math.Sign(to.Y - pos.Y);
+            s = Math.Sign(to.Y - pos.Y) * (int)stepSize.Y;
             found = false;
             tp = pos;
             for (float i = to.Y; i != pos.Y; i -= s)
             {
                 tp.Y = i;
-                if (!placeMeeting(tp, category, condition))
+                if (!placeMeeting(tp, categories, condition))
                 {
                     found = true;
                     break;
                 }
+
+                // If remaining size is smaller than the stepSize, then just do the exact substraction on the next iter
+                // (this way we avoid infinite loops)
+                s = (int) (Math.Sign(s) * Math.Min(Math.Abs(pos.Y - i), stepSize.Y));
             }
 
             if (found)
