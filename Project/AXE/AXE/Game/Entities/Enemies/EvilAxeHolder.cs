@@ -122,15 +122,6 @@ namespace AXE.Game.Entities.Base
             attributes.Add(Enemy.ATTR_SOLID);
         }
 
-        protected bool checkForGround(int x, int y)
-        {
-            bool onAir = !placeMeeting(x, y + 1, "solid");
-            if (onAir)
-                onAir = !placeMeeting(x, y + 1, "onewaysolid", onewaysolidCondition);
-
-            return !onAir;
-        }
-
         public void changeState(State newState)
         {
             if (newState != state)

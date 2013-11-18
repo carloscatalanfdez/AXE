@@ -187,6 +187,9 @@ namespace AXE.Game.Entities
                 case "FlameSpirit":
                     ge = new FlameSpirit(x, y);
                     break;
+                case "CorrosiveSlime":
+                    ge = new CorrosiveSlime(x, y);
+                    break;
                 case "Coin":
                     ge = new Coin(x, y);
                     break;

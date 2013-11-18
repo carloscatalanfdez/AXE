@@ -154,6 +154,36 @@ namespace AXE.Game.Entities
             return (world as LevelScreen).isPaused();
         }
 
+        public void switchDirections()
+        {
+            if (facing == Dir.Right)
+            {
+                facing = Dir.Left;
+            }
+            else if (facing == Dir.Left)
+            {
+                facing = Dir.Right;
+            }
+        }
+
+        protected bool checkForGround(int x, int y)
+        {
+            bool onAir = !placeMeeting(x, y + 1, "solid");
+            if (onAir)
+                onAir = !placeMeeting(x, y + 1, "onewaysolid", onewaysolidCondition);
+
+            return !onAir;
+        }
+
+        protected bool checkForCeiling(int x, int y)
+        {
+            bool onAir = !placeMeeting(x, y - 1, "solid");
+            if (onAir)
+                onAir = !placeMeeting(x, y - 1, "onewaysolid");
+
+            return !onAir;
+        }
+
         override public Vector2 moveToContact(Vector2 to, String category, Func<bEntity, bEntity, bool> condition = null)
         {
             Vector2 remnant = Vector2.Zero;
