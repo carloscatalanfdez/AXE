@@ -10,17 +10,20 @@ namespace AXE.Game.Entities
 {
     class OneWayPlatform : Entity
     {
-        public OneWayPlatform(int x, int y)
+        int width;
+
+        public OneWayPlatform(int x, int y, int w)
             : base(x, y)
         {
             // nothing here ._.
+            width = w;
         }
 
         public override void init()
         {
             base.init();
 
-            mask.w = 16;
+            mask.w = width;
             mask.h = 8;
 
             mask.update(x, y);

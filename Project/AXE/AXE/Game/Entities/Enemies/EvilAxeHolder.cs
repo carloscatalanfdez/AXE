@@ -469,15 +469,6 @@ namespace AXE.Game.Entities.Base
             return false;
         }
 
-        bool alivePlayerCondition(bEntity me, bEntity other)
-        {
-            if (other is Player)
-                return (other as Player).state != Player.MovementState.Death &&
-                    (other as Player).state != Player.MovementState.Revive;
-            else
-                return false;
-        }
-
         protected void spawnAxe()
         {
             Vector2 axePos = getHandPosition();

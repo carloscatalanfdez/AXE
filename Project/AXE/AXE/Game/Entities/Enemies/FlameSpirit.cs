@@ -21,6 +21,7 @@ namespace AXE.Game.Entities.Enemies
     class FlameSpirit : Base.Enemy, IHazard, IHazardProvider
     {
         const int DECISION_TIMER = 0;
+        const int COOLDOWN_TIMER = 1;
 
         public enum State { Invisible, In, Float, Attack, Out, Death };
         public State state;
@@ -32,14 +33,20 @@ namespace AXE.Game.Entities.Enemies
         Range waitToStartMovingTime;
         Range floatAroundTime;
         int speed;
+        Range attackCooldownTime;
+        Range attackPaceTime;
 
         // Gameplay vars
         bool moving;
         int hspeed, vspeed;
         Vector2 moveTo;
+        int attacks;
+        Entity target;
+        bool willAttack;
 
         // Debug
-        // string label;
+        string label;
+        bMask targettingMask;
 
         public FlameSpirit(int x, int y)
             : base(x, y)
@@ -71,6 +78,8 @@ namespace AXE.Game.Entities.Enemies
             waitToEnterTime = new Range(30, 320);
             waitToStartMovingTime = new Range(15, 30);
             floatAroundTime = new Range(180, 2048);
+            attackPaceTime = new Range(15, 16);
+            attackCooldownTime = new Range(60, 180);
 
             mask.w = 8;
             mask.h = 8;
@@ -87,6 +96,10 @@ namespace AXE.Game.Entities.Enemies
             hspeed = 0;
             vspeed = 0;
             moving = false;
+            attacks = 0;
+            willAttack = false;
+            targettingMask = new bMask(0, 0, 0, 0);
+            target = null;
         }
 
         public override void onTimer(int n)
@@ -106,6 +119,7 @@ namespace AXE.Game.Entities.Enemies
 
                             state = State.In;
                             smgraphic.play("in");
+                            willAttack = true;
                             break;
                         case State.Float:
                             if (!moving)
@@ -130,7 +144,30 @@ namespace AXE.Game.Entities.Enemies
                                 smgraphic.play("out");
                             }
                         break;
+                        case State.Attack:
+                            if (attacks++ < 3)
+                            {
+                                // Spawn bullet
+                                FlameSpiritBullet bullet = 
+                                    new FlameSpiritBullet(x+16, y+16, smgraphic.flipped);
+                                bullet.setOwner(this);
+                                world.add(bullet, "hazard");
+                                setTimer(DECISION_TIMER, attackPaceTime);
+                            }
+                            else
+                            {
+                                target = null;
+                                willAttack = false;
+                                state = State.Float;
+                                setTimer(DECISION_TIMER, waitToStartMovingTime);
+                                setTimer(COOLDOWN_TIMER, attackCooldownTime);
+                            }
+                        break;
                     }
+                break;
+                case COOLDOWN_TIMER:
+                    willAttack = true;
+                    target = null;
                 break;
             }
         }
@@ -155,47 +192,76 @@ namespace AXE.Game.Entities.Enemies
                     }
                     break;
                 case State.Float:
+                    // Show yourself!
+                    smgraphic.play("float");
+
                     if (moving)
                     {
-                        // Magic-like trail effect sad intent. Total failure.
-                        // world.add(new FlameSpiritTrace(x, y, smgraphic.currentAnim.frame, smgraphic.flipped), "items");
-                        if (facing == Dir.Left)
-                            hspeed = -speed;
-                        else
-                            hspeed = speed;
-
-                        moveTo.X += hspeed;
-                        moveTo.Y += vspeed;
-                        moveTo.Y += ((float) Math.Sin(MoreMath.DegToRad(timer[DECISION_TIMER])));
-
-                        // Check for bounces!
-                        if (moveTo.X < 0 && facing == Dir.Left)
+                        if (willAttack)
                         {
-                            moveTo.X = 0;
-                            facing = Dir.Right;
+                            // Check for player & attack routines
+                            Entity currentTarget = watchForTargets();
+                            target = currentTarget;
+                            if (target != null)
+                            {
+                                // Kill!
+                                if (random.NextDouble() < 0.5)
+                                {
+                                    willAttack = false;
+                                    setTimer(COOLDOWN_TIMER, attackCooldownTime);
+                                }
+                                else
+                                {                                    
+                                    state = State.Attack;
+                                    smgraphic.play("attack");
+                                    attacks = 0;
+                                    setTimer(DECISION_TIMER, attackPaceTime);
+                                }
+                            }
                         }
-                        else if ((moveTo.X + graphicWidth() > (world as LevelScreen).width) && 
-                            facing == Dir.Right)
+                        
                         {
-                            moveTo.X = (world as LevelScreen).width - graphicWidth();
-                            facing = Dir.Left;
-                        }
+                            // Magic-like trail effect sad intent. Total failure.
+                            // world.add(new FlameSpiritTrace(x, y, smgraphic.currentAnim.frame, smgraphic.flipped), "items");
+                            if (facing == Dir.Left)
+                                hspeed = -speed;
+                            else
+                                hspeed = speed;
 
-                        if (moveTo.Y < 0 && vspeed < 0)
-                        {
-                            moveTo.Y = 0;
-                            vspeed = speed;
-                        } 
-                        else if ((moveTo.Y + graphicHeight() > (world as LevelScreen).height) &&
-                            vspeed > 0)
-                        {
-                            moveTo.Y = (world as LevelScreen).height - graphicHeight();
-                            vspeed = -speed;
+                            moveTo.X += hspeed;
+                            moveTo.Y += vspeed;
+                            moveTo.Y += ((float)Math.Sin(MoreMath.DegToRad(timer[DECISION_TIMER])));
+
+                            // Check for bounces!
+                            if (moveTo.X < 0 && facing == Dir.Left)
+                            {
+                                moveTo.X = 0;
+                                facing = Dir.Right;
+                            }
+                            else if ((moveTo.X + graphicWidth() > (world as LevelScreen).width) &&
+                                facing == Dir.Right)
+                            {
+                                moveTo.X = (world as LevelScreen).width - graphicWidth();
+                                facing = Dir.Left;
+                            }
+
+                            if (moveTo.Y < 0 && vspeed < 0)
+                            {
+                                moveTo.Y = 0;
+                                vspeed = speed;
+                            }
+                            else if ((moveTo.Y + graphicHeight() > (world as LevelScreen).height) &&
+                                vspeed > 0)
+                            {
+                                moveTo.Y = (world as LevelScreen).height - graphicHeight();
+                                vspeed = -speed;
+                            }
                         }
                     }
 
-                    smgraphic.play("float");
-
+                    break;
+                case State.Attack:
+                    smgraphic.play("attack");
                     break;
                 case State.Out:
                     if (smgraphic.currentAnim.finished)
@@ -219,6 +285,31 @@ namespace AXE.Game.Entities.Enemies
             smgraphic.update();
         }
 
+        protected Entity watchForTargets()
+        {
+            if (AxeGame.input.check(Microsoft.Xna.Framework.Input.Keys.F))
+                return (world as LevelScreen).playerA;
+
+            Entity foundYou = null;
+
+            // Will try to find a suitable target in the horizontal line in
+            // which it is actually looking. Will we succeed?? We'll see...
+            targettingMask = new bMask(x, y-graphicHeight()/2, 
+                (int) ((4 / 6f) * (world as LevelScreen).width), graphicHeight() * 2);
+            if (facing == Dir.Left)
+            {
+                targettingMask.x = x - targettingMask.w;
+            }
+            else
+            {
+                targettingMask.x = x + graphicWidth();
+            }
+
+            foundYou = (Entity) instancePlace(targettingMask, "player", null, alivePlayerCondition);
+
+            return foundYou;
+        }
+
         public override bool onHit(Entity other)
         {
             if (state != State.Death)
@@ -239,9 +330,11 @@ namespace AXE.Game.Entities.Enemies
 
             // label = state.ToString() + " [" + timer[DECISION_TIMER] + "]";
             // label = "" + (4 * ((float)Math.Sin(MoreMath.DegToRad(timer[DECISION_TIMER]))));
+            label = (willAttack ? "YES" : "NO");
+            // sb.Draw(bDummyRect.sharedDummyRect(game), targettingMask.rect, new Color(199, 99, 10, 50));
             smgraphic.color = Tools.RandomColor;
             smgraphic.render(sb, pos);
-            // sb.DrawString(game.gameFont, label, new Vector2(x, y + graphicHeight()), Color.White);
+            sb.DrawString(game.gameFont, label, new Vector2(x, y + graphicHeight()), Color.White);
         }
 
         public override int graphicWidth()
@@ -284,6 +377,71 @@ namespace AXE.Game.Entities.Enemies
         public void onSuccessfulHit(Player other)
         {
             // HA!
+        }
+    }
+
+    class FlameSpiritBullet : KillerRect
+    {
+        bSpritemap sprite;
+
+        // Parameters
+        int speed;
+
+        // State vars
+        bool flipped;
+        
+
+        public FlameSpiritBullet(int x, int y, bool flipped)
+            : base(x, y, 24, 8, Player.DeathState.Fire)
+        {
+            this.flipped = flipped;
+        }
+
+        public override void init()
+        {
+            base.init();
+
+            mask.w = 15;
+            mask.h = 3;
+            mask.offsetx = 4;
+            mask.offsety = 2;
+
+            sprite = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/flamewrath-bullet-sheet"), 24, 8);
+            sprite.add(new bAnim("1", new int[] { Tools.random.Next(3) }));
+            sprite.play("1");
+            sprite.flipped = flipped;
+            if (flipped)
+            {
+                x -= sprite.width;
+            }
+
+            speed = 5;
+
+            if (y + sprite.height < 0 || y > (world as LevelScreen).height)
+                world.remove(this);
+        }
+
+        public override void update()
+        {
+            base.update();
+
+            if (flipped)
+                x -= speed;
+            else
+                x += speed;
+
+            if (x + sprite.width < 0 ||
+                x > (world as LevelScreen).width)
+                world.remove(this);
+
+            sprite.update();
+        }
+
+        public override void render(GameTime dt, SpriteBatch sb)
+        {
+            base.render(dt, sb);
+            sprite.color = Tools.RandomColor;
+            sprite.render(sb, pos);
         }
     }
 

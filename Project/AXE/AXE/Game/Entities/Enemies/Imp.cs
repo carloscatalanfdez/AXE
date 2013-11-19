@@ -566,14 +566,5 @@ namespace AXE.Game.Entities.Enemies
         {
             // tamed = true;
         }
-
-        bool alivePlayerCondition(bEntity me, bEntity other)
-        {
-            if (other is Player)
-                return (other as Player).state != Player.MovementState.Death && 
-                    (other as Player).state != Player.MovementState.Revive;
-            else
-                return false;
-        }
     }
 }

@@ -26,6 +26,14 @@ namespace AXE.Game.Entities.Base
             random = Tools.random;
         }
 
+        protected bool alivePlayerCondition(bEntity me, bEntity other)
+        {
+            if (other is Player)
+                return (other as Player).canDie();
+            else
+                return false;
+        }
+
         /**
          * ICONTRAPTION METHODS
          */

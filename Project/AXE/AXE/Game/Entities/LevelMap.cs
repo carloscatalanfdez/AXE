@@ -176,7 +176,8 @@ namespace AXE.Game.Entities
                     ge = new Stairs(x, y, width, height);
                     break;
                 case "OneWayPlatform":
-                    ge = new OneWayPlatform(x, y);
+                    width = int.Parse(element.GetAttribute("width"));
+                    ge = new OneWayPlatform(x, y, width);
                     break;
                 case "Imp":
                     ge = new Imp(x, y);
