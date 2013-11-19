@@ -90,7 +90,7 @@ namespace AXE.Game.Entities.Enemies
             _mask.w = 13;
             _mask.h = 15;
             _mask.offsetx = 9;
-            _mask.offsety = 7;
+            _mask.offsety = 14;
         }
 
         protected void loadCornerMask()
@@ -281,11 +281,14 @@ namespace AXE.Game.Entities.Enemies
 
                 if (spottedEntity != null)
                 {
-                    // Nothing stopping me from hitting you?
+                    // Nothing stopping me (with my fall mask) from hitting you?
                     Vector2 oldPos = pos;
+                    loadFallMask();
                     // Check with moveToContact, but move in steps of mask.h to improve performance (we don't need more accuracy anyways)
-                    Vector2 remnantOneWay = moveToContact(new Vector2(mask.x, spottedEntity.y - mask.h), new String[] { "onewaysolid", "solid" }, new Vector2(0, mask.h));
+                    Vector2 remnantOneWay = moveToContact(new Vector2(mask.x, spottedEntity.mask.y - mask.h), new String[] { "onewaysolid", "solid" }, new Vector2(1, mask.h));
+                    // Restore values
                     pos = oldPos;
+                    loadTopMask();
                     if (remnantOneWay.Y == 0)
                     {
                         // Yeah, let's go

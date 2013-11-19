@@ -196,6 +196,27 @@ namespace AXE.Game.Entities
             return moveToContact(to, categories, Vector2.One, condition);
         }
 
+        /**
+         * Move entity as close as we can to the desired pos. 
+         * We'll divide the distance in pieces of size maskXStep = mask.w and maskYStep = mask.h, and we'll check
+         * from the first piece to the last piece, if the user can move to the next piece (and eventually the final position).
+         * We'll call these steps big steps in the code.
+         * Within those big pieces, we'll divide the distance in smaller pieces of size s = stepSize. We'll call these steps small steps.
+         * Ideally (and by default) this step size should be 1 pixel (maximum accuracy), but caller can override that.
+         * In every big step, we'll start by checking if the entity can jump to the final position, and do small steps back until entity can move.
+         * We know we can start at the end for these small steps, because the range of the current big step is only the mask size, so we won't miss
+         * any collision between the beginning and end of the current big step.
+         * The size of the big steps can't be overriden because it will cause buggy behaviors
+         * 
+         * @param to 
+         *          Point where we want to move
+         * @param categories
+         *          List of entity categories that should be checked for the collision tests
+         * @param stepSize
+         *          Size of the small steps ( (1,1) for best accuracy)
+         * @param condition
+         *          Condition for the collision to happen
+         */
         public Vector2 moveToContact(Vector2 to, String[] categories, Vector2 stepSize, Func<bEntity, bEntity, bool> condition = null)
         {
             Vector2 remnant = Vector2.Zero;
@@ -204,61 +225,97 @@ namespace AXE.Game.Entities
             to.Y = (int)Math.Round(to.Y);
 
             // Move to contact in the X
-            int s = Math.Sign(to.X - pos.X) * (int) stepSize.X;
-            bool found = false;
+            int diff = (int) (to.X - pos.X);
+            // Size of the small steps we're gonna take (can't be bigger than the travel size)
+            int s = (int)(Math.Sign(diff) * Math.Min(Math.Abs(diff), stepSize.X));
+            bool canMove = false;
             Vector2 tp = pos;
 
             bool xWrapApplied = false;
 
-            for (float i = to.X; i != pos.X; i -= s)
+            // Size of the big steps (can't be bigger than the travel distance)
+            int maskXStep = (int)(Math.Sign(s) * Math.Min(Math.Abs(diff), mask.w));
+            for (float j = pos.X; j != to.X; j += maskXStep)
             {
-                tp.X = i;
-                if (tp.X < -(graphicWidth() / 2))
+                // In every big step, we want to check if the entity can move, so canMove should start as false
+                canMove = false;
+                // Compute the distance from j to the next iter (checking that we won't go past to.X)
+                maskXStep = (int)(Math.Sign(s) * Math.Min(Math.Abs(to.X - j), mask.w));
+                for (float i = j + maskXStep; i != j; i -= s)
                 {
-                    tp.X = (world as LevelScreen).width + tp.X;
-                    xWrapApplied = true;
-                }
-                else if (tp.X > (world as LevelScreen).width - (graphicWidth() / 2))
-                {
-                    tp.X = (tp.X - (world as LevelScreen).width);
-                    xWrapApplied = true;
-                }
-                else
-                    xWrapApplied = false;
+                    tp.X = i;
+                    if (tp.X < -(graphicWidth() / 2))
+                    {
+                        tp.X = (world as LevelScreen).width + tp.X;
+                        xWrapApplied = true;
+                    }
+                    else if (tp.X > (world as LevelScreen).width - (graphicWidth() / 2))
+                    {
+                        tp.X = (tp.X - (world as LevelScreen).width);
+                        xWrapApplied = true;
+                    }
+                    else
+                        xWrapApplied = false;
 
-                if (!placeMeeting(tp, categories, condition))
+                    if (!placeMeeting(tp, categories, condition))
+                    {
+                        canMove = true;
+                        break;
+                    }
+
+                    // If remaining size is smaller than the stepSize, then just do the exact substraction on the next iter
+                    // (this way we avoid infinite loops)
+                    s = (int)(Math.Sign(s) * Math.Min(Math.Abs(pos.X - i), stepSize.X));
+                }
+
+                // If we couldn't move on this big step, use the last pos of the previous big step
+                if (!canMove)
                 {
-                    found = true;
+                    tp.X = j;
                     break;
                 }
-
-                // If remaining size is smaller than the stepSize, then just do the exact substraction on the next iter
-                // (this way we avoid infinite loops)
-                s = (int) (Math.Sign(s) * Math.Min(Math.Abs(pos.X - i), stepSize.X));
             }
 
-            if (found)
+            if (canMove)
                 pos.X = tp.X;
 
             // Move to contact in the Y
-            s = Math.Sign(to.Y - pos.Y) * (int)stepSize.Y;
-            found = false;
+            diff = (int)(to.Y - pos.Y);
+            // Size of the small steps we're gonna take (can't be bigger than the travel size)
+            s = (int)(Math.Sign(diff) * Math.Min(Math.Abs(diff), stepSize.Y));
             tp = pos;
-            for (float i = to.Y; i != pos.Y; i -= s)
+
+            // Size of the big steps (can't be bigger than the travel distance)
+            int maskYStep = (int)(Math.Sign(s) * Math.Min(Math.Abs(to.Y - pos.Y), mask.h));
+            for (float j = pos.Y; j != to.Y; j += maskYStep)
             {
-                tp.Y = i;
-                if (!placeMeeting(tp, categories, condition))
+                // In every big step, we want to check if the entity can move, so canMove should start as false
+                canMove = false;
+                // Compute the distance from j to the next iter (checking that we won't go past to.Y)
+                maskYStep = (int)(Math.Sign(s) * Math.Min(Math.Abs(to.Y - j), mask.h));
+                for (float i = j + maskYStep; i != j; i -= s)
                 {
-                    found = true;
-                    break;
+                    tp.Y = i;
+                    if (!placeMeeting(tp, categories, condition))
+                    {
+                        canMove = true;
+                        break;
+                    }
+
+                    // If remaining size is smaller than the stepSize, then just do the exact substraction on the next iter
+                    // (this way we avoid infinite loops)
+                    s = (int) (Math.Sign(s) * Math.Min(Math.Abs(pos.Y - i), stepSize.Y));
                 }
 
-                // If remaining size is smaller than the stepSize, then just do the exact substraction on the next iter
-                // (this way we avoid infinite loops)
-                s = (int) (Math.Sign(s) * Math.Min(Math.Abs(pos.Y - i), stepSize.Y));
+                // If we couldn't move on this big step, use the last pos of the previous big step
+                if (!canMove)
+                {
+                    tp.Y = j;
+                    break;
+                }
             }
 
-            if (found)
+            if (canMove)
                 pos.Y = tp.Y;
 
             remnant = to - pos;
