@@ -63,8 +63,8 @@ namespace AXE.Game.Entities.Enemies
             smgraphic.add(new bAnim("invisible", new int[] { 17 }));
             smgraphic.add(new bAnim("in", new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 
                 9, 10, 11, 12, 13, 14, 15, 16}, 0.5f, false));
-            smgraphic.add(new bAnim("float", new int[] { 20 }));
-            smgraphic.add(new bAnim("attack", new int[] { 21 }));
+            smgraphic.add(new bAnim("float", new int[] { 20, 21, 22, 23 }, 0.3f));
+            smgraphic.add(new bAnim("attack", new int[] { 30 }));
             smgraphic.add(new bAnim("out", new int[] { 16, 15, 14, 13, 12, 11, 10, 9,
                 8, 7, 6, 5, 4, 3, 2, 1, 0}, 0.5f, false));
 
@@ -305,6 +305,11 @@ namespace AXE.Game.Entities.Enemies
                 targettingMask.x = x + graphicWidth();
             }
 
+            if (vspeed < 0)
+                targettingMask.y += targettingMask.h / 2;
+            else if (vspeed > 0)
+                targettingMask.y -= targettingMask.h / 2;
+
             foundYou = (Entity) instancePlace(targettingMask, "player", null, alivePlayerCondition);
 
             return foundYou;
@@ -330,11 +335,11 @@ namespace AXE.Game.Entities.Enemies
 
             // label = state.ToString() + " [" + timer[DECISION_TIMER] + "]";
             // label = "" + (4 * ((float)Math.Sin(MoreMath.DegToRad(timer[DECISION_TIMER]))));
-            label = (willAttack ? "YES" : "NO");
+            // label = (willAttack ? "YES" : "NO");
             // sb.Draw(bDummyRect.sharedDummyRect(game), targettingMask.rect, new Color(199, 99, 10, 50));
-            smgraphic.color = Tools.RandomColor;
+            // smgraphic.color = Tools.RandomColor;
             smgraphic.render(sb, pos);
-            sb.DrawString(game.gameFont, label, new Vector2(x, y + graphicHeight()), Color.White);
+            // sb.DrawString(game.gameFont, label, new Vector2(x, y + graphicHeight()), Color.White);
         }
 
         public override int graphicWidth()
