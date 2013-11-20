@@ -198,9 +198,10 @@ namespace AXE.Game.Entities
 
         /**
          * Move entity as close as we can to the desired pos. 
-         * We'll divide the distance in pieces of size maskXStep = mask.w and maskYStep = mask.h, and we'll check
+         * We'll divide the distance in pieces of size bigStepX = mask.w and bigStepY = mask.h, and we'll check
          * from the first piece to the last piece, if the user can move to the next piece (and eventually the final position).
-         * We'll call these steps big steps in the code.
+         * We'll call these steps big steps in the code, they are disabled during wrapping (because the size of the main mask is 0,0,
+         * and we don't really want to mess with the individual masks).
          * Within those big pieces, we'll divide the distance in smaller pieces of size s = stepSize. We'll call these steps small steps.
          * Ideally (and by default) this step size should be 1 pixel (maximum accuracy), but caller can override that.
          * In every big step, we'll start by checking if the entity can jump to the final position, and do small steps back until entity can move.
@@ -227,21 +228,26 @@ namespace AXE.Game.Entities
             // Move to contact in the X
             int diff = (int) (to.X - pos.X);
             // Size of the small steps we're gonna take (can't be bigger than the travel size)
-            int s = (int)(Math.Sign(diff) * Math.Min(Math.Abs(diff), stepSize.X));
+            int smallStepX = (int)(Math.Sign(diff) * Math.Min(Math.Abs(diff), stepSize.X));
             bool canMove = false;
             Vector2 tp = pos;
 
             bool xWrapApplied = false;
 
-            // Size of the big steps (can't be bigger than the travel distance)
-            int maskXStep = (int)(Math.Sign(s) * Math.Min(Math.Abs(diff), mask.w));
-            for (float j = pos.X; j != to.X; j += maskXStep)
+            // bigstepping is disabled by default (only one bigstep == original moveToContact)
+            int bigStepX = diff;
+            for (float j = pos.X; j != to.X; j += bigStepX)
             {
                 // In every big step, we want to check if the entity can move, so canMove should start as false
                 canMove = false;
-                // Compute the distance from j to the next iter (checking that we won't go past to.X)
-                maskXStep = (int)(Math.Sign(s) * Math.Min(Math.Abs(to.X - j), mask.w));
-                for (float i = j + maskXStep; i != j; i -= s)
+                
+                // Only consider changing the bigstep if wrapping is not applied
+                if (!(mask is bMaskList))
+                {
+                    // Compute the distance from j to the next iter (checking that we won't go past to.X)
+                    bigStepX = (int)(Math.Sign(smallStepX) * Math.Min(Math.Abs(to.X - j), mask.w));
+                }
+                for (float i = j + bigStepX; i != j; i -= smallStepX)
                 {
                     tp.X = i;
                     if (tp.X < -(graphicWidth() / 2))
@@ -265,7 +271,7 @@ namespace AXE.Game.Entities
 
                     // If remaining size is smaller than the stepSize, then just do the exact substraction on the next iter
                     // (this way we avoid infinite loops)
-                    s = (int)(Math.Sign(s) * Math.Min(Math.Abs(pos.X - i), stepSize.X));
+                    smallStepX = (int)(Math.Sign(smallStepX) * Math.Min(Math.Abs(pos.X - i), stepSize.X));
                 }
 
                 // If we couldn't move on this big step, use the last pos of the previous big step
@@ -282,18 +288,24 @@ namespace AXE.Game.Entities
             // Move to contact in the Y
             diff = (int)(to.Y - pos.Y);
             // Size of the small steps we're gonna take (can't be bigger than the travel size)
-            s = (int)(Math.Sign(diff) * Math.Min(Math.Abs(diff), stepSize.Y));
+            int smallStepY = (int)(Math.Sign(diff) * Math.Min(Math.Abs(diff), stepSize.Y));
             tp = pos;
 
-            // Size of the big steps (can't be bigger than the travel distance)
-            int maskYStep = (int)(Math.Sign(s) * Math.Min(Math.Abs(to.Y - pos.Y), mask.h));
-            for (float j = pos.Y; j != to.Y; j += maskYStep)
+            // bigstepping is disabled by default (only one bigstep == original moveToContact)
+            int bigStepY = diff;
+            for (float j = pos.Y; j != to.Y; j += bigStepY)
             {
                 // In every big step, we want to check if the entity can move, so canMove should start as false
                 canMove = false;
-                // Compute the distance from j to the next iter (checking that we won't go past to.Y)
-                maskYStep = (int)(Math.Sign(s) * Math.Min(Math.Abs(to.Y - j), mask.h));
-                for (float i = j + maskYStep; i != j; i -= s)
+
+                // Only consider changing the bigstep if wrapping is not applied
+                if (!(mask is bMaskList))
+                {
+                    // Compute the distance from j to the next iter (checking that we won't go past to.Y)
+                    bigStepY = (int)(Math.Sign(smallStepY) * Math.Min(Math.Abs(to.Y - j), mask.h));
+                }
+
+                for (float i = j + bigStepY; i != j; i -= smallStepY)
                 {
                     tp.Y = i;
                     if (!placeMeeting(tp, categories, condition))
@@ -304,7 +316,7 @@ namespace AXE.Game.Entities
 
                     // If remaining size is smaller than the stepSize, then just do the exact substraction on the next iter
                     // (this way we avoid infinite loops)
-                    s = (int) (Math.Sign(s) * Math.Min(Math.Abs(pos.Y - i), stepSize.Y));
+                    smallStepY = (int) (Math.Sign(smallStepY) * Math.Min(Math.Abs(pos.Y - i), stepSize.Y));
                 }
 
                 // If we couldn't move on this big step, use the last pos of the previous big step
