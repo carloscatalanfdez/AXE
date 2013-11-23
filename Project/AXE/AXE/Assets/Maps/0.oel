@@ -68,7 +68,7 @@
     <OneWayPlatform id="7" x="0" y="240" width="320" />
     <FlameSpirit id="8" x="272" y="208" />
     <PlayerStart id="12" x="40" y="208" />
-    <ExitDoor id="13" x="152" y="208" open="True" />
+    <ExitDoor id="13" x="0" y="24" open="True" />
     <OneWayPlatform id="14" x="200" y="208" width="120" />
     <OneWayPlatform id="5" x="56" y="184" width="176" />
     <OneWayPlatform id="0" x="56" y="128" width="176" />
