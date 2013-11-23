@@ -40,6 +40,18 @@ float4 Sepia(VertexShaderOutput input) : COLOR0
 	return result;
 }
 
+float4 CleanScanLine(VertexShaderOutput input) : COLOR0
+{
+	float4 color = tex2D(TextureSampler, input.TextureCordinate);
+	float alpha = 0.6f;
+
+	float a = saturate((input.Position.y * ImageHeight) % 3); // a is now 0 if is scanline, 1 if not
+	a = 1 - (1 - a)*alpha; // a is now 1-alpha if is scanline, 1 if not
+
+	color.rgb *= a * 1.0f;
+
+	return color;
+}
 
 float4 ScanLine(VertexShaderOutput input) : COLOR0
 {
@@ -49,7 +61,7 @@ float4 ScanLine(VertexShaderOutput input) : COLOR0
 	// float m = min(a,b);
 	float m = a;
 	
-	color.rgb *= m*1.25f;	
+	color.rgb *= m*1.25f;
 
 	return color;
 }
@@ -114,6 +126,14 @@ technique SepiaToneTechnique
     pass Pass1
     {
         PixelShader = compile ps_2_0 Sepia();
+    }
+}
+
+technique CleanScanlineTechnique
+{
+    pass Pass1
+    {
+        PixelShader = compile ps_2_0 CleanScanLine();
     }
 }
 
