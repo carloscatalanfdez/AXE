@@ -44,12 +44,12 @@ float4 Sepia(VertexShaderOutput input) : COLOR0
 float4 ScanLine(VertexShaderOutput input) : COLOR0
 {
 	float4 color = tex2D(TextureSampler, input.TextureCordinate);
-	int a = saturate((input.Position.y * ImageHeight) % 4);
-	// int b = saturate((input.Position.y * ImageHeight+1) % 4);
+	float a = saturate(((input.Position.y * ImageHeight) % 3)*0.3333f);
+	// int b = saturate((input.Position.y * ImageHeight+1) % 6);
 	// float m = min(a,b);
 	float m = a;
-
-	color.rgb *= m;
+	
+	color.rgb *= m*1.25f;	
 
 	return color;
 }

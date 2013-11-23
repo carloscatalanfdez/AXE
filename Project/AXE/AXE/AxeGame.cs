@@ -24,6 +24,8 @@ namespace AXE
 
         // Debug
         int currentTechnique;
+        RenderTarget2D renderTarget;
+        Texture2D renderResult;
 
         protected override void initSettings()
         {
@@ -37,13 +39,22 @@ namespace AXE
 
             bgColor = Color.Black;
 
-            currentTechnique = 0;
+            currentTechnique = 3;
         }
 
         protected override void Initialize()
         {
+            PresentationParameters pp = GraphicsDevice.PresentationParameters;
+            renderTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, true, GraphicsDevice.DisplayMode.Format, DepthFormat.Depth24);
+
             effect = Content.Load<Effect>("Assets/scanlines");
-            effect.CurrentTechnique = effect.Techniques[0];
+            effect.CurrentTechnique = effect.Techniques[currentTechnique];
+            Window.Title = "AXE (" + effect.CurrentTechnique.Name + ")";
+            effect.Parameters["ImageHeight"].SetValue(GraphicsDevice.Viewport.Height);
+            effect.Parameters["Contrast"].SetValue(1.0f);
+            effect.Parameters["Brightness"].SetValue(0.2f);
+            effect.Parameters["DesaturationAmount"].SetValue(1.0f);
+
             Controller.getInstance().setGame(this);
             Controller.getInstance().onMenuStart();
             /*changeWorld(new LogoScreen());*/
@@ -77,10 +88,7 @@ namespace AXE
             {
                 currentTechnique = (currentTechnique + 1) % effect.Techniques.Count;
                 effect.CurrentTechnique = effect.Techniques[currentTechnique];
-                effect.Parameters["ImageHeight"].SetValue(GraphicsDevice.Viewport.Height);
-                effect.Parameters["Contrast"].SetValue(1.0f);
-                effect.Parameters["Brightness"].SetValue(0.2f);
-                effect.Parameters["DesaturationAmount"].SetValue(1.0f);
+                Window.Title = "AXE (" + effect.CurrentTechnique.Name + ")";
             }
 
             base.update(gameTime);
@@ -88,6 +96,8 @@ namespace AXE
 
         protected override void Draw(GameTime gameTime)
         {
+            GraphicsDevice.SetRenderTarget(renderTarget);
+
             Resolution.BeginDraw();
             // Generate resolution render matrix 
             Matrix matrix = Resolution.getTransformationMatrix();
@@ -97,7 +107,7 @@ namespace AXE
                     SamplerState.PointClamp,
                     null,
                     RasterizerState.CullCounterClockwise,
-                    effect,
+                    null,
                     matrix);
 
             GraphicsDevice.Clear(bgColor);
@@ -113,6 +123,23 @@ namespace AXE
                 gamestateTransition.render(spriteBatch);
 
             spriteBatch.End();
+
+            GraphicsDevice.SetRenderTarget(null);
+            renderResult = (Texture2D)renderTarget;
+
+            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.DarkSlateBlue, 1.0f, 0);
+            using (SpriteBatch sprite = new SpriteBatch(GraphicsDevice))
+            {
+                // sprite.Begin();
+                sprite.Begin(SpriteSortMode.Deferred,
+                    BlendState.AlphaBlend,
+                    SamplerState.PointClamp,
+                    null,
+                    RasterizerState.CullCounterClockwise,
+                    effect);
+                sprite.Draw(renderResult, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
+                sprite.End();
+            }
         }
 
         public void changeWorld(Screen screen)

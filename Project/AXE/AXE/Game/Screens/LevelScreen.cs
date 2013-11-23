@@ -299,7 +299,7 @@ namespace AXE.Game.Screens
 
             //matrix *= camera.get_transformation();
 
-            sb.End();
+            /*sb.End();
 
             sb.Begin(SpriteSortMode.Deferred,
                     BlendState.AlphaBlend,
@@ -307,7 +307,7 @@ namespace AXE.Game.Screens
                     null,
                     RasterizerState.CullCounterClockwise,
                     (game as AxeGame).effect,
-                    matrix);
+                    matrix);*/
 
             // Render bg
             sb.Draw(bDummyRect.sharedDummyRect(game), game.getViewRectangle(), Color.Black);
