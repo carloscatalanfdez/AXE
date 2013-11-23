@@ -54,7 +54,7 @@ namespace AXE.Game.Control
 
         public void initPlayData()
         {
-            maxLevels = 2;
+            maxLevels = 3;
             level = 0;
         }
 

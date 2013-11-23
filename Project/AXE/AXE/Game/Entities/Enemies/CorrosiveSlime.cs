@@ -15,7 +15,7 @@ namespace AXE.Game.Entities.Enemies
 {
     class CorrosiveSlime : Enemy
     {
-        public enum State { None, IdleTop, WalkTop, HideCorner, PrepareFall, Fall, Explode, Dead }
+        public enum State { None, IdleTop, WalkTop, MoveToHide, HideCorner, PrepareFall, Fall, Explode, Dead }
         const int CHANGE_STATE_TIMER = 0;
 
         public bSpritemap spgraphic
@@ -30,7 +30,8 @@ namespace AXE.Game.Entities.Enemies
         int hspeed;
 
         Vector2 moveTo;
-        bMask watchMask;
+        bMask dropWatchMask;
+        bMask hideWatchMask;
 
         public State state;
 
@@ -38,6 +39,8 @@ namespace AXE.Game.Entities.Enemies
         int walkBaseTime, walkOptionalTime;
         int hideBaseTime, hideOptionalTime;
         int dropBaseTime, dropOptionalTime;
+
+        int hideChance;
 
         public CorrosiveSlime(int x, int y)
             : base(x, y)
@@ -51,6 +54,7 @@ namespace AXE.Game.Entities.Enemies
             spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/corrosiveslime-sheet"), 32, 32);
             spgraphic.add(new bAnim("idle-top", new int[] { 0, 1 }, 0.2f));
             spgraphic.add(new bAnim("walk-top", new int[] { 2, 3 }, 0.2f));
+            spgraphic.add(new bAnim("run-top", new int[] { 2, 3 }, 0.6f));
             spgraphic.add(new bAnim("hide-corner", new int[] { 4, 5 }, 0.1f));
             spgraphic.add(new bAnim("fall", new int[] { 0, 10, 20, 30 }, 0.3f, false));
             spgraphic.add(new bAnim("explode", new int[] { 31, 32, 33, 34 }, 0.6f, false));
@@ -59,7 +63,8 @@ namespace AXE.Game.Entities.Enemies
 
             loadTopMask();
 
-            watchMask = new bMask(x, y, 20, (world as LevelScreen).height);
+            dropWatchMask = new bMask(x, y, 20, (world as LevelScreen).height);
+            hideWatchMask = new bMask(x, y, (world as LevelScreen).width / 4, 10);
 
             hspeed = 1;
             vspeed = 0f;
@@ -73,6 +78,8 @@ namespace AXE.Game.Entities.Enemies
             hideOptionalTime = 60;
             dropBaseTime = 3;
             dropOptionalTime = 3;
+
+            hideChance = 100; // it will only hide if a random from 0 to this number is 0
 
             if (Tools.random.Next(2) < 1)
                 facing = Dir.Right;
@@ -90,7 +97,7 @@ namespace AXE.Game.Entities.Enemies
             _mask.w = 13;
             _mask.h = 15;
             _mask.offsetx = 9;
-            _mask.offsety = 7;
+            _mask.offsety = 14;
         }
 
         protected void loadCornerMask()
@@ -191,7 +198,7 @@ namespace AXE.Game.Entities.Enemies
 
         private bool isOnCeiling()
         {
-            return state == State.IdleTop || state == State.HideCorner || state == State.WalkTop;
+            return state == State.IdleTop || state == State.HideCorner || state == State.WalkTop || state == State.MoveToHide;
         }
 
         public override void onUpdate()
@@ -242,6 +249,29 @@ namespace AXE.Game.Entities.Enemies
                     }
 
                     break;
+                case State.MoveToHide:
+                    spgraphic.play("run-top");
+
+                    int hsp = (int)(hspeed * 3);
+                    nextPosition = new Vector2(x + directionToSign(facing) * hsp, y);
+                    wontFall = checkForCeiling(
+                            (int)(nextPosition.X + directionToSign(facing) * graphicWidth() / 2),
+                            (int)nextPosition.Y);
+                    wontCollide = !placeMeeting(
+                            (int)nextPosition.X,
+                            (int)nextPosition.Y, new String[] { "solid" });
+                    if (wontFall)
+                        moveTo.X += directionToSign(facing) * hsp;
+
+                    if (!wontCollide)
+                    {
+                        // Place yourself on the fucking corner
+                        moveToContact(moveTo, "solid");
+                        // and hide
+                        changeState(State.HideCorner);
+                    }
+
+                    break;
                 case State.HideCorner:
                     spgraphic.play("hide-corner");
                     break;
@@ -268,24 +298,27 @@ namespace AXE.Game.Entities.Enemies
                     break;
             }
 
-            if (state == State.IdleTop || state == State.WalkTop)
+            if (state == State.IdleTop || state == State.WalkTop || state == State.MoveToHide)
             {
                 // VERY IMPORTANT
                 // When holding the mask, we need to hold the original _mask, since
                 // mask itself is a property and will return a hacked wrapped mask sometimes
                 bMask holdMyMaskPlease = _mask;
-                mask = watchMask;
+                mask = dropWatchMask;
 
                 bEntity spottedEntity = instancePlace(x, y, "player", null, alivePlayerCondition);
                 mask = holdMyMaskPlease; // thank you!
 
                 if (spottedEntity != null)
                 {
-                    // Nothing stopping me from hitting you?
+                    // Nothing stopping me (with my fall mask) from hitting you?
                     Vector2 oldPos = pos;
+                    loadFallMask();
                     // Check with moveToContact, but move in steps of mask.h to improve performance (we don't need more accuracy anyways)
-                    Vector2 remnantOneWay = moveToContact(new Vector2(mask.x, spottedEntity.y - mask.h), new String[] { "onewaysolid", "solid" }, new Vector2(0, mask.h));
+                    Vector2 remnantOneWay = moveToContact(new Vector2(mask.x, spottedEntity.mask.y - mask.h), new String[] { "onewaysolid", "solid" }, new Vector2(1, mask.h));
+                    // Restore values
                     pos = oldPos;
+                    loadTopMask();
                     if (remnantOneWay.Y == 0)
                     {
                         // Yeah, let's go
@@ -294,7 +327,30 @@ namespace AXE.Game.Entities.Enemies
                 }
             }
 
-            if (state == State.WalkTop || state == State.Fall)
+            if (state == State.IdleTop || state == State.WalkTop)
+            {
+                // Ok so no dropping
+                // Hiding?
+                Dir facingDir = facing;
+                if (facingDir == Dir.Left)
+                    hideWatchMask.offsetx = -hideWatchMask.w;
+                else
+                    hideWatchMask.offsetx = graphicWidth();
+
+                bMask holdMyMaskPlease = _mask;
+                mask = hideWatchMask;
+
+                bool spottedSolid = placeMeeting(x, y, "solid");
+                mask = holdMyMaskPlease; // thank you!
+
+                if (spottedSolid && Tools.random.Next(100) < 1)
+                {
+                    facing = facingDir;
+                    changeState(State.MoveToHide);
+                }
+            }
+
+            if (state == State.WalkTop || state == State.Fall || state == State.MoveToHide)
             {
                 Vector2 remnant;
                 // Check wether we collide first with a solid or a onewaysolid,
