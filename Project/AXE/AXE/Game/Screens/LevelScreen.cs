@@ -306,7 +306,7 @@ namespace AXE.Game.Screens
                     SamplerState.PointClamp,
                     null,
                     RasterizerState.CullCounterClockwise,
-                    null,
+                    (game as AxeGame).effect,
                     matrix);
 
             // Render bg

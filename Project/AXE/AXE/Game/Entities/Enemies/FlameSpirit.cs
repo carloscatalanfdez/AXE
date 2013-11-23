@@ -45,7 +45,7 @@ namespace AXE.Game.Entities.Enemies
         bool willAttack;
 
         // Debug
-        string label;
+        // string label;
         bMask targettingMask;
 
         public FlameSpirit(int x, int y)
