@@ -150,6 +150,7 @@
     <Compile Include="Game\Screens\Screen.cs" />
     <Compile Include="Game\Screens\LogoScreen.cs" />
     <Compile Include="Game\Utils\HotspotContainer.cs" />
+    <Compile Include="Game\Utils\ResourceManager.cs" />
     <Compile Include="Game\Utils\Tools.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />

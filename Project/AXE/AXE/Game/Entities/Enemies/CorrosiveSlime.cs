@@ -51,7 +51,7 @@ namespace AXE.Game.Entities.Enemies
         {
             base.init();
 
-            spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/corrosiveslime-sheet"), 32, 32);
+            spgraphic = new bSpritemap((game as AxeGame).res.sprSlimeSheet, 32, 32);
             spgraphic.add(new bAnim("idle-top", new int[] { 0, 1 }, 0.2f));
             spgraphic.add(new bAnim("walk-top", new int[] { 2, 3 }, 0.2f));
             spgraphic.add(new bAnim("run-top", new int[] { 2, 3 }, 0.6f));

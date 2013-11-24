@@ -46,7 +46,7 @@ namespace AXE.Game.Entities
             mask.offsetx = 8;
             mask.offsety = 8;
 
-            spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/door-sheet"), 24, 32);
+            spgraphic = new bSpritemap((game as AxeGame).res.sprDoorSheet, 24, 32);
             spgraphic.add(new bAnim("closed", new int[] { 0 }));
             spgraphic.add(new bAnim("open", new int[] { 1 }));
             if (type == Type.Entry || type == Type.ExitClose)
@@ -56,7 +56,7 @@ namespace AXE.Game.Entities
 
             if (isExit())
             {
-                sign = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/sign-sheet"), 32, 24);
+                sign = new bSpritemap((game as AxeGame).res.sprSignSheet, 32, 24);
                 sign.add(new bAnim("idle", new int[] { 0 }));
                 sign.add(new bAnim("blink", new int[] { 1, 0 }, 0.5f, false));
                 sign.play("idle");

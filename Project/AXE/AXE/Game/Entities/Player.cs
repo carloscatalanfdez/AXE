@@ -126,8 +126,12 @@ namespace AXE.Game.Entities
             attributes.Add("moveable");
 
             // Load graphic & setup
-            string filename = "Assets/Sprites/knight-sheet" + (data.id == PlayerIndex.One ? "" : "-alt");
-            spgraphic = new bSpritemap(game.Content.Load<Texture2D>(filename), 30, 32);
+            Texture2D sheet;
+            if (data.id == PlayerIndex.One)
+                sheet = (game as AxeGame).res.sprKnightASheet;
+            else
+                sheet = (game as AxeGame).res.sprKnightBSheet;
+            spgraphic = new bSpritemap(sheet, 30, 32);
             spgraphic.add(new bAnim("idle", new int[] { 0 }, 0.1f));
             spgraphic.add(new bAnim("walk", new int[] { 1, 2, 3, 2 }, 0.2f));
             spgraphic.add(new bAnim("jump", new int[] { 8 }, 0.0f));
@@ -231,12 +235,13 @@ namespace AXE.Game.Entities
         protected void loadSoundEffects()
         {
             sfxSteps = new List<SoundEffect>();
-            for (int i = 1; i <= 3; i++)
-                sfxSteps.Add(game.Content.Load<SoundEffect>("Assets/Sfx/sfx-step." + i));
+            sfxSteps.Add((game as AxeGame).res.sfxStepA);
+            sfxSteps.Add((game as AxeGame).res.sfxStepB);
+            sfxSteps.Add((game as AxeGame).res.sfxStepC);
 
-            sfxLanded = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-land");
-            sfxCharge = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-charge");
-            sfxHit = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-playerhit");
+            sfxLanded = (game as AxeGame).res.sfxLanded;
+            sfxCharge = (game as AxeGame).res.sfxCharge;
+            sfxHit = (game as AxeGame).res.sfxPlayerHit;
         }
 
         public override int graphicWidth()

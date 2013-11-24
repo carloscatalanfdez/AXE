@@ -24,7 +24,7 @@ namespace AXE.Game.Screens
 
         public override void init()
         {
-            logo = new bStamp(game.Content.Load<Texture2D>("Assets/badladns_banner"));
+            logo = new bStamp((game as AxeGame).res.badladnsBanner);
         }
 
         public override void update(GameTime dt)

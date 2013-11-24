@@ -61,7 +61,7 @@ namespace AXE.Game.Entities.Enemies
             loadParameters();
             
             // Head
-            smgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/flamewrath-sheet"), 32, 32);
+            smgraphic = new bSpritemap((game as AxeGame).res.sprFlamewrathSheet, 32, 32);
             smgraphic.add(new bAnim("invisible", new int[] { 17 }));
             smgraphic.add(new bAnim("in", new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 
                 9, 10, 11, 12, 13, 14, 15, 16}, 0.5f, false));
@@ -71,7 +71,7 @@ namespace AXE.Game.Entities.Enemies
                 8, 7, 6, 5, 4, 3, 2, 1, 0}, 0.5f, false));
 
             // Flame
-            fgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/flame-sheet"), 32, 32);
+            fgraphic = new bSpritemap((game as AxeGame).res.sprFlameSheet, 32, 32);
             fgraphic.add(new bAnim("idle", new int[] { 0, 1, 2, 3 }, 0.3f));
             fgraphic.add(new bAnim("gone", new int[] { 4 }));
 
@@ -427,7 +427,7 @@ namespace AXE.Game.Entities.Enemies
             mask.offsetx = 4;
             mask.offsety = 2;
 
-            sprite = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/flamewrath-bullet-sheet"), 24, 8);
+            sprite = new bSpritemap((game as AxeGame).res.sprFlameBulletSheet, 24, 8);
             sprite.add(new bAnim("1", new int[] { Tools.random.Next(3) }));
             sprite.play("1");
             sprite.flipped = flipped;
@@ -484,7 +484,7 @@ namespace AXE.Game.Entities.Enemies
 
             collidable = false;
 
-            graphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/flamewrath-sheet"), 32, 32);
+            graphic = new bSpritemap((game as AxeGame).res.sprFlamewrathSheet, 32, 32);
             (graphic as bSpritemap).add(new bAnim("1", new int[] { frame }));
             (graphic as bSpritemap).play("1");
             (graphic as bSpritemap).flipped = flipped;

@@ -134,9 +134,8 @@ namespace AXE.Game.Entities
                 }
             }
 
-            tsetFilename = "basic";
-
-            tilemap = new bTilemap(w, h, tileWidth, tileHeight, game.Content.Load<Texture2D>("Assets/Tilesets/" + tsetFilename));
+            // TODO: Unhardcde tset!
+            tilemap = new bTilemap(w, h, tileWidth, tileHeight, (game as AxeGame).res.tsetBasic);
             tilemap.parseTiles(tiles);
 
             mask = new bSolidGrid(w / tileWidth, h / tileHeight, tileWidth, tileHeight);

@@ -36,7 +36,7 @@ namespace AXE.Game.Entities.Contraptions
         {
             base.init();
 
-            spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/trapdoor-sheet"), 64, 32);
+            spgraphic = new bSpritemap((game as AxeGame).res.sprTrapdoorSheet, 64, 32);
             spgraphic.add(new bAnim("idle", new int[] { 0 }));
             spgraphic.add(new bAnim("open", new int[] { 1 }));
             spgraphic.add(new bAnim("close", new int[] { 0 }));

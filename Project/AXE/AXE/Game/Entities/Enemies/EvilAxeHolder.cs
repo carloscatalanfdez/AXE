@@ -65,7 +65,7 @@ namespace AXE.Game.Entities.Base
         {
             base.init();
 
-            spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/axethrower-sheet"), 17, 26);
+            spgraphic = new bSpritemap((game as AxeGame).res.sprAxeThrowerSheet, 17, 26);
             spgraphic.add(new bAnim("idle", new int[] { 0 }));
             spgraphic.add(new bAnim("walk", new int[] { 0, 2, 1 }, 0.3f));
             spgraphic.add(new bAnim("throw", new int[] { 1 }, 1.0f, false));
@@ -103,8 +103,8 @@ namespace AXE.Game.Entities.Base
             else
                 facing = Dir.Left;
 
-            sfxGrab = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-evilpick");
-            sfxThrow = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-evilthrow");
+            sfxGrab = (game as AxeGame).res.sfxEvilPick;
+            sfxThrow = (game as AxeGame).res.sfxEvilThrow;
 
             state = State.None;
             changeState(State.Idle);

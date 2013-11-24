@@ -26,7 +26,7 @@ namespace AXE.Game.Entities.Contraptions
         {
             base.init();
 
-            smgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/lever-sheet"), 16, 16);
+            smgraphic = new bSpritemap((game as AxeGame).res.sprLeverSheet, 16, 16);
             smgraphic.add(new bAnim("left", new int[] { 0 }));
             smgraphic.add(new bAnim("right", new int[] { 4 }));
             smgraphic.add(new bAnim("left-to-right", new int[] { 0, 1, 2, 3, 4 }, 0.4f, false));

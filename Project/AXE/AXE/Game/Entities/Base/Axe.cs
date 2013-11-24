@@ -99,7 +99,7 @@ namespace AXE.Game.Entities
 
         protected virtual void initGraphic()
         {
-            spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/stick-sheet"), 14, 14);
+            spgraphic = new bSpritemap((game as AxeGame).res.sprStickSheet, 14, 14);
             loadAnims();
         }
 
@@ -133,11 +133,11 @@ namespace AXE.Game.Entities
 
         protected virtual void initSoundEffects()
         {
-            sfxThrow = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-thrown");
-            sfxHit = game.Content.Load<SoundEffect>("Assets/Sfx/axe-hit");
-            sfxDrop = game.Content.Load<SoundEffect>("Assets/Sfx/axe-drop");
-            sfxGrab = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-grab");
-            sfxHurt = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-hurt");
+            sfxThrow = (game as AxeGame).res.sfxThrow;
+            sfxHit = (game as AxeGame).res.sfxHit;
+            sfxDrop = (game as AxeGame).res.sfxDrop;
+            sfxGrab = (game as AxeGame).res.sfxGrab;
+            sfxHurt = (game as AxeGame).res.sfxHurt;
         }
 
         public override int graphicWidth()

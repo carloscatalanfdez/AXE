@@ -21,7 +21,7 @@ namespace AXE.Game.Entities
 
         public override void initParams()
         {
-            spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/coin-sheet"), 16, 17);
+            spgraphic = new bSpritemap((game as AxeGame).res.sprCoinSheet, 16, 17);
             spgraphic.add(new bAnim("idle", new int[] { 0, 1, 2 }, 0.2f));
             spgraphic.play("idle");
 

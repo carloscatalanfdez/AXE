@@ -13,6 +13,7 @@ using bEngine;
 using AXE.Game;
 using AXE.Game.Screens;
 using AXE.Game.Control;
+using AXE.Game.Utils;
 
 namespace AXE
 {
@@ -21,6 +22,8 @@ namespace AXE
     {
         public Effect effect;
         Screen screen;
+
+        public ResourceManager res;
 
         // Debug
         int currentTechnique;
@@ -37,44 +40,48 @@ namespace AXE
 
             width = 320;
             height = 256;
+            fullscreen = true;
 
             bgColor = Color.DarkGray;
 
             currentTechnique = 3;
             switchFullscreenThisStep = false;
+
+            res = ResourceManager.get();
+            res.init(this);
         }
 
         protected void generateRenderTarget()
         {
             PresentationParameters pp = GraphicsDevice.PresentationParameters;
-            if (renderTarget == null || renderTarget.IsDisposed)
-                renderTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, true, GraphicsDevice.DisplayMode.Format, DepthFormat.Depth24);
+            renderTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, true, GraphicsDevice.DisplayMode.Format, DepthFormat.Depth24);
         }
 
         protected override void LoadContent()
         {
-            base.LoadContent();
             generateRenderTarget();
-        }
+            base.LoadContent();
+            res.loadContent();
 
-        protected override void UnloadContent()
-        {
-            base.UnloadContent();
-            Content.Load<SoundEffect>("Assets/Sfx/sfx-playerhit").Play();
-            renderResult.Dispose();
-            renderTarget.Dispose();
-        }
-
-        protected override void Initialize()
-        {
-            effect = Content.Load<Effect>("Assets/scanlines");
+            effect = res.effect;
             effect.CurrentTechnique = effect.Techniques[currentTechnique];
             Window.Title = "AXE (" + effect.CurrentTechnique.Name + ")";
             effect.Parameters["ImageHeight"].SetValue(GraphicsDevice.Viewport.Height);
             effect.Parameters["Contrast"].SetValue(1.0f);
             effect.Parameters["Brightness"].SetValue(0.2f);
             effect.Parameters["DesaturationAmount"].SetValue(1.0f);
+        }
 
+        protected override void UnloadContent()
+        {
+            base.UnloadContent();
+            /*renderResult.Dispose();
+            renderTarget.Dispose();*/
+        }
+
+        protected override void Initialize()
+        {
+            switchFullScreen();
             Controller.getInstance().setGame(this);
             Controller.getInstance().onMenuStart();
             /*changeWorld(new LogoScreen());*/
@@ -189,19 +196,25 @@ namespace AXE
             {
                 GraphicsDevice.SetRenderTarget(null);
                 renderResult = (Texture2D)renderTarget;
-
                 GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.DarkSlateBlue, 1.0f, 0);
                 using (SpriteBatch sprite = new SpriteBatch(GraphicsDevice))
                 {
-                    // sprite.Begin();
-                    sprite.Begin(SpriteSortMode.Deferred,
-                        BlendState.AlphaBlend,
-                        SamplerState.PointClamp,
-                        null,
-                        RasterizerState.CullCounterClockwise,
-                        effect);
-                    sprite.Draw(renderResult, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
-                    sprite.End();
+                    try
+                    {
+                        // sprite.Begin();
+                        sprite.Begin(SpriteSortMode.Deferred,
+                            BlendState.AlphaBlend,
+                            SamplerState.PointClamp,
+                            null,
+                            RasterizerState.CullCounterClockwise,
+                            effect);
+                        sprite.Draw(renderResult, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
+                        sprite.End();
+                    }
+                    catch (Exception e)
+                    {
+                        string n = e.Message;
+                    }
                 }
             }
 

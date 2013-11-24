@@ -32,7 +32,7 @@ namespace AXE.Game.Entities.Base
             {
                 default:
                 case Type.HighFallGuard:
-                    spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/highfallguard-sheet"), 16, 16);
+                    spgraphic = new bSpritemap((game as AxeGame).res.sprHighfallGuardSheet, 16, 16);
                     spgraphic.add(new bAnim("idle", new int[] { 0 }));
                     spgraphic.play("idle");
 

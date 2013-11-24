@@ -69,7 +69,7 @@ namespace AXE.Game.Screens
 
             paused = false;
 
-            cursor = new bStamp(game.Content.Load<Texture2D>("Assets/Sprites/cursor"));
+            cursor = new bStamp((game as AxeGame).res.sprCursor);
             state = State.Enter;
 
             // Init entity collections
@@ -111,8 +111,8 @@ namespace AXE.Game.Screens
                 // Do not add it because there's no file and it will break
             }
 
-            background = new bStamp(game.Content.Load<Texture2D>("Assets/Backgrounds/bg"));
-            background.color = new Color(0.0f, 0.0f, 0.0f, 0.0f);
+            /*background = new bStamp("HOHO!");
+            background.color = new Color(0.0f, 0.0f, 0.0f, 0.0f);*/
 
             // Add player
             if (id < Controller.getInstance().data.maxLevels)
@@ -311,7 +311,8 @@ namespace AXE.Game.Screens
 
             // Render bg
             sb.Draw(bDummyRect.sharedDummyRect(game), game.getViewRectangle(), Color.Black);
-            background.render(sb, Vector2.Zero);
+            if (background != null)
+                background.render(sb, Vector2.Zero);
 
             // Render entities
             renderQueue.Clear();

@@ -74,7 +74,7 @@ namespace AXE.Game.Entities.Enemies
         {
             base.init();
 
-            spgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/imp-sheet"), 30, 32);
+            spgraphic = new bSpritemap((game as AxeGame).res.sprImpSheet, 30, 32);
             spgraphic.add(new bAnim("idle", new int[] { 0 }));
             spgraphic.add(new bAnim("turn", new int[] { 9 }));
             spgraphic.add(new bAnim("walk", new int[] { 1, 2, 3, 2 }, 0.3f));
@@ -123,10 +123,10 @@ namespace AXE.Game.Entities.Enemies
             weaponHitImage = new bStamp(spgraphic.image, new Rectangle(90, 64, 30, 32));
 
             sfxSteps = new List<SoundEffect>();
-            sfxSteps.Add(game.Content.Load<SoundEffect>("Assets/Sfx/sfx-dirtstep.1"));
-            sfxSteps.Add(game.Content.Load<SoundEffect>("Assets/Sfx/sfx-dirtstep.2"));
-            sfxSteps.Add(game.Content.Load<SoundEffect>("Assets/Sfx/sfx-dirtstep.3"));
-            sfxHit = game.Content.Load<SoundEffect>("Assets/Sfx/sfx-playerhit");
+            sfxSteps.Add((game as AxeGame).res.sfxDirtstepA);
+            sfxSteps.Add((game as AxeGame).res.sfxDirtstepB);
+            sfxSteps.Add((game as AxeGame).res.sfxDirtstepC);
+            sfxHit = (game as AxeGame).res.sfxPlayerHit;
 
             state = State.None;
             changeState(State.Idle);
