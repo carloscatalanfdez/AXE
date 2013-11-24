@@ -27,6 +27,7 @@ namespace AXE.Game.Entities.Enemies
         public State state;
 
         bSpritemap smgraphic;
+        bSpritemap fgraphic;
 
         // Parameters
         Range waitToEnterTime;
@@ -59,6 +60,7 @@ namespace AXE.Game.Entities.Enemies
 
             loadParameters();
             
+            // Head
             smgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/flamewrath-sheet"), 32, 32);
             smgraphic.add(new bAnim("invisible", new int[] { 17 }));
             smgraphic.add(new bAnim("in", new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 
@@ -67,6 +69,11 @@ namespace AXE.Game.Entities.Enemies
             smgraphic.add(new bAnim("attack", new int[] { 30 }));
             smgraphic.add(new bAnim("out", new int[] { 16, 15, 14, 13, 12, 11, 10, 9,
                 8, 7, 6, 5, 4, 3, 2, 1, 0}, 0.5f, false));
+
+            // Flame
+            fgraphic = new bSpritemap(game.Content.Load<Texture2D>("Assets/Sprites/flame-sheet"), 32, 32);
+            fgraphic.add(new bAnim("idle", new int[] { 0, 1, 2, 3 }, 0.3f));
+            fgraphic.add(new bAnim("gone", new int[] { 4 }));
 
             initParameters();
 
@@ -93,6 +100,7 @@ namespace AXE.Game.Entities.Enemies
         {
             state = State.Invisible;
             smgraphic.play("invisible");
+            fgraphic.play("gone");
             hspeed = 0;
             vspeed = 0;
             moving = false;
@@ -142,6 +150,7 @@ namespace AXE.Game.Entities.Enemies
                                 vspeed = 0;
                                 state = State.Out;
                                 smgraphic.play("out");
+                                fgraphic.play("gone");
                             }
                         break;
                         case State.Attack:
@@ -182,6 +191,7 @@ namespace AXE.Game.Entities.Enemies
             {
                 case State.Invisible:
                     smgraphic.play("invisible");
+                    fgraphic.play("gone");
                     break;
                 case State.In:
                     if (smgraphic.currentAnim.finished)
@@ -194,6 +204,7 @@ namespace AXE.Game.Entities.Enemies
                 case State.Float:
                     // Show yourself!
                     smgraphic.play("float");
+                    fgraphic.play("idle");
 
                     if (moving)
                     {
@@ -262,6 +273,7 @@ namespace AXE.Game.Entities.Enemies
                     break;
                 case State.Attack:
                     smgraphic.play("attack");
+                    fgraphic.play("idle");
                     break;
                 case State.Out:
                     if (smgraphic.currentAnim.finished)
@@ -283,6 +295,8 @@ namespace AXE.Game.Entities.Enemies
 
             smgraphic.flipped = (facing == Dir.Left);
             smgraphic.update();
+            fgraphic.flipped = (facing == Dir.Left);
+            fgraphic.update();
         }
 
         protected Entity watchForTargets()
@@ -323,6 +337,7 @@ namespace AXE.Game.Entities.Enemies
                 {
                     state = State.Death;
                     smgraphic.play("out");
+                    fgraphic.play("gone");
                 }
                 return true;
             }
@@ -338,6 +353,7 @@ namespace AXE.Game.Entities.Enemies
             // label = (willAttack ? "YES" : "NO");
             // sb.Draw(bDummyRect.sharedDummyRect(game), targettingMask.rect, new Color(199, 99, 10, 50));
             // smgraphic.color = Tools.RandomColor;
+            fgraphic.render(sb, pos);
             smgraphic.render(sb, pos);
             // sb.DrawString(game.gameFont, label, new Vector2(x, y + graphicHeight()), Color.White);
         }
@@ -494,6 +510,8 @@ namespace AXE.Game.Entities.Enemies
             base.render(dt, sb);
             graphic.color = Tools.RandomColor;
             graphic.alpha = timer[0] / 5f;
+            graphic.render(sb, pos);
+
             graphic.render(sb, pos);
         }
     }
