@@ -77,5 +77,8 @@
     <OneWayPlatform id="3" x="56" y="72" width="176" />
     <OneWayPlatform id="4" x="0" y="96" width="104" />
     <OneWayPlatform id="15" x="200" y="96" width="120" />
+    <Undead id="9" x="176" y="40" />
+    <Undead id="10" x="112" y="96" />
+    <Undead id="11" x="256" y="128" />
   </Entities>
 </level>
