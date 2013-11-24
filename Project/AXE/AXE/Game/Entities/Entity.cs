@@ -226,7 +226,8 @@ namespace AXE.Game.Entities
             to.Y = (int)Math.Round(to.Y);
 
             // Move to contact in the X
-            int diff = (int) (to.X - pos.X);
+            int posX = (int) Math.Round(pos.X);
+            int diff = (int) (to.X - posX);
             // Size of the small steps we're gonna take (can't be bigger than the travel size)
             int smallStepX = (int)(Math.Sign(diff) * Math.Min(Math.Abs(diff), stepSize.X));
             bool canMove = false;
@@ -236,7 +237,7 @@ namespace AXE.Game.Entities
 
             // bigstepping is disabled by default (only one bigstep == original moveToContact)
             int bigStepX = diff;
-            for (float j = pos.X; j != to.X; j += bigStepX)
+            for (float j = posX; j != to.X; j += bigStepX)
             {
                 // In every big step, we want to check if the entity can move, so canMove should start as false
                 canMove = false;
@@ -271,7 +272,7 @@ namespace AXE.Game.Entities
 
                     // If remaining size is smaller than the stepSize, then just do the exact substraction on the next iter
                     // (this way we avoid infinite loops)
-                    smallStepX = (int)(Math.Sign(smallStepX) * Math.Min(Math.Abs(pos.X - i), stepSize.X));
+                    smallStepX = (int)(Math.Sign(smallStepX) * Math.Min(Math.Abs(posX - i), stepSize.X));
                 }
 
                 // If we couldn't move on this big step, use the last pos of the previous big step
@@ -286,14 +287,15 @@ namespace AXE.Game.Entities
                 pos.X = tp.X;
 
             // Move to contact in the Y
-            diff = (int)(to.Y - pos.Y);
+            int posY = (int)Math.Round(pos.Y);
+            diff = (int)(to.Y - posY);
             // Size of the small steps we're gonna take (can't be bigger than the travel size)
             int smallStepY = (int)(Math.Sign(diff) * Math.Min(Math.Abs(diff), stepSize.Y));
             tp = pos;
 
             // bigstepping is disabled by default (only one bigstep == original moveToContact)
             int bigStepY = diff;
-            for (float j = pos.Y; j != to.Y; j += bigStepY)
+            for (float j = posY; j != to.Y; j += bigStepY)
             {
                 // In every big step, we want to check if the entity can move, so canMove should start as false
                 canMove = false;
@@ -316,7 +318,7 @@ namespace AXE.Game.Entities
 
                     // If remaining size is smaller than the stepSize, then just do the exact substraction on the next iter
                     // (this way we avoid infinite loops)
-                    smallStepY = (int) (Math.Sign(smallStepY) * Math.Min(Math.Abs(pos.Y - i), stepSize.Y));
+                    smallStepY = (int)(Math.Sign(smallStepY) * Math.Min(Math.Abs(posY - i), stepSize.Y));
                 }
 
                 // If we couldn't move on this big step, use the last pos of the previous big step

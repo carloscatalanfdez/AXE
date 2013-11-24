@@ -23,7 +23,7 @@ namespace AXE.Game.Entities.Enemies
 {
     class Undead : Enemy, IHazardProvider
     {
-        public enum State { None, Idle, Walk, Chase, Attacking, Attacked, Falling, Dead }
+        public enum State { None, Idle, Turn, Walk, Chase, Attacking, Attacked, Falling, Dead }
         const int CHANGE_STATE_TIMER = 0;
         const int CHASE_REACTION_TIMER = 1;
         const int DEAD_ANIM_TIMER = 2;
@@ -52,12 +52,12 @@ namespace AXE.Game.Entities.Enemies
         int attackChargeTime;
         int attackTime;
         KillerRect weaponHitZone;
-        bStamp weaponHitImage;
 
         float hspeed;
         
         int idleBaseTime, idleOptionalTime;
         int walkBaseTime, walkOptionalTime;
+        int turnBaseTime, turnOptionalTime;
 
         int deathAnimDuration;
 
@@ -86,18 +86,20 @@ namespace AXE.Game.Entities.Enemies
             mask.offsetx = 7;
             mask.offsety = 11;
 
-            watchMask = new bMask(x, y, 90, 24);
+            watchMask = new bMask(x, y, 90, 21);
 
-            hspeed = 1.0f;
+            hspeed = 0.2f;
             vspeed = 0f;
             gravity = 0.5f;
             deathFallThreshold = 5;
 
             idleBaseTime = 80;
             idleOptionalTime = 80;
-            walkBaseTime = 30;
-            walkOptionalTime = 30;
+            walkBaseTime = 70;
+            walkOptionalTime = 70;
             deathAnimDuration = 50;
+            turnBaseTime = 20;
+            turnOptionalTime = 20;
 
             if (Tools.random.Next(2) < 1)
                 facing = Dir.Right;
@@ -107,10 +109,9 @@ namespace AXE.Game.Entities.Enemies
             beginChase = false;
             chaseReactionTime = 15;
 
-            attackThreshold = 30;
+            attackThreshold = 16;
             attackChargeTime = 10;
             attackTime = 8;
-            weaponHitImage = new bStamp(spgraphic.image, new Rectangle(90, 64, 30, 32));
 
             state = State.None;
             changeState(State.Idle);
@@ -131,6 +132,9 @@ namespace AXE.Game.Entities.Enemies
                     case State.Walk:
                         timer[0] = walkBaseTime + Tools.random.Next(walkOptionalTime) - walkOptionalTime;
                         break;
+                    case State.Turn:
+                        timer[0] = turnBaseTime + Tools.random.Next(turnOptionalTime) - turnOptionalTime;
+                        break;
                     case State.Chase:
                         beginChase = false;
                         timer[1] = chaseReactionTime;
@@ -141,9 +145,9 @@ namespace AXE.Game.Entities.Enemies
                     case State.Attacked:
                         int xx, yy = 4;
                         if (facing == Dir.Right)
-                            xx = 20;
+                            xx = 10;
                         else
-                            xx = -10;
+                            xx = -0;
                         weaponHitZone = new KillerRect(x + xx, y + yy, 20, 27, Player.DeathState.ForceHit);
                         weaponHitZone.setOwner(this);
                         world.add(weaponHitZone, "hazard");
@@ -173,15 +177,19 @@ namespace AXE.Game.Entities.Enemies
                     {
                         case State.Idle:
                             if (Tools.random.Next(2) < 1)
-                                turn();
+                                changeState(State.Turn);
                             
                             changeState(State.Walk);
                             break;
                         case State.Walk:
                             if (Tools.random.Next(2) < 1)
-                                turn();
+                                changeState(State.Turn);
                             else
                                 changeState(State.Idle);
+                            break;
+                        case State.Turn:
+                            turn();
+                            changeState(State.Idle);
                             break;
                         case State.Chase:
                             break;
@@ -243,12 +251,12 @@ namespace AXE.Game.Entities.Enemies
                     if (wontFall && wontCollide)
                         moveTo.X += directionToSign(facing) * hspeed;
 
-                    if (!wontCollide)
-                        turn();
-                    if (!wontFall)
-                        changeState(State.Idle);
-                    
+                    if (!wontFall || !wontCollide)
+                        changeState(State.Turn);
 
+                    break;
+                case State.Turn:
+                    spgraphic.play("idle");
                     break;
                 case State.Falling:
                     if (onAir)
@@ -282,7 +290,7 @@ namespace AXE.Game.Entities.Enemies
                     {
                         spgraphic.play("chase");
 
-                        int hsp = (int) hspeed;
+                        float hsp = hspeed;
                         nextPosition = new Vector2(x + directionToSign(facing) * hsp, y);
                         wontFall = checkForGround(
                                 (int)(nextPosition.X + directionToSign(facing) * graphicWidth() / 2),
@@ -299,8 +307,6 @@ namespace AXE.Game.Entities.Enemies
                     {
                         if (state == State.Chase)
                             spgraphic.play("chase-reacting");
-                        else
-                            spgraphic.play("chase-running-reacting");
                     }
                     break;
                 case State.Attacking:
@@ -335,13 +341,29 @@ namespace AXE.Game.Entities.Enemies
                 bMask holdMyMaskPlease = _mask;
                 mask = watchMask;
 
-                bool sawYou = placeMeeting(x, y, "player", alivePlayerCondition);
+                bEntity spottedEntity = instancePlace(x, y, "player", null, alivePlayerCondition);
                 mask = holdMyMaskPlease; // thank you!
 
-                if (sawYou)
+                if (spottedEntity != null)
                 {
-                    facing = facingDir;
-                    changeState(State.Chase);
+                    // Nothing stopping me from hitting you?
+                    Vector2 oldPos = pos;
+                    // Check with moveToContact, but move in steps of mask.h to improve performance (we don't need more accuracy anyways)
+                    float xDestination;
+                    if (spottedEntity.mask.x - mask.x > 0)
+                        xDestination = spottedEntity.mask.x - mask.w;
+                    else
+                        xDestination = spottedEntity.mask.x + mask.w;
+                    Vector2 remnantOneWay = moveToContact(new Vector2(xDestination, mask.y), new String[] { "solid" }, new Vector2(mask.w, 1));
+                    // Restore values
+                    pos = oldPos;
+                    if (remnantOneWay.X == 0)
+                    {
+                        // Yeah, let's go
+                        facing = facingDir;
+                        changeState(State.Chase);
+                    }
+
                 }
             }
             else if (state == State.Chase)
@@ -358,43 +380,54 @@ namespace AXE.Game.Entities.Enemies
 
             if (state == State.Walk || state == State.Chase || state == State.Falling)
             {
-                Vector2 remnant;
-                // Check wether we collide first with a solid or a onewaysolid,
-                // and use that data to position the player character.
-                Vector2 oldPos = pos;
-                Vector2 remnantOneWay = moveToContact(moveTo, "onewaysolid", onewaysolidCondition);
-                Vector2 posOneWay = pos;
-                pos = oldPos;
-                Vector2 remnantSolid = moveToContact(moveTo, "solid");
-                Vector2 posSolid = pos;
-                if (remnantOneWay.Length() > remnantSolid.Length())
+                int currentX = (int)Math.Round(pos.X);
+                int nextX = (int)Math.Round(moveTo.X);
+                int c = currentX - nextX;
+                if (Math.Abs(currentX - nextX) < 1)
                 {
-                    remnant = remnantOneWay;
-                    pos = posOneWay;
+                    pos = moveTo;
                 }
                 else
                 {
-                    remnant = remnantSolid;
-                    pos = posSolid;
-                }
+                    Vector2 remnant;
+                    // Check wether we collide first with a solid or a onewaysolid,
+                    // and use that data to position the undead enemy.
+                    Vector2 oldPos = pos;
+                    Vector2 remnantOneWay = moveToContact(moveTo, "onewaysolid", onewaysolidCondition);
+                    Vector2 posOneWay = pos;
+                    pos = oldPos;
+                    Vector2 remnantSolid = moveToContact(moveTo, "solid");
+                    Vector2 posSolid = pos;
+                    if (remnantOneWay.Length() > remnantSolid.Length())
+                    {
+                        remnant = remnantOneWay;
+                        pos = posOneWay;
+                    }
+                    else
+                    {
+                        remnant = remnantSolid;
+                        pos = posSolid;
+                    }
 
-                // We have been stopped
-                if (remnant.X != 0)
-                {
-                }
+                    // We have been stopped
+                    if (remnant.X != 0)
+                    {
+                        if (state == State.Chase)
+                        {
+                            changeState(State.Turn);
+                        }
+                    }
 
-                // The y movement was stopped
-                if (remnant.Y != 0 && vspeed < 0)
-                {
-                    // Touched ceiling
-                    vspeed = 0;
-                }
-                else if (remnant.Y != 0 && vspeed > 0)
-                {
-                    // Landed
-                    /*isLanding = true;
-                    sfxSteps[0].Play();
-                    sfxSteps[1].Play();*/
+                    // The y movement was stopped
+                    if (remnant.Y != 0 && vspeed < 0)
+                    {
+                        // Touched ceiling
+                        vspeed = 0;
+                    }
+                    else if (remnant.Y != 0 && vspeed > 0)
+                    {
+                        // Landed
+                    }
                 }
             }
 
@@ -413,17 +446,6 @@ namespace AXE.Game.Entities.Enemies
 
             spgraphic.color = color;
             spgraphic.render(sb, pos);
-            if (state == State.Attacked)
-                if (facing == Dir.Left)
-                {
-                    weaponHitImage.flipped = true;
-                    weaponHitImage.render(sb, new Vector2(x - weaponHitImage.width, y));
-                }
-                else
-                {
-                    weaponHitImage.flipped = false;
-                    weaponHitImage.render(sb, new Vector2(x + graphicWidth(), y));
-                }
 
             if (bConfig.DEBUG)
                 sb.DrawString(game.gameFont, state.ToString() + " [" + timer[0] + "]", new Vector2(x, y - 8), Color.White);
@@ -439,7 +461,6 @@ namespace AXE.Game.Entities.Enemies
             return spgraphic.height;
         }
 
-        bool playedStepEffect = false;
         public void handleSoundEffects()
         {
         }
