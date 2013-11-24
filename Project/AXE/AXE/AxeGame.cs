@@ -81,7 +81,7 @@ namespace AXE
 
         protected override void Initialize()
         {
-            switchFullScreen();
+            // switchFullScreen();
             Controller.getInstance().setGame(this);
             Controller.getInstance().onMenuStart();
             /*changeWorld(new LogoScreen());*/
@@ -167,16 +167,16 @@ namespace AXE
 
             Resolution.BeginDraw();
             // Generate resolution render matrix 
-            // Matrix matrix = Resolution.getTransformationMatrix();
+            Matrix matrix = Resolution.getTransformationMatrix();
 
-            /*spriteBatch.Begin(SpriteSortMode.Deferred,
+            spriteBatch.Begin(SpriteSortMode.Deferred,
                     BlendState.AlphaBlend,
                     SamplerState.PointClamp,
                     null,
                     RasterizerState.CullCounterClockwise,
                     null,
-                    matrix);*/
-            spriteBatch.Begin();
+                    matrix);
+            // spriteBatch.Begin();
 
             GraphicsDevice.Clear(bgColor);
 
