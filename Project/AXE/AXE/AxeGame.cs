@@ -26,6 +26,7 @@ namespace AXE
         int currentTechnique;
         RenderTarget2D renderTarget;
         Texture2D renderResult;
+        bool switchFullscreenThisStep;
 
         protected override void initSettings()
         {
@@ -37,16 +38,35 @@ namespace AXE
             width = 320;
             height = 256;
 
-            bgColor = Color.Black;
+            bgColor = Color.DarkGray;
 
             currentTechnique = 3;
+            switchFullscreenThisStep = false;
+        }
+
+        protected void generateRenderTarget()
+        {
+            PresentationParameters pp = GraphicsDevice.PresentationParameters;
+            if (renderTarget == null || renderTarget.IsDisposed)
+                renderTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, true, GraphicsDevice.DisplayMode.Format, DepthFormat.Depth24);
+        }
+
+        protected override void LoadContent()
+        {
+            base.LoadContent();
+            generateRenderTarget();
+        }
+
+        protected override void UnloadContent()
+        {
+            base.UnloadContent();
+            Content.Load<SoundEffect>("Assets/Sfx/sfx-playerhit").Play();
+            renderResult.Dispose();
+            renderTarget.Dispose();
         }
 
         protected override void Initialize()
         {
-            PresentationParameters pp = GraphicsDevice.PresentationParameters;
-            renderTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight, true, GraphicsDevice.DisplayMode.Format, DepthFormat.Depth24);
-
             effect = Content.Load<Effect>("Assets/scanlines");
             effect.CurrentTechnique = effect.Techniques[currentTechnique];
             Window.Title = "AXE (" + effect.CurrentTechnique.Name + ")";
@@ -91,7 +111,47 @@ namespace AXE
                 Window.Title = "AXE (" + effect.CurrentTechnique.Name + ")";
             }
 
-            base.update(gameTime);
+            // Allows the game to exit
+            if (input.pressed(Buttons.Back) || input.pressed(Keys.Escape))
+                this.Exit();
+            // Handles full screen mode
+            else if (input.pressed(Keys.F4) && !switchFullscreenThisStep)
+            {
+                switchFullscreenThisStep = true;
+            }
+            // Increases milliseconds per frame (slows down game)
+            else if (input.pressed(Keys.Add))
+            {
+                millisecondsPerFrame += 5.0;
+            }
+            // Decreases milliseconds per frame (speeds up game)
+            else if (input.pressed(Keys.Subtract))
+            {
+                millisecondsPerFrame -= 5.0;
+            }
+            // Takes a screenshot
+            else if (input.pressed(Keys.F12))
+            {
+                screenshot();
+            }
+        }
+
+        void switchFullScreen()
+        {
+            
+            int rw, rh;
+            if (graphics.IsFullScreen)
+            {
+                rw = width * (int)horizontalZoom;
+                rh = height * (int)verticalZoom;
+            }
+            else
+            {
+                rw = GraphicsDevice.DisplayMode.Width;
+                rh = GraphicsDevice.DisplayMode.Height;
+            }
+
+            Resolution.SetResolution(rw, rh, !graphics.IsFullScreen);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -100,15 +160,16 @@ namespace AXE
 
             Resolution.BeginDraw();
             // Generate resolution render matrix 
-            Matrix matrix = Resolution.getTransformationMatrix();
+            // Matrix matrix = Resolution.getTransformationMatrix();
 
-            spriteBatch.Begin(SpriteSortMode.Deferred,
+            /*spriteBatch.Begin(SpriteSortMode.Deferred,
                     BlendState.AlphaBlend,
                     SamplerState.PointClamp,
                     null,
                     RasterizerState.CullCounterClockwise,
                     null,
-                    matrix);
+                    matrix);*/
+            spriteBatch.Begin();
 
             GraphicsDevice.Clear(bgColor);
 
@@ -116,7 +177,7 @@ namespace AXE
 
             // Render world if available
             if (world != null)
-                world.render(gameTime, spriteBatch, matrix);
+                world.render(gameTime, spriteBatch, Matrix.Identity/*matrix*/);
 
             // Transition
             if (gamestateTransition != null)
@@ -124,21 +185,30 @@ namespace AXE
 
             spriteBatch.End();
 
-            GraphicsDevice.SetRenderTarget(null);
-            renderResult = (Texture2D)renderTarget;
-
-            GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.DarkSlateBlue, 1.0f, 0);
-            using (SpriteBatch sprite = new SpriteBatch(GraphicsDevice))
+            if (renderTarget != null && renderTarget.IsDisposed == false)
             {
-                // sprite.Begin();
-                sprite.Begin(SpriteSortMode.Deferred,
-                    BlendState.AlphaBlend,
-                    SamplerState.PointClamp,
-                    null,
-                    RasterizerState.CullCounterClockwise,
-                    effect);
-                sprite.Draw(renderResult, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
-                sprite.End();
+                GraphicsDevice.SetRenderTarget(null);
+                renderResult = (Texture2D)renderTarget;
+
+                GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.DarkSlateBlue, 1.0f, 0);
+                using (SpriteBatch sprite = new SpriteBatch(GraphicsDevice))
+                {
+                    // sprite.Begin();
+                    sprite.Begin(SpriteSortMode.Deferred,
+                        BlendState.AlphaBlend,
+                        SamplerState.PointClamp,
+                        null,
+                        RasterizerState.CullCounterClockwise,
+                        effect);
+                    sprite.Draw(renderResult, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
+                    sprite.End();
+                }
+            }
+
+            if (switchFullscreenThisStep)
+            {
+                switchFullscreenThisStep = false;
+                switchFullScreen();
             }
         }
 
