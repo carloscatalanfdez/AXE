@@ -32,6 +32,8 @@ namespace AXE.Game.Entities
         public enum MovementState { Idle, Walk, Jump, Ladder, Death, Attacking, Attacked, Activate, Exit, Revive };
         public enum DeathState { None, Generic, Fall, ForceHit, Fire };
         public enum ActionState { None, Squid };
+        public enum BodyState { Standing, Crouching };
+
         public const int EXIT_ANIM_TIMER = 1;
         public const int ACTIVATION_TIME_TIMER = 3;
         public const int AXE_GRAB_TIMER = 4;
@@ -75,6 +77,7 @@ namespace AXE.Game.Entities
         public MovementState state;
         public ActionState action;
         public DeathState deathCause;
+        public BodyState bodyState;
 
         // Step variables
         public Vector2 stepInitialPosition;
@@ -143,6 +146,10 @@ namespace AXE.Game.Entities
             spgraphic.add(new bAnim("air-readyweapon", new int[] { 8, 19, 20, 20, 20 }, 0.6f, false));
             spgraphic.add(new bAnim("thrownweapon", new int[] { 18, 18 }, 0.2f, false));
             spgraphic.add(new bAnim("air-thrownweapon", new int[] { 18, 18 }, 0.2f, false));
+            spgraphic.add(new bAnim("crouch-idle", new int[] { 6 }));
+            spgraphic.add(new bAnim("crouch-walk", new int[] { 6, 7 }, 0.2f));
+            spgraphic.add(new bAnim("crouch-squid", new int[] { 6 }));
+
             spgraphic.add(new bAnim("exit", new int[] { 4 }));
             // Hotspot config for anim frames
             hotspotContainer = new HotspotContainer("Assets/SpriteConfs/knight-hotspots.cfg");
@@ -187,7 +194,7 @@ namespace AXE.Game.Entities
                 -(int)(graphicHeight()*0.25f));
         }
 
-        protected void initMask()
+        protected void initStandingMask()
         {
             _mask.w = 16;
             _mask.h = 24;
@@ -195,9 +202,17 @@ namespace AXE.Game.Entities
             _mask.offsety = 8;
         }
 
+        protected void initCrouchMask()
+        {
+            _mask.w = 16;
+            _mask.h = 17;
+            _mask.offsetx = 7;
+            _mask.offsety = 15;
+        }
+
         protected void initParameters()
         {
-            initMask();
+            initStandingMask();
 
             current_hspeed = 0;
             vspeed = 0f;
@@ -207,6 +222,7 @@ namespace AXE.Game.Entities
             state = MovementState.Idle;
             action = ActionState.None;
             deathCause = DeathState.None;
+            bodyState = BodyState.Standing;
             fallingFrom = Vector2.Zero;
             jumpMaxSpeed = 3.0f;
             axeToCatch = null;
@@ -355,6 +371,18 @@ namespace AXE.Game.Entities
                                         timer[EXIT_ANIM_TIMER] = exitAnimationWaitTime;
                                     }
                                 }
+                            }
+
+                            if (mginput.check(PadButton.down) && !toLadder)
+                            {
+                                if ((state == MovementState.Idle || state == MovementState.Walk) && bodyState != BodyState.Crouching)
+                                {
+                                    crouch();
+                                }
+                            }
+                            else if (bodyState != BodyState.Standing)
+                            {
+                                standUp();
                             }
                         }
                     }
@@ -568,6 +596,18 @@ namespace AXE.Game.Entities
 
         }
 
+        public void standUp()
+        {
+            bodyState = BodyState.Standing;
+            initStandingMask();
+        }
+
+        public void crouch()
+        {
+            bodyState = BodyState.Crouching;
+            initCrouchMask();
+        }
+
         public Vector2 moveToContactSafe(Vector2 targetPosition)
         {
             Vector2 remnant;
@@ -678,12 +718,38 @@ namespace AXE.Game.Entities
                 case MovementState.Walk:
                     spgraphic.color = Color.White;
                     if (state == MovementState.Idle)
-                        spgraphic.play("idle");
+                    {
+                        if (bodyState == BodyState.Crouching)
+                        {
+                            spgraphic.play("crouch-idle");
+                        }
+                        else
+                        {
+                            spgraphic.play("idle");
+                        }
+                    }
                     else if (state == MovementState.Walk)
-                        spgraphic.play("walk");
-
+                    {
+                        if (bodyState == BodyState.Crouching)
+                        {
+                            spgraphic.play("crouch-walk");
+                        }
+                        else
+                        {
+                            spgraphic.play("walk");
+                        }
+                    }
                     if (action == ActionState.Squid)
-                        spgraphic.play("squid");
+                    {
+                        if (bodyState == BodyState.Crouching)
+                        {
+                            spgraphic.play("crouch-squid");
+                        }
+                        else
+                        {
+                            spgraphic.play("squid");
+                        }
+                    }
 
                     if (facing == Dir.Right)
                         spgraphic.flipped = false;
@@ -735,18 +801,26 @@ namespace AXE.Game.Entities
 
         public void handleAcceleratedMovement(ref float _haccel, ref float _hspeed)
         {
+            float speed = _hspeed;
+            float accel = _haccel;
+            if (bodyState == BodyState.Crouching)
+            {
+                speed /= 2;
+                accel /= 2;
+            }
+
             if (mginput.check(PadButton.left))
             {
                 // Going right - squid
                 if (current_hspeed > 0)
                 {
                     action = ActionState.Squid;
-                    current_hspeed -= _haccel * 2;
+                    current_hspeed -= accel * 2;
                 }
                 else
                 {
                     action = ActionState.None;
-                    current_hspeed = Math.Max(current_hspeed - _haccel, -_hspeed);
+                    current_hspeed = Math.Max(current_hspeed - accel, -speed);
                 }
                 moveTo.X += current_hspeed;
                 facing = Dir.Left;
@@ -759,12 +833,12 @@ namespace AXE.Game.Entities
                 if (current_hspeed < 0)
                 {
                     action = ActionState.Squid;
-                    current_hspeed += _haccel * 2;
+                    current_hspeed += accel * 2;
                 }
                 else
                 {
                     action = ActionState.None;
-                    current_hspeed = Math.Min(current_hspeed + _haccel, _hspeed);
+                    current_hspeed = Math.Min(current_hspeed + accel, speed);
                 }
                 moveTo.X += current_hspeed;
                 facing = Dir.Right;
@@ -779,9 +853,9 @@ namespace AXE.Game.Entities
                 moveTo.X += current_hspeed;
 
                 // Decelerate
-                float temp_haccel = haccel;
+                float temp_haccel = accel;
                 if (isLanding)
-                    temp_haccel = 2 * haccel;
+                    temp_haccel = 2 * accel;
                 if (Math.Abs(current_hspeed) > temp_haccel)
                 {
                     if (current_hspeed > 0)
@@ -1219,7 +1293,7 @@ namespace AXE.Game.Entities
             data.alive = true;
             state = MovementState.Revive;
             // Place him on ground
-            initMask();
+            initStandingMask();
             // moveToContactSafe(new Vector2(x, (world as LevelScreen).height));
             while (!placeMeeting(x, y + 1, new string[] { "onewaysolid", "solid" }))
                 y++;
