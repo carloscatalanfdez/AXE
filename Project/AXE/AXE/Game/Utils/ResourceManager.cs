@@ -106,6 +106,9 @@ namespace AXE.Game.Utils
             // Tilesets
             tsetBasic       = loadTileset("basic");
 
+            // Backgrounds
+            bgTest          = loadBackground("bg");
+
             // Sfx
             sfxStepA        = loadSfx("sfx-step.1");
             sfxStepB        = loadSfx("sfx-step.2");
@@ -157,6 +160,9 @@ namespace AXE.Game.Utils
 
         // Tileset
         public Texture2D tsetBasic;
+
+        // Background
+        public Texture2D bgTest;
 
         // Sfx
         public SoundEffect sfxStepA;

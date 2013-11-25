@@ -158,5 +158,10 @@ namespace AXE.Game.Control
 
             return false;
         }
+
+        public bool canSwitchFullscreen()
+        {
+            return (game.world is TitleScreen);
+        }
     }
 }

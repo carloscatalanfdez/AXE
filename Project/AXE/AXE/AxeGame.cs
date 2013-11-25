@@ -60,7 +60,9 @@ namespace AXE
         protected override void LoadContent()
         {
             generateRenderTarget();
+
             base.LoadContent();
+
             res.loadContent();
 
             effect = res.effect;
@@ -75,16 +77,16 @@ namespace AXE
         protected override void UnloadContent()
         {
             base.UnloadContent();
-            /*renderResult.Dispose();
-            renderTarget.Dispose();*/
+            renderResult.Dispose();
+            renderTarget.Dispose();
         }
 
         protected override void Initialize()
         {
             // switchFullScreen();
             Controller.getInstance().setGame(this);
-            Controller.getInstance().onMenuStart();
-            /*changeWorld(new LogoScreen());*/
+            // Controller.getInstance().onMenuStart();
+            changeWorld(new LogoScreen());
             base.Initialize();
         }
 
@@ -145,20 +147,22 @@ namespace AXE
 
         void switchFullScreen()
         {
-            
-            int rw, rh;
-            if (graphics.IsFullScreen)
+            if (Controller.getInstance().canSwitchFullscreen())
             {
-                rw = width * (int)horizontalZoom;
-                rh = height * (int)verticalZoom;
-            }
-            else
-            {
-                rw = GraphicsDevice.DisplayMode.Width;
-                rh = GraphicsDevice.DisplayMode.Height;
-            }
+                int rw, rh;
+                if (graphics.IsFullScreen)
+                {
+                    rw = width * (int)horizontalZoom;
+                    rh = height * (int)verticalZoom;
+                }
+                else
+                {
+                    rw = GraphicsDevice.DisplayMode.Width;
+                    rh = GraphicsDevice.DisplayMode.Height;
+                }
 
-            Resolution.SetResolution(rw, rh, !graphics.IsFullScreen);
+                Resolution.SetResolution(rw, rh, !graphics.IsFullScreen);
+            }
         }
 
         protected override void Draw(GameTime gameTime)
@@ -201,14 +205,23 @@ namespace AXE
                 {
                     try
                     {
-                        // sprite.Begin();
+                        sprite.Begin();
+                        sprite.Draw(res.bgTest, new Rectangle(0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height), Color.Wheat);
+                        sprite.End();
                         sprite.Begin(SpriteSortMode.Deferred,
                             BlendState.AlphaBlend,
                             SamplerState.PointClamp,
                             null,
                             RasterizerState.CullCounterClockwise,
                             effect);
-                        sprite.Draw(renderResult, new Vector2(0, 0), null, Color.White, 0, new Vector2(0, 0), 1f, SpriteEffects.None, 1);
+                        Rectangle rect = new Rectangle(
+                            (int) ((graphics.PreferredBackBufferWidth / 2) - (width * horizontalZoom / 2)),
+                            (int) ((graphics.PreferredBackBufferHeight / 2) - (height * verticalZoom / 2)),
+                            (int) (width * horizontalZoom),
+                            (int) (height * verticalZoom));
+                        sprite.Draw(renderResult, new Vector2(rect.X, rect.Y), rect, 
+                            Color.White, 0, new Vector2(0, 0), 1f, 
+                            SpriteEffects.None, 1);
                         sprite.End();
                     }
                     catch (Exception e)

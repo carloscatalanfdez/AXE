@@ -9,6 +9,7 @@ using bEngine;
 using bEngine.Graphics;
 using AXE.Common;
 using AXE.Game.Control;
+using AXE.Game.Entities;
 
 namespace AXE.Game.Screens
 {
@@ -61,7 +62,6 @@ namespace AXE.Game.Screens
             base.render(dt, sb, matrix);
             sb.Draw(bDummyRect.sharedDummyRect(game), game.getViewRectangle(), Color.Black);
             sb.DrawString(game.gameFont, message, new Vector2(game.getWidth() / 2 - message.Length / 2 * 8, game.getHeight() / 4), Color.White);
-
 
             if (GameData.get().credits > 0)
             {
