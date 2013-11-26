@@ -43,6 +43,7 @@ namespace AXE.Game.Entities.Enemies
 
         Vector2 moveTo;
         bMask watchMask;
+        bMaskList watchWrappedMask;
 
         public State state;
         bool beginChase;
@@ -87,6 +88,13 @@ namespace AXE.Game.Entities.Enemies
             mask.offsety = 11;
 
             watchMask = new bMask(x, y, 90, 21);
+            watchMask.game = game;
+            bMask maskL = new bMask(0, 0, 0, 0);
+            maskL.game = game;
+            bMask maskR = new bMask(0, 0, 0, 0);
+            maskR.game = game;
+            watchWrappedMask = new bMaskList(new bMask[] { maskL, maskR }, 0, 0, false);
+            watchWrappedMask.game = game;
 
             hspeed = 0.2f;
             vspeed = 0f;
@@ -330,40 +338,17 @@ namespace AXE.Game.Entities.Enemies
             {
                 Dir facingDir = facing;
                 if (facingDir == Dir.Left)
-                    watchMask.offsetx = -watchMask.w;
+                    watchMask.offsetx = _mask.offsetx - watchMask.w;
                 else
-                    watchMask.offsetx = graphicWidth();
+                    watchMask.offsetx = _mask.offsetx + _mask.w;
                 watchMask.offsety = (graphicHeight() - watchMask.h);
 
-                // VERY IMPORTANT
-                // When holding the mask, we need to hold the original _mask, since
-                // mask itself is a property and will return a hacked wrapped mask sometimes
-                bMask holdMyMaskPlease = _mask;
-                mask = watchMask;
 
-                bEntity spottedEntity = instancePlace(x, y, "player", null, alivePlayerCondition);
-                mask = holdMyMaskPlease; // thank you!
-
-                if (spottedEntity != null)
+                if (isPlayerOnSight(facingDir, false, watchMask, watchWrappedMask))
                 {
-                    // Nothing stopping me from hitting you?
-                    Vector2 oldPos = pos;
-                    // Check with moveToContact, but move in steps of mask.h to improve performance (we don't need more accuracy anyways)
-                    float xDestination;
-                    if (spottedEntity.mask.x - mask.x > 0)
-                        xDestination = spottedEntity.mask.x - mask.w;
-                    else
-                        xDestination = spottedEntity.mask.x + mask.w;
-                    Vector2 remnantOneWay = moveToContact(new Vector2(xDestination, mask.y), new String[] { "solid" }, new Vector2(mask.w, 1));
-                    // Restore values
-                    pos = oldPos;
-                    if (remnantOneWay.X == 0)
-                    {
-                        // Yeah, let's go
-                        facing = facingDir;
-                        changeState(State.Chase);
-                    }
-
+                    // Yeah, let's go
+                    facing = facingDir;
+                    changeState(State.Chase);
                 }
             }
             else if (state == State.Chase)
@@ -443,6 +428,9 @@ namespace AXE.Game.Entities.Enemies
         public override void render(GameTime dt, SpriteBatch sb)
         {
             base.render(dt, sb);
+
+            bMask result = generateWrappedMask(watchMask, watchWrappedMask);
+            result.render(sb);
 
             spgraphic.color = color;
             spgraphic.render(sb, pos);

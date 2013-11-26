@@ -392,7 +392,7 @@ namespace AXE.Game.Entities
 
                 if (clippedSize > 0)
                 {
-                    int oppositeMaskSize = Math.Min(clippedSize, _mask.h);
+                    int oppositeMaskSize = Math.Min(clippedSize, _mask.w);
 
                     bMask oppositeMask = _wrappedMask.masks[0];
                     bMask currentClippedMask = _wrappedMask.masks[1];
@@ -448,41 +448,99 @@ namespace AXE.Game.Entities
 
         protected bMask generateWrappedMask(bMask target)
         {
+            return generateWrappedMask(target, null);
+        }
+
+        /**
+         * Generates a wrapped mask using the given vars
+         * If wrappedMaskTarget is null, it will be created and returned.
+         * If not, it will be used and return too (why not)
+         */
+        protected bMask generateWrappedMask(bMask target, bMaskList wrappedMaskTarget)
+        {
+            target.update(x, y);
+
             int maskX = target.x - target.offsetx;
             int maskY = target.y - target.offsety;
 
-            bMask wrappedMask = null;
-            if (showWrapEffect == Dir.Left)
+            Dir localMaskEffect;
+            if (target.x < 0)
+            {
+                localMaskEffect = Dir.Right;
+            }
+            else if (target.x + target.w > (world as LevelScreen).width)
+            {
+                localMaskEffect = Dir.Left;
+            }
+            else
+            {
+                localMaskEffect = Dir.None;
+            }
+
+            bMaskList resultWrappedMask = null;
+            if (localMaskEffect == Dir.Left)
             {
                 int clippedSize = target.x + target.w - (world as LevelScreen).width;
 
                 if (clippedSize > 0)
                 {
-                    int oppositeMaskSize = Math.Min(clippedSize, target.h);
+                    int oppositeMaskSize = Math.Min(clippedSize, target.w);
 
+                    // Opposite mask
                     // Mask on the other side will have increasing width as we wrap
                     // Starts at the beginning of the screen (taking into account mask offset)
-                    bMask oppositeMask = new bMask(
-                        maskX, 
-                        maskY, 
-                        oppositeMaskSize,
-                        target.h,
-                        -(world as LevelScreen).width + target.offsetx + target.w - oppositeMaskSize,
-                        target.offsety);
-
+                    int oppositeW = oppositeMaskSize;
+                    int oppositeH = target.h;
+                    int oppositeXOffset = -(world as LevelScreen).width + target.offsetx + target.w - oppositeMaskSize;
+                    int oppositeYOffset = target.offsety;
+                    // Current mask
                     // Mask on current side will have decreasing width as we wrap
-                    bMask currentMask = new bMask(
-                        maskX,
-                        maskY,
-                        target.w - clippedSize,
-                        target.h,
-                        target.offsetx,
-                        target.offsety);
+                    int currentW = target.w - clippedSize;
+                    int currentH = target.h;
+                    int currentXOffset = target.offsetx;
+                    int currentYOffset = target.offsety;
 
-                    wrappedMask = new bMaskList(new bMask[] { oppositeMask, currentMask }, maskX, maskY, false);
+                    if (wrappedMaskTarget == null)
+                    {
+                        bMask oppositeMask = new bMask(
+                            maskX,
+                            maskY,
+                            oppositeW,
+                            oppositeH,
+                            oppositeXOffset,
+                            oppositeYOffset);
+
+                        bMask currentMask = new bMask(
+                            maskX,
+                            maskY,
+                            currentW,
+                            currentH,
+                            currentXOffset,
+                            currentYOffset);
+
+                        resultWrappedMask = new bMaskList(new bMask[] { oppositeMask, currentMask }, maskX, maskY, false);
+                    }
+                    else
+                    {
+                        resultWrappedMask = wrappedMaskTarget;
+                        bMask oppositeMask = resultWrappedMask.masks[0];
+                        bMask currentClippedMask = resultWrappedMask.masks[1];
+
+                        oppositeMask.w = oppositeW;
+                        oppositeMask.h = oppositeH;
+                        oppositeMask.offsetx = oppositeXOffset;
+                        oppositeMask.offsety = oppositeYOffset;
+
+                        currentClippedMask.w = currentW;
+                        currentClippedMask.h = currentH;
+                        currentClippedMask.offsetx = currentXOffset;
+                        currentClippedMask.offsety = currentYOffset;
+
+                        resultWrappedMask.update(x, y);
+                    }
                 }
             }
-            else if (showWrapEffect == Dir.Right)
+            else if (localMaskEffect == Dir.Right)
             {
                 int clippedOffset = -target.x;
 
@@ -491,33 +549,65 @@ namespace AXE.Game.Entities
                     int currentMaskOffset = target.x >= 0 ? 0 : target.offsetx;
                     int oppositeMaskSize = Math.Min(clippedOffset, target.w);
 
+                    // Opposite mask
                     // Mask on the other side will have increasing width as we wrap
-                    // Starts at the end of the screen (taking into account mask offset)
-                    bMask oppositeMask = new bMask(
-                        maskX,
-                        maskY,
-                        oppositeMaskSize,
-                        target.h,
-                        target.offsetx + (world as LevelScreen).width,
-                        target.offsety);
-
+                    // Starts at the beginning of the screen (taking into account mask offset)
+                    int oppositeW = oppositeMaskSize;
+                    int oppositeH = target.h;
+                    int oppositeXOffset = target.offsetx + (world as LevelScreen).width;
+                    int oppositeYOffset = target.offsety;
+                    // Current mask
                     // Mask on current side will have decreasing width as we wrap
-                    bMask currentMask = new bMask(
-                        maskX,
-                        maskY,
-                        target.w - clippedOffset,
-                        target.h,
-                        clippedOffset + target.offsetx,
-                        target.offsety);
+                    int currentW = target.w - clippedOffset;
+                    int currentH = target.h;
+                    int currentXOffset = clippedOffset + target.offsetx;
+                    int currentYOffset = target.offsety;
 
-                    wrappedMask = new bMaskList(new bMask[] { oppositeMask, currentMask }, maskX, maskY, false);
+                    if (wrappedMaskTarget == null)
+                    {
+                        bMask oppositeMask = new bMask(
+                            maskX,
+                            maskY,
+                            oppositeW,
+                            oppositeH,
+                            oppositeXOffset,
+                            oppositeYOffset);
+
+                        bMask currentMask = new bMask(
+                            maskX,
+                            maskY,
+                            currentW,
+                            currentH,
+                            currentXOffset,
+                            currentYOffset);
+
+                        resultWrappedMask = new bMaskList(new bMask[] { oppositeMask, currentMask }, maskX, maskY, false);
+                    }
+                    else
+                    {
+                        resultWrappedMask = wrappedMaskTarget;
+                        bMask oppositeMask = resultWrappedMask.masks[0];
+                        bMask currentClippedMask = resultWrappedMask.masks[1];
+
+                        oppositeMask.w = oppositeW;
+                        oppositeMask.h = oppositeH;
+                        oppositeMask.offsetx = oppositeXOffset;
+                        oppositeMask.offsety = oppositeYOffset;
+
+                        currentClippedMask.w = currentW;
+                        currentClippedMask.h = currentH;
+                        currentClippedMask.offsetx = currentXOffset;
+                        currentClippedMask.offsety = currentYOffset;
+
+                        resultWrappedMask.update(x, y);
+                    }
                 }
             }
 
-            if (wrappedMask == null)
+            if (resultWrappedMask == null)
                 return target;
             else
-                return wrappedMask;
+                return resultWrappedMask;
         }
 
         // Returns wether the hit was successful or not
