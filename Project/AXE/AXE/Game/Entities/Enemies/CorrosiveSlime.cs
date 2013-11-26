@@ -31,6 +31,8 @@ namespace AXE.Game.Entities.Enemies
 
         Vector2 moveTo;
         bMask dropWatchMask;
+        bMaskList dropWrappedWatchMask;
+
         bMask hideWatchMask;
 
         public State state;
@@ -64,6 +66,13 @@ namespace AXE.Game.Entities.Enemies
             loadTopMask();
 
             dropWatchMask = new bMask(x, y, 20, (world as LevelScreen).height);
+            bMask maskL = new bMask(0, 0, 0, 0);
+            maskL.game = game;
+            bMask maskR = new bMask(0, 0, 0, 0);
+            maskR.game = game;
+            dropWrappedWatchMask = new bMaskList(new bMask[] { maskL, maskR }, 0, 0, false);
+            dropWrappedWatchMask.game = game;
+
             hideWatchMask = new bMask(x, y, (world as LevelScreen).width / 4, 10);
 
             hspeed = 1;
@@ -300,30 +309,10 @@ namespace AXE.Game.Entities.Enemies
 
             if (state == State.IdleTop || state == State.WalkTop || state == State.MoveToHide)
             {
-                // VERY IMPORTANT
-                // When holding the mask, we need to hold the original _mask, since
-                // mask itself is a property and will return a hacked wrapped mask sometimes
-                bMask holdMyMaskPlease = _mask;
-                mask = dropWatchMask;
-
-                bEntity spottedEntity = instancePlace(x, y, "player", null, alivePlayerCondition);
-                mask = holdMyMaskPlease; // thank you!
-
-                if (spottedEntity != null)
+                if (isPlayerOnSight(Dir.None, true, new String[] { "onewaysolid", "solid" }, dropWatchMask, dropWrappedWatchMask))
                 {
-                    // Nothing stopping me (with my fall mask) from hitting you?
-                    Vector2 oldPos = pos;
-                    loadFallMask();
-                    // Check with moveToContact, but move in steps of mask.h to improve performance (we don't need more accuracy anyways)
-                    Vector2 remnantOneWay = moveToContact(new Vector2(mask.x, spottedEntity.mask.y - mask.h), new String[] { "onewaysolid", "solid" }, new Vector2(1, mask.h));
-                    // Restore values
-                    pos = oldPos;
-                    loadTopMask();
-                    if (remnantOneWay.Y == 0)
-                    {
-                        // Yeah, let's go
-                        changeState(State.PrepareFall);
-                    }
+                    // Yeah, let's go
+                    changeState(State.PrepareFall);
                 }
             }
 

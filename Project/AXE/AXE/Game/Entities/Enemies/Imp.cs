@@ -43,6 +43,7 @@ namespace AXE.Game.Entities.Enemies
 
         Vector2 moveTo;
         bMask watchMask;
+        bMaskList watchWrappedMask;
 
         public State state;
         bool beginChase;
@@ -94,6 +95,12 @@ namespace AXE.Game.Entities.Enemies
             mask.offsety = 11;
 
             watchMask = new bMask(x, y, 90, 24);
+            bMask maskL = new bMask(0, 0, 0, 0);
+            maskL.game = game;
+            bMask maskR = new bMask(0, 0, 0, 0);
+            maskR.game = game;
+            watchWrappedMask = new bMaskList(new bMask[] { maskL, maskR }, 0, 0, false);
+            watchWrappedMask.game = game;
 
             hspeed = 1;
             vspeed = 0f;
@@ -377,21 +384,12 @@ namespace AXE.Game.Entities.Enemies
                     if (facingDir == Dir.Left) facingDir = Dir.Right;
                     else facingDir = Dir.Left;
                 if (facingDir == Dir.Left)
-                    watchMask.offsetx = -watchMask.w;
+                    watchMask.offsetx = _mask.offsetx -watchMask.w;
                 else
-                    watchMask.offsetx = graphicWidth();
+                    watchMask.offsetx = _mask.offsetx + _mask.w;
                 watchMask.offsety = (graphicHeight() - watchMask.h);
 
-                // VERY IMPORTANT
-                // When holding the mask, we need to hold the original _mask, since
-                // mask itself is a property and will return a hacked wrapped mask sometimes
-                bMask holdMyMaskPlease = _mask;
-                mask = watchMask;
-
-                bool sawYou = placeMeeting(x, y, "player", alivePlayerCondition);
-                mask = holdMyMaskPlease; // thank you!
-
-                if (sawYou)
+                if (isPlayerOnSight(facingDir, false, new String[] { "solid" }, watchMask, watchWrappedMask))
                 {
                     facing = facingDir;
                     changeState(State.Chase);

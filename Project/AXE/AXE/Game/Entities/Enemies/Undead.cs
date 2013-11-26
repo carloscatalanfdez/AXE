@@ -344,7 +344,7 @@ namespace AXE.Game.Entities.Enemies
                 watchMask.offsety = (graphicHeight() - watchMask.h);
 
 
-                if (isPlayerOnSight(facingDir, false, watchMask, watchWrappedMask))
+                if (isPlayerOnSight(facingDir, false, new String[] { "solid" }, watchMask, watchWrappedMask))
                 {
                     // Yeah, let's go
                     facing = facingDir;

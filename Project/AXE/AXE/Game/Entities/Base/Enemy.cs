@@ -35,9 +35,9 @@ namespace AXE.Game.Entities.Base
                 return false;
         }
 
-        protected bool isPlayerOnSightbMask(Dir dir, bool vertical, bMask watchMask)
+        protected bool isPlayerOnSight(Dir dir, bool vertical, String []categories, bMask watchMask)
         {
-            return isPlayerOnSight(dir, vertical, watchMask, null);
+            return isPlayerOnSight(dir, vertical, categories, watchMask, null);
         }
 
         /**
@@ -49,7 +49,7 @@ namespace AXE.Game.Entities.Base
          * when vertical we suppose it's be up-down.
          * If vertical is true, vertical movement is considered
          */
-        protected bool isPlayerOnSight(Dir dir, bool vertical, bMask watchMask, bMaskList usingThisVarToWrap)
+        protected bool isPlayerOnSight(Dir dir, bool vertical, String []categories, bMask watchMask, bMaskList usingThisVarToWrap)
         {
             // VERY IMPORTANT
             // When holding the mask, we need to hold the original _mask, since
@@ -72,9 +72,9 @@ namespace AXE.Game.Entities.Base
                 {
                     xDestination = mask.x;
                     if (spottedEntity.mask.y - mask.y > 0)
-                        yDestination = spottedEntity.mask.y - mask.w;
+                        yDestination = spottedEntity.mask.y - mask.h;
                     else
-                        yDestination = spottedEntity.mask.y + mask.w;
+                        yDestination = spottedEntity.mask.y + mask.h;
                 }
                 else
                 {
@@ -100,13 +100,17 @@ namespace AXE.Game.Entities.Base
                 }
 
 
-                Vector2 remnantOneWay = moveToContact(new Vector2(xDestination, yDestination), new String[] { "solid" }, new Vector2(mask.w, 1));
+                Vector2 remnantOneWay = moveToContact(new Vector2(xDestination, yDestination), categories, new Vector2(1, mask.h));
                 // Restore values
                 pos = oldPos;
-                if (remnantOneWay.X == 0)
+                if (vertical)
+                {
+                    return remnantOneWay.Y == 0;
+                }
+                else
                 {
                     // Yeah, let's go
-                    return true;
+                    return remnantOneWay.X == 0;
                 }
 
             }
