@@ -23,7 +23,7 @@ namespace AXE.Game.Entities.Enemies
 {
     class Undead : Enemy, IHazardProvider
     {
-        public enum State { None, Idle, Turn, Walk, Chase, Attacking, Attacked, Falling, Dead }
+        public enum State { None, Idle, Turn, Walk, Fall, StandUp, Chase, Attacking, Attacked, Falling, Dead }
         const int CHANGE_STATE_TIMER = 0;
         const int CHASE_REACTION_TIMER = 1;
         const int DEAD_ANIM_TIMER = 2;
@@ -59,6 +59,10 @@ namespace AXE.Game.Entities.Enemies
         int idleBaseTime, idleOptionalTime;
         int walkBaseTime, walkOptionalTime;
         int turnBaseTime, turnOptionalTime;
+        int fallBaseTime, fallOptionalTime;
+        int standUpBaseTime, standUpOptionalTime;
+
+        int fallChance = 5;
 
         int deathAnimDuration;
 
@@ -78,6 +82,8 @@ namespace AXE.Game.Entities.Enemies
             spgraphic.add(new bAnim("chase", new int[] { 8, 9, 10, 11 }, 0.1f));
             spgraphic.add(new bAnim("attack", new int[] { 12, 13, 14 }, 0.3f, false));
             spgraphic.add(new bAnim("attacked", new int[] { 15 }));
+            spgraphic.add(new bAnim("fall", new int[] { 5, 6 }, 0.4f, false));
+            spgraphic.add(new bAnim("stand-up", new int[] { 7 }));
             spgraphic.add(new bAnim("jump", new int[] { 16 }));
             spgraphic.add(new bAnim("death", new int[] { 16 }));
             spgraphic.play("idle");
@@ -108,6 +114,11 @@ namespace AXE.Game.Entities.Enemies
             deathAnimDuration = 50;
             turnBaseTime = 20;
             turnOptionalTime = 20;
+
+            fallBaseTime = 50;
+            fallOptionalTime = 50;
+            standUpBaseTime = 30;
+            standUpOptionalTime = 30;
 
             if (Tools.random.Next(2) < 1)
                 facing = Dir.Right;
@@ -142,6 +153,12 @@ namespace AXE.Game.Entities.Enemies
                         break;
                     case State.Turn:
                         timer[0] = turnBaseTime + Tools.random.Next(turnOptionalTime) - turnOptionalTime;
+                        break;
+                    case State.Fall:
+                        timer[0] = fallBaseTime + Tools.random.Next(fallOptionalTime) - fallOptionalTime;
+                        break;
+                    case State.StandUp:
+                        timer[0] = standUpBaseTime + Tools.random.Next(standUpOptionalTime) - standUpOptionalTime;
                         break;
                     case State.Chase:
                         beginChase = false;
@@ -197,6 +214,12 @@ namespace AXE.Game.Entities.Enemies
                             break;
                         case State.Turn:
                             turn();
+                            changeState(State.Idle);
+                            break;
+                        case State.Fall:
+                            changeState(State.StandUp);
+                            break;
+                        case State.StandUp:
                             changeState(State.Idle);
                             break;
                         case State.Chase:
@@ -293,23 +316,47 @@ namespace AXE.Game.Entities.Enemies
                     spgraphic.play("jump");
 
                     break;
+                case State.Fall:
+                    spgraphic.play("fall");
+                    break;
+                case State.StandUp:
+                    spgraphic.play("stand-up");
+                    break;
                 case State.Chase:
                     if (beginChase)
                     {
                         spgraphic.play("chase");
 
-                        float hsp = hspeed;
-                        nextPosition = new Vector2(x + directionToSign(facing) * hsp, y);
-                        wontFall = checkForGround(
-                                (int)(nextPosition.X + directionToSign(facing) * graphicWidth() / 2),
-                                (int)nextPosition.Y);
-                        wontCollide = !placeMeeting(
-                                (int)nextPosition.X,
-                                (int)nextPosition.Y, new String[] { "player", "solid" });
-                        if (wontFall && wontCollide)
-                            moveTo.X += directionToSign(facing) * hsp;
-                        else if (!wontFall || !wontCollide)
+                        // Should I keep trying?
+                        bool shouldKeepChasing = true;
+                        if (Tools.random.Next(30) < 1)
+                        {
+                            if (!isPlayerOnSight(facing, false, new String[] { "solid" }, watchMask, watchWrappedMask))
+                            {
+   
+                                shouldKeepChasing = false;
+                            }
+                        }
+
+                        if (shouldKeepChasing)
+                        {
+                            float hsp = hspeed;
+                            nextPosition = new Vector2(x + directionToSign(facing) * hsp, y);
+                            wontFall = checkForGround(
+                                    (int)(nextPosition.X + directionToSign(facing) * graphicWidth() / 2),
+                                    (int)nextPosition.Y);
+                            wontCollide = !placeMeeting(
+                                    (int)nextPosition.X,
+                                    (int)nextPosition.Y, new String[] { "player", "solid" });
+                            if (wontFall && wontCollide)
+                                moveTo.X += directionToSign(facing) * hsp;
+                            else if (!wontFall || !wontCollide)
+                                changeState(State.Idle);
+                        }
+                        else
+                        {
                             changeState(State.Idle);
+                        }
                     }
                     else
                     {
@@ -416,6 +463,15 @@ namespace AXE.Game.Entities.Enemies
                 }
             }
 
+            if (state == State.Chase || state == State.Walk)
+            {
+                int chance = state == State.Chase ? fallChance * 5 : fallChance;
+                if (Tools.random.Next(5000) < chance)
+                {
+                    changeState(State.Fall);
+                }
+            }
+
             spgraphic.flipped = (facing == Dir.Left);
 
             handleSoundEffects();
@@ -429,8 +485,11 @@ namespace AXE.Game.Entities.Enemies
         {
             base.render(dt, sb);
 
-            bMask result = generateWrappedMask(watchMask, watchWrappedMask);
-            result.render(sb);
+            if (bConfig.DEBUG)
+            {
+                bMask result = generateWrappedMask(watchMask, watchWrappedMask);
+                result.render(sb);
+            }
 
             spgraphic.color = color;
             spgraphic.render(sb, pos);

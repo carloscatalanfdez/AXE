@@ -339,18 +339,36 @@ namespace AXE.Game.Entities.Enemies
                         else
                             spgraphic.play("chase-running");
 
-                        int hsp = (int)(hspeed * 2 * (state == State.ChaseRunning ? 1.5 : 1));
-                        nextPosition = new Vector2(x + directionToSign(facing) * hsp, y);
-                        wontFall = checkForGround(
-                                (int)(nextPosition.X + directionToSign(facing) * graphicWidth() / 2),
-                                (int)nextPosition.Y);
-                        wontCollide = !placeMeeting(
-                                (int)nextPosition.X,
-                                (int)nextPosition.Y, new String[] { "player", "solid" });
-                        if (wontFall && wontCollide)
-                            moveTo.X += directionToSign(facing) * hsp;
-                        else if (!wontFall || !wontCollide)
+                        // Should I keep trying?
+                        bool shouldKeepChasing = true;
+                        if (Tools.random.Next(30) < 1)
+                        {
+                            if (!isPlayerOnSight(facing, false, new String[] { "solid" }, watchMask, watchWrappedMask))
+                            {
+
+                                shouldKeepChasing = false;
+                            }
+                        }
+
+                        if (shouldKeepChasing)
+                        {
+                            int hsp = (int)(hspeed * 2 * (state == State.ChaseRunning ? 1.5 : 1));
+                            nextPosition = new Vector2(x + directionToSign(facing) * hsp, y);
+                            wontFall = checkForGround(
+                                    (int)(nextPosition.X + directionToSign(facing) * graphicWidth() / 2),
+                                    (int)nextPosition.Y);
+                            wontCollide = !placeMeeting(
+                                    (int)nextPosition.X,
+                                    (int)nextPosition.Y, new String[] { "player", "solid" });
+                            if (wontFall && wontCollide)
+                                moveTo.X += directionToSign(facing) * hsp;
+                            else if (!wontFall || !wontCollide)
+                                changeState(State.Idle);
+                        }
+                        else
+                        {
                             changeState(State.Idle);
+                        }
                     }
                     else
                     {
