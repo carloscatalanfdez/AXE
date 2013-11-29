@@ -23,10 +23,11 @@ namespace AXE.Game.Entities.Enemies
 {
     class Dagger : Enemy, IHazardProvider
     {
-        public enum State { None, Idle, Turn, Walk, Chase, Attacking, Attacked, Falling, Dead }
+        public enum State { None, Idle, Turn, Walk, Jump, Attacking, Attacked, Throw, Falling, Dead }
         const int CHANGE_STATE_TIMER = 0;
-        const int CHASE_REACTION_TIMER = 1;
-        const int DEAD_ANIM_TIMER = 2;
+        const int THROW_REACTION_TIMER = 1;
+        const int THROW_COOLDOWN_TIMER = 2;
+        const int DEAD_ANIM_TIMER = 3;
 
         public bSpritemap spgraphic
         {
@@ -47,7 +48,7 @@ namespace AXE.Game.Entities.Enemies
 
         public State state;
         bool beginChase;
-        int chaseReactionTime;
+        int throwReactionTime;
 
         int attackThreshold;
         int attackChargeTime;
@@ -59,6 +60,10 @@ namespace AXE.Game.Entities.Enemies
         int idleBaseTime, idleOptionalTime;
         int walkBaseTime, walkOptionalTime;
         int turnBaseTime, turnOptionalTime;
+
+        bool isTrackingPlayer;
+        bool canThrow;
+        int throwCoolTime;
 
         int deathAnimDuration;
 
@@ -74,18 +79,15 @@ namespace AXE.Game.Entities.Enemies
             spgraphic = new bSpritemap((game as AxeGame).res.sprDaggerSheet, 30, 32);
             spgraphic.add(new bAnim("idle", new int[] { 0 }));
             spgraphic.add(new bAnim("walk", new int[] { 0, 1, 2, 1 }, 0.3f));
-            spgraphic.add(new bAnim("chase-reacting", new int[] { 1 }));
-            spgraphic.add(new bAnim("chase", new int[] { 0, 1, 2, 1 }, 0.4f));
+            spgraphic.add(new bAnim("seen-reacting", new int[] { 1 }));
+            spgraphic.add(new bAnim("throw", new int[] { 0, 1 }, 0.4f, false));
             spgraphic.add(new bAnim("attack", new int[] { 1 }, 0.3f, false));
             spgraphic.add(new bAnim("attacked", new int[] { 1 }));
             spgraphic.add(new bAnim("jump", new int[] { 1 }));
             spgraphic.add(new bAnim("death", new int[] { 1 }));
             spgraphic.play("idle");
 
-            mask.w = 16;
-            mask.h = 21;
-            mask.offsetx = 7;
-            mask.offsety = 11;
+            loadNormalMask();
 
             watchMask = new bMask(x, y, 90, 21);
             watchMask.game = game;
@@ -109,13 +111,17 @@ namespace AXE.Game.Entities.Enemies
             turnBaseTime = 20;
             turnOptionalTime = 20;
 
+            isTrackingPlayer = false;
+            canThrow = true;
+            throwCoolTime = 40;
+
             if (Tools.random.Next(2) < 1)
                 facing = Dir.Right;
             else
                 facing = Dir.Left;
 
             beginChase = false;
-            chaseReactionTime = 15;
+            throwReactionTime = 5;
 
             attackThreshold = 16;
             attackChargeTime = 10;
@@ -143,9 +149,8 @@ namespace AXE.Game.Entities.Enemies
                     case State.Turn:
                         timer[0] = turnBaseTime + Tools.random.Next(turnOptionalTime) - turnOptionalTime;
                         break;
-                    case State.Chase:
-                        beginChase = false;
-                        timer[1] = chaseReactionTime;
+                    case State.Throw:
+                        spgraphic.play("throw");
                         break;
                     case State.Attacking:
                         timer[0] = attackChargeTime;
@@ -199,8 +204,6 @@ namespace AXE.Game.Entities.Enemies
                             turn();
                             changeState(State.Idle);
                             break;
-                        case State.Chase:
-                            break;
                         case State.Attacking:
                             changeState(State.Attacked);
                             // Sound!
@@ -216,9 +219,12 @@ namespace AXE.Game.Entities.Enemies
                             break;
                     }
                     break;
-                case CHASE_REACTION_TIMER:
-                    if (state == State.Chase)
-                        beginChase = true;
+                case THROW_REACTION_TIMER:
+                    if (state != State.Throw)
+                        changeState(State.Throw);
+                    break;
+                case THROW_COOLDOWN_TIMER:
+                    canThrow = true;
                     break;
                 case DEAD_ANIM_TIMER:
                     break;
@@ -239,6 +245,19 @@ namespace AXE.Game.Entities.Enemies
                 state = State.Falling;
                 fallingFrom = pos;
                 fallingToDeath = false;
+            }
+            if (onAir)
+            {
+                if (vspeed < 0)
+                {
+                    state = State.Jump;
+                }
+                else
+                {
+                    state = State.Falling;
+                    fallingToDeath = false;
+                    fallingFrom = pos;
+                }
             }
 
             switch (state)
@@ -293,46 +312,11 @@ namespace AXE.Game.Entities.Enemies
                     spgraphic.play("jump");
 
                     break;
-                case State.Chase:
-                    if (beginChase)
+                case State.Throw:
+                    if (spgraphic.currentAnim.finished)
                     {
-                        spgraphic.play("chase");
-
-                        // Should I keep trying?
-                        bool shouldKeepChasing = true;
-                        if (Tools.random.Next(30) < 1)
-                        {
-                            if (!isPlayerOnSight(facing, false, new String[] { "solid" }, watchMask, watchWrappedMask))
-                            {
-   
-                                shouldKeepChasing = false;
-                            }
-                        }
-
-                        if (shouldKeepChasing)
-                        {
-                            float hsp = hspeed;
-                            nextPosition = new Vector2(x + directionToSign(facing) * hsp, y);
-                            wontFall = checkForGround(
-                                    (int)(nextPosition.X + directionToSign(facing) * graphicWidth() / 2),
-                                    (int)nextPosition.Y);
-                            wontCollide = !placeMeeting(
-                                    (int)nextPosition.X,
-                                    (int)nextPosition.Y, new String[] { "player", "solid" });
-                            if (wontFall && wontCollide)
-                                moveTo.X += directionToSign(facing) * hsp;
-                            else if (!wontFall || !wontCollide)
-                                changeState(State.Idle);
-                        }
-                        else
-                        {
-                            changeState(State.Idle);
-                        }
-                    }
-                    else
-                    {
-                        if (state == State.Chase)
-                            spgraphic.play("chase-reacting");
+                        throwDagger();
+                        changeState(State.Idle);
                     }
                     break;
                 case State.Attacking:
@@ -352,7 +336,7 @@ namespace AXE.Game.Entities.Enemies
                     break;
             }
 
-            if (state == State.Idle || state == State.Walk)
+            if (canThrow && (state == State.Idle || state == State.Walk || state == State.Jump || state == State.Falling))
             {
                 Dir facingDir = facing;
                 if (facingDir == Dir.Left)
@@ -361,27 +345,28 @@ namespace AXE.Game.Entities.Enemies
                     watchMask.offsetx = _mask.offsetx + _mask.w;
                 watchMask.offsety = (graphicHeight() - watchMask.h);
 
+                loadThrowMask();
+                bool canIseeYou = isPlayerOnSight(facingDir, false, new String[] { "solid" }, watchMask, watchWrappedMask);
+                loadNormalMask();
 
-                if (isPlayerOnSight(facingDir, false, new String[] { "solid" }, watchMask, watchWrappedMask))
+                if (canIseeYou)
                 {
-                    // Yeah, let's go
-                    facing = facingDir;
-                    changeState(State.Chase);
-                }
-            }
-            else if (state == State.Chase)
-            {
-                Player[] players = (world as LevelScreen).players;
-                foreach (Player player in players)
-                {
-                    if (player != null && player.state != Player.MovementState.Death && (player.pos - pos).Length() < attackThreshold)
+                    canThrow = false;
+                    if (isTrackingPlayer)
                     {
-                        changeState(State.Attacking);
+                        isTrackingPlayer = false;
+                        changeState(State.Throw);
+                    }
+                    else
+                    {
+                        // Yeah, let's go
+                        facing = facingDir;
+                        timer[THROW_REACTION_TIMER] = throwReactionTime;
                     }
                 }
             }
 
-            if (state == State.Walk || state == State.Chase || state == State.Falling)
+            if (state == State.Walk || state == State.Jump || state == State.Falling)
             {
                 int currentX = (int)Math.Round(pos.X);
                 int nextX = (int)Math.Round(moveTo.X);
@@ -415,10 +400,6 @@ namespace AXE.Game.Entities.Enemies
                     // We have been stopped
                     if (remnant.X != 0)
                     {
-                        if (state == State.Chase)
-                        {
-                            changeState(State.Turn);
-                        }
                     }
 
                     // The y movement was stopped
@@ -450,7 +431,7 @@ namespace AXE.Game.Entities.Enemies
             if (bConfig.DEBUG)
             {
                 bMask result = generateWrappedMask(watchMask, watchWrappedMask);
-                result.render(sb);
+                //result.render(sb);
             }
 
             spgraphic.color = color;
@@ -468,6 +449,22 @@ namespace AXE.Game.Entities.Enemies
         public override int graphicHeight()
         {
             return spgraphic.height;
+        }
+
+        public void loadNormalMask()
+        {
+            _mask.w = 16;
+            _mask.h = 21;
+            _mask.offsetx = 7;
+            _mask.offsety = 11;
+        }
+
+        public void loadThrowMask()
+        {
+            _mask.w = 16;
+            _mask.h = 4;
+            _mask.offsetx = 7;
+            _mask.offsety = 15;
         }
 
         public void handleSoundEffects()
@@ -505,6 +502,18 @@ namespace AXE.Game.Entities.Enemies
             }
 
             return false;
+        }
+        
+        public void throwDagger()
+        {
+            // spawn dagger
+            int spawnX = facing == Dir.Left ? 0 : _mask.offsetx + _mask.w;
+            FlameSpiritBullet bullet =
+                new FlameSpiritBullet(x + spawnX, y + 15, spgraphic.flipped);
+            bullet.setOwner(this);
+            world.add(bullet, "hazard");
+
+            timer[THROW_COOLDOWN_TIMER] = throwCoolTime;
         }
 
         /**
