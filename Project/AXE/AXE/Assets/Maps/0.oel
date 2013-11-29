@@ -80,5 +80,6 @@
     <Undead id="9" x="176" y="40" />
     <Undead id="10" x="112" y="96" />
     <Undead id="11" x="256" y="128" />
+    <Dagger id="16" x="160" y="208" />
   </Entities>
 </level>

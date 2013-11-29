@@ -102,6 +102,7 @@ namespace AXE.Game.Utils
                             = loadSprite("flamewrath-bullet-sheet");
             sprImpSheet     = loadSprite("imp-sheet");
             sprZombieSheet  = loadSprite("zombie-sheet");
+            sprDaggerSheet = loadSprite("dagger-sheet");
 
             // Tilesets
             tsetBasic       = loadTileset("basic");
@@ -157,6 +158,7 @@ namespace AXE.Game.Utils
         public Texture2D sprFlameBulletSheet;
         public Texture2D sprImpSheet;
         public Texture2D sprZombieSheet;
+        public Texture2D sprDaggerSheet;
 
         // Tileset
         public Texture2D tsetBasic;
