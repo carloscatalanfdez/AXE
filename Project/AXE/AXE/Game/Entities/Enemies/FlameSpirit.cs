@@ -45,6 +45,8 @@ namespace AXE.Game.Entities.Enemies
         Entity target;
         bool willAttack;
 
+        int oscillation;
+
         // Debug
         // string label;
         bMask targettingMask;
@@ -94,6 +96,7 @@ namespace AXE.Game.Entities.Enemies
             mask.offsety = 8;
 
             speed = 3;
+            oscillation = 0;
         }
 
         protected void initParameters()
@@ -200,11 +203,17 @@ namespace AXE.Game.Entities.Enemies
                         state = State.Float;
                         setTimer(DECISION_TIMER, waitToStartMovingTime);
                     }
+
                     break;
                 case State.Float:
                     // Show yourself!
                     smgraphic.play("float");
                     fgraphic.play("idle");
+
+                    // Oscillation
+                    float yOscillation = (float) (Math.Sin(0.1 * oscillation));
+                    oscillation++;
+                    moveTo.Y += vspeed + yOscillation;
 
                     if (moving)
                     {
@@ -240,7 +249,6 @@ namespace AXE.Game.Entities.Enemies
                                 hspeed = speed;
 
                             moveTo.X += hspeed;
-                            moveTo.Y += vspeed;
                             moveTo.Y += ((float)Math.Sin(MoreMath.DegToRad(timer[DECISION_TIMER])));
 
                             // Check for bounces!

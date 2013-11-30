@@ -185,6 +185,9 @@ namespace AXE.Game.Entities
                 case "Undead":
                     ge = new Undead(x, y);
                     break;
+                case "Dagger":
+                    ge = new Dagger(x, y);
+                    break;
                 case "EvilAxeHolder":
                     ge = new EvilAxeHolder(x, y);
                     break;
