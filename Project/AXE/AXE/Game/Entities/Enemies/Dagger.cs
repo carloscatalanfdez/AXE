@@ -78,7 +78,7 @@ namespace AXE.Game.Entities.Enemies
 
             spgraphic = new bSpritemap((game as AxeGame).res.sprDaggerSheet, 30, 32);
             spgraphic.add(new bAnim("idle", new int[] { 0 }));
-            spgraphic.add(new bAnim("walk", new int[] { 0, 1, 2, 1 }, 0.3f));
+            spgraphic.add(new bAnim("walk", new int[] { 1, 2, 1, 0 }, 0.3f));
             spgraphic.add(new bAnim("seen-reacting", new int[] { 1 }));
             spgraphic.add(new bAnim("throw", new int[] { 0, 1 }, 0.4f, false));
             spgraphic.add(new bAnim("attack", new int[] { 1 }, 0.3f, false));
@@ -99,7 +99,7 @@ namespace AXE.Game.Entities.Enemies
             watchWrappedMask = new bMaskList(new bMask[] { maskL, maskR }, 0, 0, false);
             watchWrappedMask.game = game;
 
-            hspeed = 0.2f;
+            hspeed = 1;
             vspeed = 0f;
             gravity = 0.5f;
             deathFallThreshold = 5;
