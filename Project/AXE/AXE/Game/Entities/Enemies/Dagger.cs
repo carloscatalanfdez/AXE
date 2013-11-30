@@ -80,7 +80,7 @@ namespace AXE.Game.Entities.Enemies
             spgraphic.add(new bAnim("idle", new int[] { 0 }));
             spgraphic.add(new bAnim("walk", new int[] { 1, 2, 1, 0 }, 0.3f));
             spgraphic.add(new bAnim("seen-reacting", new int[] { 1 }));
-            spgraphic.add(new bAnim("throw", new int[] { 0, 1 }, 0.4f, false));
+            spgraphic.add(new bAnim("throw", new int[] { 16, 17, 18}, 0.5f, false));
             spgraphic.add(new bAnim("attack", new int[] { 1 }, 0.3f, false));
             spgraphic.add(new bAnim("attacked", new int[] { 1 }));
             spgraphic.add(new bAnim("jump", new int[] { 8, 9 }, 0.7f, false));
