@@ -415,7 +415,7 @@ namespace AXE.Game.Entities.Enemies
                 int currentX = (int)Math.Round(pos.X);
                 int nextX = (int)Math.Round(moveTo.X);
                 int c = currentX - nextX;
-                if (Math.Abs(currentX - nextX) < 1)
+                if (Math.Abs(pos.Y - moveTo.Y) < 1 && Math.Abs(currentX - nextX) < 1)
                 {
                     pos = moveTo;
                 }

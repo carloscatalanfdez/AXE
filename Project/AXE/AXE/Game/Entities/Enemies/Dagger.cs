@@ -83,7 +83,8 @@ namespace AXE.Game.Entities.Enemies
             spgraphic.add(new bAnim("throw", new int[] { 0, 1 }, 0.4f, false));
             spgraphic.add(new bAnim("attack", new int[] { 1 }, 0.3f, false));
             spgraphic.add(new bAnim("attacked", new int[] { 1 }));
-            spgraphic.add(new bAnim("jump", new int[] { 1 }));
+            spgraphic.add(new bAnim("jump", new int[] { 8, 9 }, 0.7f, false));
+            spgraphic.add(new bAnim("fall", new int[] { 10 }));
             spgraphic.add(new bAnim("death", new int[] { 1 }));
             spgraphic.play("idle");
 
@@ -242,12 +243,6 @@ namespace AXE.Game.Entities.Enemies
 
             if (onAir)
             {
-                state = State.Falling;
-                fallingFrom = pos;
-                fallingToDeath = false;
-            }
-            if (onAir)
-            {
                 if (vspeed < 0)
                 {
                     state = State.Jump;
@@ -309,7 +304,7 @@ namespace AXE.Game.Entities.Enemies
 
                     moveTo.Y += vspeed;
 
-                    spgraphic.play("jump");
+                    spgraphic.play("fall");
 
                     break;
                 case State.Throw:
@@ -368,50 +363,40 @@ namespace AXE.Game.Entities.Enemies
 
             if (state == State.Walk || state == State.Jump || state == State.Falling)
             {
-                int currentX = (int)Math.Round(pos.X);
-                int nextX = (int)Math.Round(moveTo.X);
-                int c = currentX - nextX;
-                if (Math.Abs(currentX - nextX) < 1)
+                Vector2 remnant;
+                // Check wether we collide first with a solid or a onewaysolid,
+                // and use that data to position the Dagger enemy.
+                Vector2 oldPos = pos;
+                Vector2 remnantOneWay = moveToContact(moveTo, "onewaysolid", onewaysolidCondition);
+                Vector2 posOneWay = pos;
+                pos = oldPos;
+                Vector2 remnantSolid = moveToContact(moveTo, "solid");
+                Vector2 posSolid = pos;
+                if (remnantOneWay.Length() > remnantSolid.Length())
                 {
-                    pos = moveTo;
+                    remnant = remnantOneWay;
+                    pos = posOneWay;
                 }
                 else
                 {
-                    Vector2 remnant;
-                    // Check wether we collide first with a solid or a onewaysolid,
-                    // and use that data to position the Dagger enemy.
-                    Vector2 oldPos = pos;
-                    Vector2 remnantOneWay = moveToContact(moveTo, "onewaysolid", onewaysolidCondition);
-                    Vector2 posOneWay = pos;
-                    pos = oldPos;
-                    Vector2 remnantSolid = moveToContact(moveTo, "solid");
-                    Vector2 posSolid = pos;
-                    if (remnantOneWay.Length() > remnantSolid.Length())
-                    {
-                        remnant = remnantOneWay;
-                        pos = posOneWay;
-                    }
-                    else
-                    {
-                        remnant = remnantSolid;
-                        pos = posSolid;
-                    }
+                    remnant = remnantSolid;
+                    pos = posSolid;
+                }
 
-                    // We have been stopped
-                    if (remnant.X != 0)
-                    {
-                    }
+                // We have been stopped
+                if (remnant.X != 0)
+                {
+                }
 
-                    // The y movement was stopped
-                    if (remnant.Y != 0 && vspeed < 0)
-                    {
-                        // Touched ceiling
-                        vspeed = 0;
-                    }
-                    else if (remnant.Y != 0 && vspeed > 0)
-                    {
-                        // Landed
-                    }
+                // The y movement was stopped
+                if (remnant.Y != 0 && vspeed < 0)
+                {
+                    // Touched ceiling
+                    vspeed = 0;
+                }
+                else if (remnant.Y != 0 && vspeed > 0)
+                {
+                    // Landed
                 }
             }
 
