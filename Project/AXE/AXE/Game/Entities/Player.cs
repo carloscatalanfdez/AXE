@@ -182,7 +182,7 @@ namespace AXE.Game.Entities
         {
             exitAnimationWaitTime = 15;
             activationTime = 15;
-            axeGrabTime = 2;
+            axeGrabTime = 0;
             hspeed = 1.5f;
             gravity = 0.5f;
             haccel = 0.2f;

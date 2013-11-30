@@ -23,7 +23,7 @@ namespace AXE.Game.Entities.Enemies
 {
     class Dagger : Enemy, IHazardProvider
     {
-        public enum State { None, Idle, Turn, Walk, Jump, Attacking, Attacked, Throw, Falling, Dead }
+        public enum State { None, Idle, Turn, Walk, Jump, Attacking, Attacked, Throw, Falling, Dead, JumpToLevel, DropFromLevel }
         const int CHANGE_STATE_TIMER = 0;
         const int THROW_REACTION_TIMER = 1;
         const int THROW_COOLDOWN_TIMER = 2;
@@ -67,6 +67,10 @@ namespace AXE.Game.Entities.Enemies
 
         int deathAnimDuration;
 
+        int jumpHeight;
+        int jumpPow;
+        int canLandAfterY;
+
         public Dagger(int x, int y)
             : base(x, y)
         {
@@ -86,6 +90,8 @@ namespace AXE.Game.Entities.Enemies
             spgraphic.add(new bAnim("jump", new int[] { 8, 9 }, 0.7f, false));
             spgraphic.add(new bAnim("fall", new int[] { 10 }));
             spgraphic.add(new bAnim("death", new int[] { 1 }));
+            spgraphic.add(new bAnim("duck", new int[] { 8 }, 0.2f, false));
+            spgraphic.add(new bAnim("highJump", new int[] { 10 }));
             spgraphic.play("idle");
 
             loadNormalMask();
@@ -103,6 +109,9 @@ namespace AXE.Game.Entities.Enemies
             vspeed = 0f;
             gravity = 0.5f;
             deathFallThreshold = 5;
+
+            jumpHeight = 56;
+            jumpPow = 8;
 
             idleBaseTime = 80;
             idleOptionalTime = 80;
@@ -167,6 +176,57 @@ namespace AXE.Game.Entities.Enemies
                         world.add(weaponHitZone, "hazard");
                         timer[0] = attackTime;
                         break;
+                    case State.JumpToLevel:
+                        // Locate landing spot, starting from top of jump
+                        bool found = false;
+                        Vector2 temporalPreviousPosition = previousPosition;
+                        for (yy = y - jumpHeight; yy < y; yy++)
+                        {
+                            previousPosition = new Vector2(x, yy - 1);
+                            if (placeMeeting(x, yy, "onewaysolid", onewaysolidCondition))
+                            {
+                                found = true;
+                                spgraphic.play("duck");
+                                break;
+                            }
+                        }
+
+                        if (!found)
+                        {
+                            state = State.JumpToLevel;
+                            performChange = false;
+                            changeState(State.Walk);
+                        }
+
+                        previousPosition = temporalPreviousPosition;
+
+                        break;
+                    case State.DropFromLevel:
+                        // Locate landing spot, starting from top of drop
+                        found = false;
+                        temporalPreviousPosition = previousPosition;
+                        for (yy = y+8; yy <= y + jumpHeight + graphicHeight(); yy++)
+                        {
+                            previousPosition = new Vector2(x, yy - 1);
+                            if (placeMeeting(x, yy, "onewaysolid", onewaysolidCondition)
+                                || placeMeeting(x, yy, "solid"))
+                            {
+                                found = true;
+                                spgraphic.play("duck");
+                                break;
+                            }
+                        }
+
+                        if (!found)
+                        {
+                            state = State.DropFromLevel;
+                            performChange = false;
+                            changeState(State.Walk);
+                        }
+
+                        previousPosition = temporalPreviousPosition;
+
+                        break;
                 }
 
                 if (performChange)
@@ -190,10 +250,16 @@ namespace AXE.Game.Entities.Enemies
                     switch (state)
                     {
                         case State.Idle:
-                            if (Tools.random.Next(2) < 1)
+                            int random = Tools.random.Next(4);
+                            if (random < 1)
                                 changeState(State.Turn);
-                            
-                            changeState(State.Walk);
+                            else if (random < 2)
+                                changeState(State.Walk);
+                            else if (random < 3)
+                                changeState(State.JumpToLevel);
+                            else
+                                changeState(State.DropFromLevel);
+
                             break;
                         case State.Walk:
                             if (Tools.random.Next(2) < 1)
@@ -240,8 +306,9 @@ namespace AXE.Game.Entities.Enemies
 
             moveTo = pos;
             bool onAir = !checkForGround(x, y);
-
-            if (onAir)
+            
+            // JumpToLevel & DropFromLevel automanag their gravity state
+            if (onAir && state != State.JumpToLevel && state != State.DropFromLevel)
             {
                 if (vspeed < 0)
                 {
@@ -295,10 +362,10 @@ namespace AXE.Game.Entities.Enemies
                             fallingToDeath = true;
                         }
                     }
-                    else
+                    else if (vspeed > 0)
                     {
                         if (fallingToDeath)
-                            onDeath(); // You'd be dead, buddy!
+                            ; //onDeath(); // You'd be dead, buddy!
                         changeState(State.Idle);
                     }
 
@@ -328,6 +395,77 @@ namespace AXE.Game.Entities.Enemies
                     {
                         world.remove(this);
                     }
+                    break;
+                case State.JumpToLevel:
+                    if (spgraphic.currentAnim.name == "duck" && spgraphic.currentAnim.finished)
+                    {
+                        vspeed = -jumpPow;
+                        y -= 1;
+                        spgraphic.play("highJump");
+                    }
+                    else if (spgraphic.currentAnim.name == "highJump")
+                    {
+                        if (onAir)
+                        {
+                            vspeed += gravity;
+                            if (vspeed > 0 && fallingFrom == Vector2.Zero)
+                            {
+                                fallingToDeath = false;
+                                fallingFrom = pos;
+                            }
+
+                            if (vspeed > 0 && pos.Y - fallingFrom.Y >= deathFallThreshold)
+                            {
+                                fallingToDeath = true;
+                            }
+                        }
+                        else if (vspeed > 0)
+                        {
+                            if (fallingToDeath)
+                                ; // onDeath(); // You'd be dead, buddy!
+                            changeState(State.Idle);
+                        }
+                    }
+
+                    moveTo.Y += vspeed;
+
+                    break;
+                case State.DropFromLevel:
+                    if (spgraphic.currentAnim.name == "duck" && spgraphic.currentAnim.finished)
+                    {
+                        vspeed = -jumpPow / 3.0f;
+                        y -= 1;
+                        spgraphic.play("highJump");
+                        // Don't check for collisions with the current ground
+                        canLandAfterY = y + graphicHeight() / 2;
+                    }
+                    else if (spgraphic.currentAnim.name == "highJump")
+                    {
+                        if (onAir)
+                        {
+                            vspeed += gravity;
+                            if (vspeed > 0 && fallingFrom == Vector2.Zero)
+                            {
+                                fallingToDeath = false;
+                                fallingFrom = pos;
+                            }
+
+                            if (vspeed > 0 && pos.Y - fallingFrom.Y >= deathFallThreshold)
+                            {
+                                fallingToDeath = true;
+                            }
+                        }
+                        else if (vspeed > 0)
+                        {
+                            canLandAfterY = 0;
+                            if (fallingToDeath)
+                                ; // onDeath(); // You'd be dead, buddy!
+                            changeState(State.Idle);
+                        }
+                    }
+
+                    moveTo.Y += vspeed;
+
                     break;
             }
 
@@ -361,7 +499,13 @@ namespace AXE.Game.Entities.Enemies
                 }
             }
 
-            if (state == State.Walk || state == State.Jump || state == State.Falling)
+            // Wont land on the same platform
+            if (state == State.DropFromLevel && y < canLandAfterY)
+            {
+                pos = moveTo;
+            }
+            else if (state == State.Walk || state == State.Jump || state == State.Falling ||
+                state == State.JumpToLevel || state == State.DropFromLevel)
             {
                 Vector2 remnant;
                 // Check wether we collide first with a solid or a onewaysolid,
@@ -507,6 +651,21 @@ namespace AXE.Game.Entities.Enemies
         public void onSuccessfulHit(Player other)
         {
             // tamed = true;
+        }
+
+        public override void onClick()
+        {
+            base.onClick();
+            if (Tools.random.Next(2) < 0)
+            {
+                if (state != State.JumpToLevel)
+                    changeState(State.JumpToLevel);
+            }
+            else
+            {
+                if (state != State.DropFromLevel)
+                    changeState(State.DropFromLevel);
+            }
         }
     }
 }
