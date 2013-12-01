@@ -36,7 +36,6 @@ namespace AXE.Game.Entities
 
         public const int EXIT_ANIM_TIMER = 1;
         public const int ACTIVATION_TIME_TIMER = 3;
-        public const int AXE_GRAB_TIMER = 4;
         public int exitAnimationWaitTime;
 
         // Data
@@ -123,6 +122,7 @@ namespace AXE.Game.Entities
             random = Utils.Tools.random;
 
             // Set attributes (for collisions & location in world)
+            attributes.Add(ATTR_SOLID);
             attributes.Add("player");
             attributes.Add("moveable");
 
@@ -512,7 +512,7 @@ namespace AXE.Game.Entities
                         if (weapon != null)
                         {
                             weapon.onThrow(10, facing);
-                            GameData.get().playerAData.weapon = PlayerData.Weapons.None;
+                            data.weapon = PlayerData.Weapons.None;
                             state = MovementState.Attacked;
                             if (!onair)
                                 spgraphic.play("thrownweapon");
@@ -689,14 +689,20 @@ namespace AXE.Game.Entities
                             bEntity entity = instancePlace(wrappedMask, "axe");
                             if (entity != null)
                             {
-                                if ((entity as Axe).holder != null)
+                                // Console.WriteLine("Got axe by handleActionButton");
+
+                                // Can't steal from other player, you moron!
+                                if (!((entity as Axe).holder is Player))
                                 {
-                                    ((entity as Axe).holder).onAxeStolen();
-                                    (entity as Axe).holder = null;
+                                    if ((entity as Axe).holder != null)
+                                    {
+                                        ((entity as Axe).holder).onAxeStolen();
+                                        (entity as Axe).holder = null;
+                                    }
+                                    (entity as Axe).onGrab(this);
+                                    data.weapon = (entity as Axe).type;
+                                    pickedWeapon = true;
                                 }
-                                (entity as Axe).onGrab(this);
-                                data.weapon = (entity as Axe).type;
-                                pickedWeapon = true;
                             }
                         }
 
@@ -973,6 +979,7 @@ namespace AXE.Game.Entities
                         {
                             if (weapon != null)
                                 world.remove((weapon as bEntity));
+                            attributes.Remove(ATTR_SOLID);
                             collidable = false;
                             visible = false;
                         }
@@ -980,10 +987,6 @@ namespace AXE.Game.Entities
                     break;
                 case ACTIVATION_TIME_TIMER:
                     state = MovementState.Idle;
-                    break;
-                case AXE_GRAB_TIMER:
-                    axeToCatch.onHitSolid(this);
-                    onDeath(DeathState.Generic);
                     break;
             }
         }
@@ -1009,17 +1012,20 @@ namespace AXE.Game.Entities
                 return;
 
             if (type == "solid")
+                // This should not happen!
                 color = Color.Turquoise;
-            else if (type == "enemy")
+            else if (type == "enemy" || type == "player")
             {
+                if (type == "player")
+                    Console.WriteLine("PVP " + this.data.id + " vs " + (other as Player).data.id);
                 // First, reposition
-                if (other.attributes.Contains(Enemy.ATTR_SOLID))
+                if (other.attributes.Contains(ATTR_SOLID))
                 {
-                    // Allow ethereal enemies
-                    if (placeMeeting(x, y, "enemy"))
+                    pos.X = stepInitialPosition.X;
+                    // Allow ethereal entities
+                    if (placeMeeting(x, y, type))
                     {
-                        pos.X = stepInitialPosition.X;
-                        if (state == MovementState.Ladder)
+                        if (state == MovementState.Ladder || bodyState == BodyState.Crouching)
                         {
                             // Just ignore him when you're on a ladder for now
                             pos = stepInitialPosition;
@@ -1077,6 +1083,7 @@ namespace AXE.Game.Entities
                     {
                         if (state != MovementState.Attacking && state != MovementState.Attacked && state != MovementState.Activate)
                         {
+                            // Console.WriteLine("Got axe by onCollision");
                             bEntity entity = other;
                             if (entity != null)
                             {
@@ -1263,6 +1270,7 @@ namespace AXE.Game.Entities
         public void onAxeStolen()
         {
             weapon = null;
+            data.weapon = PlayerData.Weapons.None;
             if (state == MovementState.Attacking || state == MovementState.Attacked)
             {
                 // Dude stop it

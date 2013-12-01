@@ -98,7 +98,7 @@ namespace AXE.Game.Entities.Enemies
             state = State.None;
             changeState(State.IdleTop);
 
-            attributes.Add(Enemy.ATTR_SOLID);
+            attributes.Add(ATTR_SOLID);
         }
 
         protected void loadFallMask()

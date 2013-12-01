@@ -14,6 +14,7 @@ namespace AXE.Game.Entities
 {
     class Entity : bEntity
     {
+        public const string ATTR_SOLID = "solid";
         public enum Dir { None, Left, Right };
 
         public bool wrappable = true;

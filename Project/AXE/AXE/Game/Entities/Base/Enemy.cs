@@ -12,8 +12,6 @@ namespace AXE.Game.Entities.Base
 {
     class Enemy : Entity, IContraption
     {
-        public const string ATTR_SOLID = "solid";
-
         public IRewarder rewarder;
         public ContraptionRewardData contraptionRewardData;
 

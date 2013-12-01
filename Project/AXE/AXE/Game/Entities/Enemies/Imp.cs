@@ -138,7 +138,7 @@ namespace AXE.Game.Entities.Enemies
             state = State.None;
             changeState(State.Idle);
             
-            attributes.Add(Enemy.ATTR_SOLID);
+            attributes.Add(ATTR_SOLID);
         }
 
         public void changeState(State newState)

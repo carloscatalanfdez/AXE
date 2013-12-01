@@ -119,7 +119,7 @@ namespace AXE.Game.Entities.Base
                 -(int)(graphicWidth() * 0.25f),
                 -(int)(graphicHeight() * 0.25f));
 
-            attributes.Add(Enemy.ATTR_SOLID);
+            attributes.Add(ATTR_SOLID);
         }
 
         public void changeState(State newState)
