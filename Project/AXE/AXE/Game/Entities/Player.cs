@@ -38,7 +38,6 @@ namespace AXE.Game.Entities
         public const int ACTIVATION_TIME_TIMER = 3;
         public const int AXE_GRAB_TIMER = 4;
         public int exitAnimationWaitTime;
-        public int axeGrabTime;
 
         // Data
         public PlayerData data;
@@ -87,6 +86,8 @@ namespace AXE.Game.Entities
         protected IWeapon weapon;
         protected HotspotContainer hotspotContainer;
         protected bMask weaponCatchMask;
+        protected int actionPressedSteps;
+        protected int weaponCatchThreshold;
         
         // Sound effects
         protected List<SoundEffect> sfxSteps;
@@ -181,8 +182,7 @@ namespace AXE.Game.Entities
         protected void loadParameters()
         {
             exitAnimationWaitTime = 15;
-            activationTime = 15;
-            axeGrabTime = 0;
+            activationTime = 15;            
             hspeed = 1.5f;
             gravity = 0.5f;
             haccel = 0.2f;
@@ -196,6 +196,7 @@ namespace AXE.Game.Entities
                 (int)(graphicHeight() * 1.25f), 
                 -(int)(graphicWidth()*0.25f), 
                 -(int)(graphicHeight()*0.25f));
+            weaponCatchThreshold = 5;
         }
 
         protected void initStandingMask()
@@ -230,6 +231,7 @@ namespace AXE.Game.Entities
             fallingFrom = Vector2.Zero;
             jumpMaxSpeed = 3.0f;
             axeToCatch = null;
+            actionPressedSteps = 0;
         }
 
         protected void loadSoundEffects()
@@ -280,6 +282,14 @@ namespace AXE.Game.Entities
             handleDebugRoutines();
 
             handleSoundEffects();
+
+            // Updated action button pressed steps counter
+            if (mginput.pressed(PadButton.b))
+                actionPressedSteps = 1;
+            else if (mginput.check(PadButton.b))
+                actionPressedSteps++;
+            else
+                actionPressedSteps = 0;
 
             // Check for outside playfield death
             if (state != MovementState.Death && y + mask.h / 2 > (world as LevelScreen).height)
@@ -670,6 +680,7 @@ namespace AXE.Game.Entities
                     else // No weapon, pick / activate
                     {
                         bool pickedWeapon = false;
+
                         if (state != MovementState.Attacking && state != MovementState.Attacked && state != MovementState.Activate)
                         {
                             // generateWrappedMask will give us our current mask or the wrapped one, depends on where we are
@@ -678,14 +689,13 @@ namespace AXE.Game.Entities
                             bEntity entity = instancePlace(wrappedMask, "axe");
                             if (entity != null)
                             {
-                                timer[AXE_GRAB_TIMER] = -1;
                                 if ((entity as Axe).holder != null)
                                 {
                                     ((entity as Axe).holder).onAxeStolen();
                                     (entity as Axe).holder = null;
                                 }
                                 (entity as Axe).onGrab(this);
-                                GameData.get().playerAData.weapon = (entity as Axe).type;
+                                data.weapon = (entity as Axe).type;
                                 pickedWeapon = true;
                             }
                         }
@@ -1061,14 +1071,31 @@ namespace AXE.Game.Entities
             {
                 Axe axe = (other as Axe);
                 if (axe.state == Axe.MovementState.Flying && !axe.justLaunched)
-                    /*if (timer[AXE_GRAB_TIMER] < 0)
-                        onDeath(DeathState.ForceHit);
-                    else*/
-                    if (timer[AXE_GRAB_TIMER] < 0)
+                {
+                    axeToCatch = (other as Axe);
+                    if (actionPressedSteps > 0 && actionPressedSteps < weaponCatchThreshold)
                     {
-                        axeToCatch = (other as Axe);
-                        timer[AXE_GRAB_TIMER] = axeGrabTime;
+                        if (state != MovementState.Attacking && state != MovementState.Attacked && state != MovementState.Activate)
+                        {
+                            bEntity entity = other;
+                            if (entity != null)
+                            {
+                                if ((entity as Axe).holder != null)
+                                {
+                                    ((entity as Axe).holder).onAxeStolen();
+                                    (entity as Axe).holder = null;
+                                }
+                                (entity as Axe).onGrab(this);
+                                data.weapon = (entity as Axe).type;
+                            }
+                        }
                     }
+                    else
+                    {
+                        axeToCatch.onHitSolid(this);
+                        onDeath(DeathState.Generic);
+                    }
+                }
             }
         }
 

@@ -364,8 +364,9 @@ namespace AXE.Game.Entities.Enemies
                     }
                     else if (vspeed > 0)
                     {
-                        if (fallingToDeath)
-                            ; //onDeath(); // You'd be dead, buddy!
+                        // Won't die from falling (yet)
+                        /*if (fallingToDeath)
+                            ; //onDeath(); // You'd be dead, buddy!*/
                         changeState(State.Idle);
                     }
 
@@ -421,8 +422,9 @@ namespace AXE.Game.Entities.Enemies
                         }
                         else if (vspeed > 0)
                         {
-                            if (fallingToDeath)
-                                ; // onDeath(); // You'd be dead, buddy!
+                            // Won't die from falling
+                            //if (fallingToDeath)
+                            //    ; // onDeath(); // You'd be dead, buddy!
                             changeState(State.Idle);
                         }
                     }
@@ -458,8 +460,11 @@ namespace AXE.Game.Entities.Enemies
                         else if (vspeed > 0)
                         {
                             canLandAfterY = 0;
-                            if (fallingToDeath)
-                                ; // onDeath(); // You'd be dead, buddy!
+                            // Won't die from falling
+                            // And third equal code block!
+                            // TODO: REFACTOR THIS SH*T NOW!
+                            //if (fallingToDeath)
+                            //    ; // onDeath(); // You'd be dead, buddy!
                             changeState(State.Idle);
                         }
                     }
