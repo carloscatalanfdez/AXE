@@ -17,6 +17,7 @@ namespace AXE.Game.Entities.Enemies
     {
         public enum State { None, IdleTop, WalkTop, MoveToHide, HideCorner, PrepareFall, Fall, Explode, Dead }
         const int CHANGE_STATE_TIMER = 0;
+        const int DEAD_ANIM_TIMER = 2;
 
         public bSpritemap spgraphic
         {
@@ -43,6 +44,7 @@ namespace AXE.Game.Entities.Enemies
         int dropBaseTime, dropOptionalTime;
 
         int hideChance;
+        int deathAnimDuration;
 
         public CorrosiveSlime(int x, int y)
             : base(x, y)
@@ -202,7 +204,27 @@ namespace AXE.Game.Entities.Enemies
                             break;
                     }
                     break;
+                case DEAD_ANIM_TIMER:
+                    break;
             }
+        }
+
+        public override bool onHit(Entity other)
+        {
+            base.onHit(other);
+
+            onDeath();
+
+            if (rewarder != null)
+            {
+                if (contraptionRewardData.target == null)
+                {
+                    contraptionRewardData.target = ((other as NormalAxe).thrower as bEntity);
+                }
+            }
+            onSolved();
+
+            return true;
         }
 
         private bool isOnCeiling()
@@ -303,6 +325,14 @@ namespace AXE.Game.Entities.Enemies
                     if (spgraphic.currentAnim.finished)
                     {
                         onDeath();
+                    }
+                    break;
+                case State.Dead:
+                    float factor = (timer[DEAD_ANIM_TIMER] / (deathAnimDuration * 1f));
+                    color *= factor;
+                    if (color.A <= 0)
+                    {
+                        world.remove(this);
                     }
                     break;
             }
@@ -414,9 +444,10 @@ namespace AXE.Game.Entities.Enemies
         {
             if (state != State.Dead)
             {
+                attributes.Remove(ATTR_SOLID);
                 state = State.Dead;
                 color = new Color(164, 0, 0, 255);
-                world.remove(this);
+                timer[DEAD_ANIM_TIMER] = deathAnimDuration;
             }
         }
     }
