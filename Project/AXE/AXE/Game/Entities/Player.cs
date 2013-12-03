@@ -1073,7 +1073,7 @@ namespace AXE.Game.Entities
 
                                 }
  
-                                // Bounce ém
+                                // Bounce'im!
                                 if (otherEffectiveXPos < effectiveXPos)
                                 {
                                     jumpedFacing = Dir.Right;
