@@ -186,6 +186,17 @@ namespace AXE.Game.Screens
                     spawnPlayerWeapon(playerB.data, playerB);
                     _add(playerB, "player");
                 }
+
+                int ntries = 0;
+                while (player.placeMeeting(player.x, player.y, new String[] { "player", "enemy", "solid" }))
+                {
+                    // Pferv-like fail safe
+                    ntries++;
+                    if (ntries > width)
+                        break;
+
+                    player.x++;
+                }
             }
 
             return player;
