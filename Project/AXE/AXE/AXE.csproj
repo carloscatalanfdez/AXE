@@ -112,6 +112,8 @@
     <Compile Include="Game\Entities\Axes\NormalAxe.cs" />
     <Compile Include="Game\Entities\Base\Axe.cs" />
     <Compile Include="Game\Entities\Base\Enemy.cs" />
+    <Compile Include="Game\Entities\Base\IPlatformUser.cs" />
+    <Compile Include="Game\Entities\Contraptions\MoveablePlatform.cs" />
     <Compile Include="Game\Entities\Enemies\Dagger.cs" />
     <Compile Include="Game\Entities\Enemies\Undead.cs" />
     <Compile Include="Game\Entities\Enemies\CorrosiveSlime.cs" />
@@ -153,6 +155,7 @@
     <Compile Include="Game\Utils\HotspotContainer.cs" />
     <Compile Include="Game\Utils\ResourceManager.cs" />
     <Compile Include="Game\Utils\Tools.cs" />
+    <Compile Include="Game\Utils\VisualDebugger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="AxeGame.cs" />

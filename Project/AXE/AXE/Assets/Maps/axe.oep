@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <OgmoVersion>2.1.0.6</OgmoVersion>
+  <OgmoVersion>1.0</OgmoVersion>
   <Name>Axe Levels</Name>
   <BackgroundColor A="255" R="125" G="160" B="255" />
   <GridColor A="255" R="255" G="240" B="90" />
@@ -16,7 +16,7 @@
     <Width>1280</Width>
     <Height>1024</Height>
   </LevelMaximumSize>
-  <Filename>C:\Users\Carlos\code\games\AXE\Project\AXE\AXE\Assets\Maps\axe.oep</Filename>
+  <Filename>D:\Dev\thebadlands\AXE\Coding\AXE\Project\AXE\AXE\Assets\Maps\axe.oep</Filename>
   <AngleMode>Radians</AngleMode>
   <CameraEnabled>false</CameraEnabled>
   <CameraSize>
@@ -342,8 +342,28 @@
       <ImageDefinition DrawMode="Image" ImagePath="..\..\..\AXEContent\Assets\Sprites\dagger-sheet.png" Tiled="true">
         <RectColor A="255" R="255" G="0" B="0" />
       </ImageDefinition>
-      <ValueDefinitions />
+      <ValueDefinitions>
+        <ValueDefinition xsi:type="IntValueDefinition" Name="NewValue0" Default="0" Min="0" Max="100" ShowSlider="false" />
+      </ValueDefinitions>
       <NodesDefinition Enabled="false" Limit="-1" DrawMode="None" Ghost="false" />
+    </EntityDefinition>
+    <EntityDefinition Name="MoveablePlatform" Limit="-1" ResizableX="true" ResizableY="false" Rotatable="false" RotateIncrement="15">
+      <Size>
+        <Width>16</Width>
+        <Height>8</Height>
+      </Size>
+      <Origin>
+        <X>0</X>
+        <Y>0</Y>
+      </Origin>
+      <ImageDefinition DrawMode="Rectangle" ImagePath="" Tiled="false">
+        <RectColor A="255" R="255" G="0" B="0" />
+      </ImageDefinition>
+      <ValueDefinitions>
+        <ValueDefinition xsi:type="IntValueDefinition" Name="stepsBetweenNodes" Default="30" Min="0" Max="10000" ShowSlider="true" />
+        <ValueDefinition xsi:type="BoolValueDefinition" Name="cyclic" Default="false" />
+      </ValueDefinitions>
+      <NodesDefinition Enabled="true" Limit="-1" DrawMode="Path" Ghost="true" />
     </EntityDefinition>
   </EntityDefinitions>
 </project>

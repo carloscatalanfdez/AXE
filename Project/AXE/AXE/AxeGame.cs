@@ -30,6 +30,7 @@ namespace AXE
         RenderTarget2D renderTarget;
         Texture2D renderResult;
         bool switchFullscreenThisStep;
+        VisualDebugger vizdeb;
 
         protected override void initSettings()
         {
@@ -49,6 +50,8 @@ namespace AXE
 
             res = ResourceManager.get();
             res.init(this);
+
+            vizdeb = VisualDebugger.get(this);
         }
 
         protected void generateRenderTarget()
@@ -83,10 +86,12 @@ namespace AXE
 
         protected override void Initialize()
         {
+            Tools.step = 0;
             // switchFullScreen();
             Controller.getInstance().setGame(this);
             // Controller.getInstance().onMenuStart();
             changeWorld(new LogoScreen());
+
             base.Initialize();
         }
 
@@ -143,6 +148,10 @@ namespace AXE
             {
                 screenshot();
             }
+
+            vizdeb.update();
+
+            Tools.step++;
         }
 
         void switchFullScreen()
@@ -205,9 +214,12 @@ namespace AXE
                 {
                     try
                     {
+                        // Background
                         sprite.Begin();
                         sprite.Draw(res.bgTest, new Rectangle(0, 0, GraphicsDevice.DisplayMode.Width, GraphicsDevice.DisplayMode.Height), Color.Wheat);
                         sprite.End();
+
+                        // Main window
                         sprite.Begin(SpriteSortMode.Deferred,
                             BlendState.AlphaBlend,
                             SamplerState.PointClamp,
@@ -222,6 +234,11 @@ namespace AXE
                         sprite.Draw(renderResult, new Vector2(rect.X, rect.Y), rect, 
                             Color.White, 0, new Vector2(0, 0), 1f, 
                             SpriteEffects.None, 1);
+                        sprite.End();
+
+                        // Front
+                        sprite.Begin();
+                        vizdeb.render(sprite);
                         sprite.End();
                     }
                     catch (Exception e)

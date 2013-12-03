@@ -8,6 +8,8 @@ namespace AXE.Game.Utils
 {
     class Tools
     {
+        public static ulong step = 0;
+
         public static Random random = new Random();
         public static Color RandomColor 
         { 

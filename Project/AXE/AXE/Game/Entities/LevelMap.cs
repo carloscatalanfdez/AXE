@@ -214,6 +214,27 @@ namespace AXE.Game.Entities
                 case "Lever":
                     ge = new Lever(x, y);
                     break;
+                case "MoveablePlatform":
+                    attr = element.GetAttribute("width");
+                    width = attr != null ? int.Parse(attr) : 16;
+                    int steps = int.Parse(element.GetAttribute("stepsBetweenNodes"));
+                    bool cycle = (element.GetAttribute("cyclic") == "True");
+
+                    List<Vector2> nodes = new List<Vector2>();
+                    XmlReader nodeReader = element.ReadSubtree();
+                    while (nodeReader.Read())
+                    {
+                        if (nodeReader.Name == "node")
+                        {
+                            int xx = int.Parse(nodeReader.GetAttribute("x"));
+                            int yy = int.Parse(nodeReader.GetAttribute("y"));
+                            Vector2 node = new Vector2(xx, yy);
+                            nodes.Add(node);
+                        }
+                    }
+                    
+                    ge = new MoveablePlatform(x, y, width, nodes, steps, cycle);
+                    break;
                 case "HighGuardFallPowerUp":
                     ge = new PowerUpPickable(x, y, PowerUpPickable.Type.HighFallGuard);
                     break;

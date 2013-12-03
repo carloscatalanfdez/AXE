@@ -22,7 +22,7 @@ using Microsoft.Xna.Framework.Media;
 
 namespace AXE.Game.Entities
 {
-    class Player : Entity, IWeaponHolder
+    class Player : Entity, IWeaponHolder, IPlatformUser
     {
         // Utilities
         public GameInput mginput;
@@ -105,6 +105,12 @@ namespace AXE.Game.Entities
 
         // Debug
         bool floater;
+
+        public MovementState movementState { get { return state; } }
+        public ActionState actionState { get { return action; } }
+        public bool onAir { get { return onair; } }
+        public float dhspeed { get { return current_hspeed; } }
+        public float dvspeed { get { return vspeed; } }
 
         public Player(int x, int y, PlayerData data)
             : base(x, y)
@@ -586,8 +592,8 @@ namespace AXE.Game.Entities
             {
                 Vector2 remnant = moveToContactSafe(moveTo);
                 
-                // We have been stopped
-                if (remnant.X != 0)
+                // We have been stopped if no decimals? test
+                if (Math.Floor(Math.Abs(remnant.X)) > 0)
                 {
                     // Stop accelerating if we have stopped
                     current_hspeed = 0;
@@ -1372,6 +1378,19 @@ namespace AXE.Game.Entities
             return (state != MovementState.Death &&
                 state != MovementState.Exit &&
                 state != MovementState.Revive);
+        }
+
+        /* IPlatformUser implementation */
+        public void onPlatformMovedWithDelta(Vector2 delta, Entity platform)
+        {
+            if (state != MovementState.Jump || (state == MovementState.Jump && vspeed > 0))
+            {
+                if (Math.Abs(mask.rect.Bottom - platform.y) <= Math.Abs(delta.Y))
+                {
+                    previousPosition += delta;
+                    pos += delta;
+                }
+            }    
         }
     }
 }

@@ -415,9 +415,11 @@ namespace AXE.Game.Screens
                 else if (e is Item)
                     _add(e, "items");
                 else if (e is TrapDoor)
-                    _add(e, "solid");
+                    _add(e, "onewaysolid");
                 else if (e is Lever)
                     _add(e, "contraptions");
+                else if (e is MoveablePlatform)
+                    _add(e, "onewaysolid");
                 // Contraptions and rewarders may be added before, but if they are not,
                 // we'll add them to these categories
                 else if (e is IContraption)

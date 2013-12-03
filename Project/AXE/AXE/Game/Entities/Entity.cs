@@ -128,7 +128,11 @@ namespace AXE.Game.Entities
                 {
                     mouseHover = mask.rect.Contains(bGame.input.mouseX, bGame.input.mouseY);
                     if (mouseHover && bGame.input.pressed(0))
+                    {
+                        VisualDebugger.get(game).setTarget(this);
                         onClick();
+                    }
+                    
                 }
 
                 onUpdate();
