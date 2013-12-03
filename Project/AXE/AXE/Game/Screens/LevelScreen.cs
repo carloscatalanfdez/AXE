@@ -207,8 +207,8 @@ namespace AXE.Game.Screens
                     foreach (bEntity pp in entities["player"])
                         if (p != pp && p.collides(pp))
                         {
-                            pp.onCollision("player", p);
                             p.onCollision("player", pp);
+                            pp.onCollision("player", p);
                         }
                     foreach (bEntity e in entities["enemy"])
                         if (p != e && p.collides(e))

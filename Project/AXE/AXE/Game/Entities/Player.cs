@@ -1046,13 +1046,41 @@ namespace AXE.Game.Entities
                             {
                                 state = MovementState.Jump;
                                 vspeed = -jumpPower / 2;
-                                if (other.x + (other as Entity).graphicWidth() / 2 < x + graphicWidth() / 2)
+
+                                // Wait: does the collision make sense
+                                float otherEffectiveXPos = other.x + (other as Entity).graphicWidth() / 2;
+                                float effectiveXPos = x + graphicWidth() / 2;
+                                if (Math.Abs(other.x - x) > Math.Max((other as Entity).graphicWidth(), graphicWidth()))
+                                {
+                                    // They're actually really far appart, so only one has wrapped
+                                    // Find it and get the pos on the other side of the screen
+                                    if (otherEffectiveXPos < 0)
+                                    {
+                                        otherEffectiveXPos += (world as LevelScreen).width;
+                                    }
+                                    else if (other.x + (other as Entity).graphicWidth() > ((world as LevelScreen).width))
+                                    {
+                                        otherEffectiveXPos -= (world as LevelScreen).width;
+                                    }
+                                    else if (effectiveXPos < 0)
+                                    {
+                                        effectiveXPos += (world as LevelScreen).width;
+                                    }
+                                    else if (x + graphicWidth() > ((world as LevelScreen).width))
+                                    {
+                                        effectiveXPos -= (world as LevelScreen).width;
+                                    }
+
+                                }
+ 
+                                // Bounce ém
+                                if (otherEffectiveXPos < effectiveXPos)
                                 {
                                     jumpedFacing = Dir.Right;
                                     facing = Dir.Left;
                                     current_hspeed = getDirectionAsSign(Dir.Right) * hspeed;
                                 }
-                                else if (other.x + (other as Entity).graphicWidth() / 2 > x + graphicWidth() / 2)
+                                else if (otherEffectiveXPos > effectiveXPos)
                                 {
                                     jumpedFacing = Dir.Left;
                                     facing = Dir.Right;
