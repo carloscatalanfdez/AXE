@@ -94,6 +94,8 @@ namespace AXE.Game.Entities
         protected SoundEffect sfxCharge;
         protected SoundEffect sfxHit;
 
+        public Vector2 currentPlatformDelta;
+
         public int powerUps
         {
             get { return data.powerUps; }
@@ -238,6 +240,8 @@ namespace AXE.Game.Entities
             jumpMaxSpeed = 3.0f;
             axeToCatch = null;
             actionPressedSteps = 0;
+
+            currentPlatformDelta = Vector2.Zero;
         }
 
         protected void loadSoundEffects()
@@ -517,7 +521,10 @@ namespace AXE.Game.Entities
                     {
                         if (weapon != null)
                         {
-                            weapon.onThrow(10, facing);
+                            // Offset the axe if the user is moving on a platform, otherwise the player
+                            // can catch up with the axe on the first step and bam, dead
+                            float speedXOffset = currentPlatformDelta.X;
+                            weapon.onThrow(10, facing, (int) speedXOffset);
                             data.weapon = PlayerData.Weapons.None;
                             state = MovementState.Attacked;
                             if (!onair)
@@ -737,6 +744,7 @@ namespace AXE.Game.Entities
         {
             base.onUpdateEnd();
 
+            currentPlatformDelta = Vector2.Zero;
             handleActionButton();
 
             switch (state)
@@ -1385,6 +1393,7 @@ namespace AXE.Game.Entities
         {
             if (state != MovementState.Jump || (state == MovementState.Jump && vspeed > 0))
             {
+                currentPlatformDelta = delta;
                 base.onPlatformMovedWithDelta(delta, platform);
             }    
         }
