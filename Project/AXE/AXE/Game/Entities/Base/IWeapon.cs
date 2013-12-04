@@ -10,7 +10,7 @@ namespace AXE.Game.Entities.Base
     interface IWeapon
     {
         Vector2 getGrabPosition();
-        void onThrow(int force, Player.Dir dir, int xoffset = 0);
+        void onThrow(int force, Player.Dir dir, Vector2 handPosition);
         void onGrab(IWeaponHolder holder);
         void onDrop();
     }

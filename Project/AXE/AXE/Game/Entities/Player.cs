@@ -521,10 +521,9 @@ namespace AXE.Game.Entities
                     {
                         if (weapon != null)
                         {
-                            // Offset the axe if the user is moving on a platform, otherwise the player
-                            // can catch up with the axe on the first step and bam, dead
-                            float speedXOffset = currentPlatformDelta.X;
-                            weapon.onThrow(10, facing, (int) speedXOffset);
+                            // Update the axe pos, just in case
+                            Vector2 handPos = getHandPosition();
+                            weapon.onThrow(10, facing, getHandPosition());
                             data.weapon = PlayerData.Weapons.None;
                             state = MovementState.Attacked;
                             if (!onair)

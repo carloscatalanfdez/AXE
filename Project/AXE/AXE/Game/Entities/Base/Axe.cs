@@ -416,10 +416,10 @@ namespace AXE.Game.Entities
             thrower = null;
         }
 
-        public virtual void onThrow(int force, Player.Dir dir, int xoffset)
+        public virtual void onThrow(int force, Player.Dir dir, Vector2 handPosition)
         {
             // Holder is stored during flight
-            x += xoffset;
+            pos = handPosition - getGrabPosition();
             thrower = holder;
             justLaunched = true;
             wrapCount = 0;

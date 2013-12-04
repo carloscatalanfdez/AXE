@@ -142,7 +142,7 @@ namespace AXE.Game.Entities.Base
                     case State.Throwing:
                         sfxThrow.Play();
 
-                        weapon.onThrow(3, facing);
+                        weapon.onThrow(3, facing, getHandPosition());
                         timer[CHANGE_STATE_TIMER] = throwBaseTime + Tools.random.Next(throwOptionalTime) - throwOptionalTime;
                         break;
                     case State.GrabbedAxe:
