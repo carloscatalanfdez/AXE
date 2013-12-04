@@ -93,5 +93,8 @@
       <node x="272" y="240" />
       <node x="272" y="96" />
     </MoveablePlatform>
+    <Lever id="4" x="112" y="192" rewarder="0" />
+    <Undead id="5" x="64" y="176" />
+    <Dagger id="6" x="128" y="96" NewValue0="0" />
   </Entities>
 </level>

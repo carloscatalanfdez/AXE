@@ -22,7 +22,7 @@ using Microsoft.Xna.Framework.Media;
 
 namespace AXE.Game.Entities
 {
-    class Player : Entity, IWeaponHolder, IPlatformUser
+    class Player : Entity, IWeaponHolder
     {
         // Utilities
         public GameInput mginput;
@@ -1381,15 +1381,11 @@ namespace AXE.Game.Entities
         }
 
         /* IPlatformUser implementation */
-        public void onPlatformMovedWithDelta(Vector2 delta, Entity platform)
+        override public void onPlatformMovedWithDelta(Vector2 delta, Entity platform)
         {
             if (state != MovementState.Jump || (state == MovementState.Jump && vspeed > 0))
             {
-                if (Math.Abs(mask.rect.Bottom - platform.y) <= Math.Abs(delta.Y))
-                {
-                    previousPosition += delta;
-                    pos += delta;
-                }
+                base.onPlatformMovedWithDelta(delta, platform);
             }    
         }
     }

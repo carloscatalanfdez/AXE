@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using AXE.Game.Entities.Base;
+using Microsoft.Xna.Framework;
+using bEngine;
 using bEngine.Graphics;
+
+
+using AXE.Game.Entities.Base;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace AXE.Game.Entities.Contraptions

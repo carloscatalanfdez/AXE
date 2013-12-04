@@ -114,10 +114,10 @@ namespace AXE.Game.Entities.Contraptions
             }
 
             // Notify people up there!
-            List<bEntity> cargo = instancesPlace(x, y - 1, "player", null, platformUserCondition);
+            List<bEntity> cargo = instancesPlace(x, y - 1, new String[] { "player", "enemy", "contraptions", "items"  }, null, platformUserCondition);
             foreach (bEntity entity in cargo)
             {
-                if (entity != null && entity is IPlatformUser)
+                if (entity != null && entity is IPlatformUser && entity != this)
                     (entity as IPlatformUser).onPlatformMovedWithDelta(pos - oldPosition, this);
             }
         }

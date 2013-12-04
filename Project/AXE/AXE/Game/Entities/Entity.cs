@@ -9,10 +9,11 @@ using bEngine.Graphics;
 
 using AXE.Game.Screens;
 using AXE.Game.Utils;
+using AXE.Game.Entities.Base;
 
 namespace AXE.Game.Entities
 {
-    class Entity : bEntity
+    class Entity : bEntity, IPlatformUser
     {
         public const string ATTR_SOLID = "solid";
         public enum Dir { None, Left, Right };
@@ -670,6 +671,16 @@ namespace AXE.Game.Entities
         {
             this.timer[timer] = Utils.Tools.random.Next(range.min, range.max);
             return this.timer[timer];
+        }
+
+        /* IPlatformUser implementation */
+        virtual public void onPlatformMovedWithDelta(Vector2 delta, Entity platform)
+        {
+            if (Math.Abs(mask.rect.Bottom - platform.y) <= Math.Abs(delta.Y))
+            {
+                previousPosition += delta;
+                pos += delta;
+            }
         }
     }
 }
