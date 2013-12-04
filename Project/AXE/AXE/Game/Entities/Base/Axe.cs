@@ -80,10 +80,35 @@ namespace AXE.Game.Entities
             initParams();
         }
 
+        virtual public void loadIdleMask()
+        {
+            _mask.w = 14;
+            _mask.h = 14;
+            _mask.offsetx = 0;
+            _mask.offsety = 0;
+        }
+
+        virtual public void loadFlyMask()
+        {
+            if (facing == Player.Dir.Left)
+            {
+                _mask.w = 1;
+                _mask.h = 14;
+                _mask.offsetx = 0;
+                _mask.offsety = 0;
+            }
+            else
+            {
+                _mask.w = 1;
+                _mask.h = 14;
+                _mask.offsetx = 13;
+                _mask.offsety = 0;
+            }
+        }
+
         protected virtual void initParams()
         {
-            mask = new bMask(0, 0, 14, 14);
-            mask.game = game;
+            loadIdleMask();
             attributes.Add("axe");
             current_hspeed = current_vspeed = 0;
             gravity = 0.5f;
@@ -173,6 +198,15 @@ namespace AXE.Game.Entities
         {
             base.onUpdate();
 
+            if (state == MovementState.Flying)
+            {
+                loadFlyMask();
+            }
+            else
+            {
+                loadIdleMask();
+            }
+
             // Prepare step
             Vector2 moveTo = pos;
 
@@ -194,16 +228,25 @@ namespace AXE.Game.Entities
 
                     moveTo.X += current_hspeed;
                     moveTo.Y += current_vspeed;
-                    Vector2 remnant = moveToContact(moveTo, "solid");
 
-                    traveledFlightDistance += (int) Math.Abs(pos.X - moveTo.X);
-
-                    // We have been stopped
-                    if (remnant.X != 0 || remnant.Y != 0)
+                    Vector2 remnant;
+                    if (justLaunched)
                     {
-                        // Stop accelerating if we have stopped
-                        bEntity entity = instancePlace(moveTo, "solid");
-                        onHitSolid(entity);
+                        pos = moveTo;
+                    }
+                    else
+                    {
+                        remnant = moveToContact(moveTo, "solid");
+
+                        traveledFlightDistance += (int)Math.Abs(pos.X - moveTo.X);
+
+                        // We have been stopped
+                        if (remnant.X != 0 || remnant.Y != 0)
+                        {
+                            // Stop accelerating if we have stopped
+                            bEntity entity = instancePlace(moveTo, "solid");
+                            onHitSolid(entity);
+                        }
                     }
                     break;
                 case MovementState.Bouncing:
@@ -408,6 +451,9 @@ namespace AXE.Game.Entities
 
         public virtual void onHitSolid(bEntity entity)
         {
+            if (justLaunched)
+                return;
+
             // notify other entity
             if (entity != null && (entity is Entity))
             {
@@ -418,6 +464,9 @@ namespace AXE.Game.Entities
 
         public virtual void onStuck(bEntity entity)
         {
+            if (justLaunched)
+                return;
+
             current_hspeed = current_vspeed = 0;
             state = MovementState.Stuck;
             if (entity is Entity)

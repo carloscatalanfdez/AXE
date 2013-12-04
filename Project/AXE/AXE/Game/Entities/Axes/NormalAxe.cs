@@ -19,10 +19,35 @@ namespace AXE.Game.Entities.Axes
             // create stuff
         }
 
+        override public void loadIdleMask()
+        {
+            _mask.w = 14;
+            _mask.h = 15;
+            _mask.offsetx = 3;
+            _mask.offsety = 3;
+        }
+
+        override public void loadFlyMask()
+        {
+            if (facing == Player.Dir.Left)
+            {
+                _mask.w = 1;
+                _mask.h = 15;
+                _mask.offsetx = 3;
+                _mask.offsety = 3;
+            }
+            else
+            {
+                _mask.w = 1;
+                _mask.h = 15;
+                _mask.offsetx = 16;
+                _mask.offsety = 3;
+            }
+        }
+
         protected override void initParams()
         {
-            mask = new bMask(0, 0, 14, 15, 3, 3);
-            mask.game = game;
+            loadIdleMask();
             attributes.Add("axe");
             current_hspeed = current_vspeed = 0;
             gravity = 0.8f;
@@ -54,6 +79,9 @@ namespace AXE.Game.Entities.Axes
 
         public override void onHitSolid(bEntity entity)
         {
+            if (justLaunched)
+                return;
+
             if (entity != null && (entity is Entity))
             {
                 if ((entity as Entity).onHit(this))
