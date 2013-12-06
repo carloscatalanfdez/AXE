@@ -412,6 +412,8 @@ namespace AXE.Game.Screens
                     _add(e, "items");
                 else if (e is Enemy)
                     _add(e, "enemy");
+                else if (e is Axe)
+                    _add(e, "axe");
                 else if (e is Item)
                     _add(e, "items");
                 else if (e is TrapDoor)

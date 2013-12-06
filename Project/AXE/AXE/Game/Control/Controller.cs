@@ -147,8 +147,9 @@ namespace AXE.Game.Control
                 if (!pdata.playing)
                 {
                     // Give new axe on game start
-                    if (pdata.weapon == PlayerData.Weapons.None)
-                        pdata.weapon = PlayerData.Weapons.Axe;
+                    // NO!! >:(
+                    //if (pdata.weapon == PlayerData.Weapons.None)
+                    //    pdata.weapon = PlayerData.Weapons.Axe;
 
                     pdata.playing = true;
                     activePlayers++;

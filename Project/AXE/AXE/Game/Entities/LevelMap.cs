@@ -14,6 +14,7 @@ using AXE.Game.Entities;
 using AXE.Game.Entities.Contraptions;
 using AXE.Game.Entities.Base;
 using AXE.Game.Entities.Enemies;
+using AXE.Game.Entities.Axes;
 
 namespace AXE.Game.Entities
 {
@@ -213,6 +214,9 @@ namespace AXE.Game.Entities
                     break;
                 case "Lever":
                     ge = new Lever(x, y);
+                    break;
+                case "NormalAxe":
+                    ge = new NormalAxe(x, y, null);
                     break;
                 case "MoveablePlatform":
                     attr = element.GetAttribute("width");
