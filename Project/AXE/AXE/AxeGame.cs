@@ -25,6 +25,14 @@ namespace AXE
 
         public ResourceManager res;
 
+        public int FramesPerSecond
+        {
+            get
+            {
+                return (int)(1.0f / millisecondsPerFrame * 1000);
+            }
+        }
+
         // Debug
         int currentTechnique;
         RenderTarget2D renderTarget;
@@ -89,8 +97,8 @@ namespace AXE
             Tools.step = 0;
             // switchFullScreen();
             Controller.getInstance().setGame(this);
-            // Controller.getInstance().onMenuStart();
-            changeWorld(new LogoScreen());
+            Controller.getInstance().onMenuStart();
+            // changeWorld(new LogoScreen());
 
             base.Initialize();
         }
@@ -108,6 +116,11 @@ namespace AXE
                     GameData.get().coins--;
                     GameData.saveGame();
                 }
+            }
+
+            if (input.pressed(Keys.T))
+            {
+                Controller.getInstance().onGameOver();
             }
 
             if (Common.GameInput.getInstance(PlayerIndex.One).pressed(Common.PadButton.debug))
@@ -148,6 +161,18 @@ namespace AXE
             {
                 screenshot();
             }
+            // 
+            else if (input.pressed(Keys.D8))
+            {
+                horizontalZoom--;
+                verticalZoom--;
+            }
+            else if (input.pressed(Keys.D9))
+            {
+                horizontalZoom++;
+                verticalZoom++;
+            }
+
 
             vizdeb.update();
 

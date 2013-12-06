@@ -72,8 +72,9 @@ namespace AXE.Game.Utils
         public void loadContent()
         {
             // Misc
-            effect = contentManager.Load<Effect>(resourcesPath + "/scanlines");
-            badladnsBanner = contentManager.Load<Texture2D>(resourcesPath + "/badladns_banner");
+            effect          = contentManager.Load<Effect>(resourcesPath + "/scanlines");
+            badladnsBanner  = contentManager.Load<Texture2D>(resourcesPath + "/badladns_banner");
+            sprTotalLine    = loadSprite("total-line");
 
             // Spritesheets
             sprCursor = loadSprite("cursor");
@@ -127,12 +128,16 @@ namespace AXE.Game.Utils
             sfxDirtstepA    = loadSfx("sfx-dirtstep.1");
             sfxDirtstepB    = loadSfx("sfx-dirtstep.2");
             sfxDirtstepC    = loadSfx("sfx-dirtstep.3");
+            sfxGreatBell    = loadSfx("sfx-bell");
+            sfxBigBell      = loadSfx("sfx-bell.1");
+            sfxMidBell      = loadSfx("sfx-bell.2");
         }
 
         // Hardcoding resources for now to ease development
         // Misc
         public Effect effect;
         public Texture2D badladnsBanner;
+        public Texture2D sprTotalLine;
 
         // Spritesheets
         public Texture2D sprCursor;
@@ -183,5 +188,8 @@ namespace AXE.Game.Utils
         public SoundEffect sfxDirtstepA;
         public SoundEffect sfxDirtstepB;
         public SoundEffect sfxDirtstepC;
+        public SoundEffect sfxGreatBell;
+        public SoundEffect sfxBigBell;
+        public SoundEffect sfxMidBell;
     }
 }

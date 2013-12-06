@@ -94,5 +94,6 @@
     <Undead id="27" x="64" y="40" />
     <Undead id="28" x="88" y="40" />
     <Undead id="29" x="112" y="40" />
+    <FlameSpirit id="30" x="224" y="152" />
   </Entities>
 </level>

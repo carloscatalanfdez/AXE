@@ -71,6 +71,8 @@ namespace AXE.Game.Utils
             drawLabel(sb, text, new Vector2(0, 64));
             drawLabel(sb, "" + Tools.step, 
                 new Vector2(0, game.GraphicsDevice.PresentationParameters.BackBufferHeight - 8));
+            drawLabel(sb, "" + (game as AxeGame).FramesPerSecond,
+                new Vector2(0, game.GraphicsDevice.PresentationParameters.BackBufferHeight - 16));
         }
 
         void drawLabel(SpriteBatch sb, string label, Vector2 pos)

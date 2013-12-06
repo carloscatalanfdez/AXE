@@ -92,6 +92,7 @@ namespace AXE.Game.Control
 
         public void onGameOver()
         {
+            game.changeWorld(new GameOverScreen(), new FadeToColor(game, Color.Black, 120));
         }
 
         public void onGameWin()
@@ -127,7 +128,7 @@ namespace AXE.Game.Control
 
             activePlayers--;
             if (activePlayers <= 0)
-                game.changeWorld(new GameOverScreen(), new FadeToColor(game, Color.Black, 120));
+                onGameOver();
         }
 
         /** Returns true if valid start press **/

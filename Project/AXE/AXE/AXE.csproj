@@ -141,6 +141,7 @@
     <Compile Include="Game\Entities\Stairs.cs" />
     <Compile Include="Game\Screens\GameOverScreen.cs" />
     <Compile Include="Game\Screens\WinScreen.cs" />
+    <Compile Include="Game\UI\TimedLabel.cs" />
     <Compile Include="Game\Utils\Range.cs" />
     <Compile Include="Game\Utils\Colors.cs" />
     <Compile Include="Game\Control\Controller.cs" />
@@ -229,6 +230,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Assets\Maps\r0.oel">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Maps\r1.oel">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Assets\Maps\test-1.oel">
