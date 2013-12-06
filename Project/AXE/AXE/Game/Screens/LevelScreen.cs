@@ -28,7 +28,7 @@ namespace AXE.Game.Screens
         List<bEntity> renderQueue;
 
         // Management
-        public int id;
+        public string id;
         public String name;
         bool paused;
 
@@ -56,7 +56,7 @@ namespace AXE.Game.Screens
         // String msg;
         public bStamp cursor;
         
-        public LevelScreen(int id, int lastCheckpoint = -1)
+        public LevelScreen(string id, int lastCheckpoint = -1)
             : base()
         {
             this.id = id;
@@ -85,46 +85,15 @@ namespace AXE.Game.Screens
             entities.Add("rewarders", new List<bEntity>());
 
             // Load level
-            if (id < Controller.getInstance().data.maxLevels)
+            String fname = id.ToString();
+            levelMap = new LevelMap(fname);
+            _add(levelMap, "solid"); // Adding to world performs init & loading
+            name = levelMap.name;
+
+            // Add players
+            foreach (PlayerData pdata in GameData.get().playerData)
             {
-                String fname = id.ToString();
-                levelMap = new LevelMap(fname);
-                _add(levelMap, "solid"); // Adding to world performs init & loading
-                name = levelMap.name;
-            }
-            else
-            {
-                // Handle ending/nonsense
-
-                // Dummy floor for now
-                bEntity ground = new bEntity(0, 246);
-                ground.mask = new bMask(0, 0, 300, 20);
-                ground.mask.game = game;
-                _add(ground, "solid");
-
-                Stairs stairs = new Stairs(0, 206, 20, 40);
-                _add(stairs, "stairs");
-
-                // Dummy map
-                levelMap = new LevelMap(null);
-                levelMap.tilemap = new bTilemap(400, 256, 8, 8, bDummyRect.sharedDummyRect(game));
-                // Do not add it because there's no file and it will break
-            }
-
-            /*background = new bStamp("HOHO!");
-            background.color = new Color(0.0f, 0.0f, 0.0f, 0.0f);*/
-
-            // Add player
-            if (id < Controller.getInstance().data.maxLevels)
-            {
-                foreach (PlayerData pdata in GameData.get().playerData)
-                {
-                    spawnPlayer(pdata);
-                }
-            }
-            else
-            {
-                // Handle ending/nonsense
+                spawnPlayer(pdata);
             }
 
             // Add loaded entities
@@ -277,17 +246,7 @@ namespace AXE.Game.Screens
                 }
                     
             }
-            
-            // Update camera
-            if (id >= GameData.get().maxLevels)
-            {
-                // Handle ending/nonsense
-            }
-            else
-            {
-                // Camera follows player?
-            }
-            
+                        
             // Debug: R for restart
             if (bGame.input.pressed(Microsoft.Xna.Framework.Input.Keys.R))
                 game.changeWorld(new LevelScreen(id));

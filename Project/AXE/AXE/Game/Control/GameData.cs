@@ -18,9 +18,25 @@ namespace AXE.Game.Control
         }
 
         // Declare here game data
+        List<string> levels;
         public int level;
-        public int maxLevels;
+        public string GetCurrentLevel
+        {
+            get { return levels[level]; }
+        }
+
+        public int MaxLevels 
+        { 
+            get 
+            { 
+                if (levels == null)
+                    return 0;
+                else
+                    return levels.Count; 
+            } 
+        }
         public int credits;
+
         // Meta
         GameDataStruct state;
         public int coins
@@ -54,7 +70,7 @@ namespace AXE.Game.Control
 
         public void initPlayData()
         {
-            maxLevels = 4;
+            levels = new List<string>(new string[]{"base", "r0", "c0", "c1", "0", "1", "2", "3", "test-1"});
             level = 0;
         }
 

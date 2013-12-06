@@ -83,7 +83,7 @@ namespace AXE.Game.Control
             }
 
             // Go to first screen
-            game.changeWorld(new LevelScreen(data.level), new FadeToColor(game, Color.Black, 10));
+            game.changeWorld(new LevelScreen(data.GetCurrentLevel), new FadeToColor(game, Color.Black, 10));
         }
 
         public void onGameEnd()
@@ -105,10 +105,10 @@ namespace AXE.Game.Control
 
             // Handle level progression
             data.level += 1;
-            if (data.level >= data.maxLevels)
+            if (data.level >= data.MaxLevels)
                 onGameWin();
             else
-                game.changeWorld(new LevelScreen(data.level), new FadeToColor(game, Colors.clear, 10));
+                game.changeWorld(new LevelScreen(data.GetCurrentLevel), new FadeToColor(game, Colors.clear, 10));
             return data.level;
         }
 
