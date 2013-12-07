@@ -79,20 +79,28 @@ namespace AXE.Game.Utils
             // Spritesheets
             sprCursor = loadSprite("cursor");
 
+                // Player
             sprKnightASheet = loadSprite("knight-sheet");
             sprKnightBSheet = loadSprite("knight-sheet-alt");
+
+                // Weapons
             sprAxeSheet     = loadSprite("axe-sheet");
             sprStickSheet   = loadSprite("stick-sheet");
             
+                // Items
             sprCoinSheet    = loadSprite("coin-sheet");
             sprHighfallGuardSheet 
                             = loadSprite("highfallguard-sheet");
 
+                // Contraptions
             sprLeverSheet   = loadSprite("lever-sheet");
             sprTrapdoorSheet= loadSprite("trapdoor-sheet");
-            sprDoorSheet    = loadSprite("door-sheet");
+            sprExitDoorSheet= loadSprite("door-sheet");
             sprSignSheet    = loadSprite("sign-sheet");
+            sprDoorSheet    = loadSprite("doors-sheet");
+            sprLocksSheet   = loadSprite("locks-sheet");
 
+                // Enemies
             sprSlimeSheet   = loadSprite("corrosiveslime-sheet");
             sprAxeThrowerSheet 
                             = loadSprite("axethrower-sheet");
@@ -123,11 +131,16 @@ namespace AXE.Game.Utils
             sfxDrop         = loadSfx("axe-drop");
             sfxGrab         = loadSfx("sfx-grab");
             sfxHurt         = loadSfx("sfx-hurt");
+
             sfxEvilPick     = loadSfx("sfx-evilpick");
             sfxEvilThrow    = loadSfx("sfx-evilthrow");
             sfxDirtstepA    = loadSfx("sfx-dirtstep.1");
             sfxDirtstepB    = loadSfx("sfx-dirtstep.2");
             sfxDirtstepC    = loadSfx("sfx-dirtstep.3");
+
+            sfxOpenDoor     = loadSfx("sfx-opendoor");
+            sfxCloseDoor    = loadSfx("sfx-closedoor");
+
             sfxGreatBell    = loadSfx("sfx-bell");
             sfxBigBell      = loadSfx("sfx-bell.1");
             sfxMidBell      = loadSfx("sfx-bell.2");
@@ -153,8 +166,10 @@ namespace AXE.Game.Utils
 
         public Texture2D sprLeverSheet;
         public Texture2D sprTrapdoorSheet;
-        public Texture2D sprDoorSheet;
+        public Texture2D sprExitDoorSheet;
         public Texture2D sprSignSheet;
+        public Texture2D sprDoorSheet;
+        public Texture2D sprLocksSheet;
 
         public Texture2D sprSlimeSheet;
         public Texture2D sprAxeThrowerSheet;
@@ -183,11 +198,16 @@ namespace AXE.Game.Utils
         public SoundEffect sfxDrop;
         public SoundEffect sfxGrab;
         public SoundEffect sfxHurt;
+
         public SoundEffect sfxEvilPick;
         public SoundEffect sfxEvilThrow;
         public SoundEffect sfxDirtstepA;
         public SoundEffect sfxDirtstepB;
         public SoundEffect sfxDirtstepC;
+
+        public SoundEffect sfxOpenDoor;
+        public SoundEffect sfxCloseDoor;
+
         public SoundEffect sfxGreatBell;
         public SoundEffect sfxBigBell;
         public SoundEffect sfxMidBell;

@@ -81,5 +81,6 @@
     <CorrosiveSlime id="14" x="8" y="136" />
     <Imp id="15" x="128" y="40" rewarder="0" target="0" targetX="0" targetY="0" value="0" />
     <Imp id="16" x="232" y="208" rewarder="0" target="0" targetX="0" targetY="0" value="0" />
+    <Door id="17" x="152" y="200" lock="None" />
   </Entities>
 </level>

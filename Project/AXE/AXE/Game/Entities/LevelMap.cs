@@ -24,7 +24,6 @@ namespace AXE.Game.Entities
         int tileHeight = 8;
 
         public String mapName;
-        public String tsetFilename;
 
         public bTilemap tilemap;
         public List<bEntity> entities;
@@ -164,11 +163,11 @@ namespace AXE.Game.Entities
                     break;
                 case "ExitDoor":
                     bool open = bool.Parse(element.GetAttribute("open"));
-                    ge = new Door(x, y, open ? Door.Type.ExitOpen : Door.Type.ExitClose);
+                    ge = new ExitDoor(x, y, open ? ExitDoor.Type.ExitOpen : ExitDoor.Type.ExitClose);
                     break;
                 case "PlayerStart":
                     playerStart = new Vector2(x, y);
-                    ge = new Door(x, y, Door.Type.Entry);
+                    ge = new ExitDoor(x, y, ExitDoor.Type.Entry);
                     break;
                 case "Ladder":
                     int width = int.Parse(element.GetAttribute("width"));
@@ -238,6 +237,9 @@ namespace AXE.Game.Entities
                     }
                     
                     ge = new MoveablePlatform(x, y, width, nodes, steps, cycle);
+                    break;
+                case "Door":
+                    ge = new Door(x, y);
                     break;
                 case "HighGuardFallPowerUp":
                     ge = new PowerUpPickable(x, y, PowerUpPickable.Type.HighFallGuard);

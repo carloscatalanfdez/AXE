@@ -68,6 +68,8 @@ namespace AXE.Game.Entities
             throw new NotImplementedException("Declare this method for this class!");
         }
 
+        public AxeGame Game { get { return game as AxeGame; } }
+
         public Entity(int x, int y)
             : base(x, y)
         {

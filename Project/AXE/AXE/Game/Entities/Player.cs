@@ -387,10 +387,10 @@ namespace AXE.Game.Entities
                             else if (mginput.check(PadButton.up) && placeMeeting(x, y, "items"))
                             {
                                 bEntity door = (bEntity)instancePlace(x, y, "items");
-                                if (door is Door)
+                                if (door is ExitDoor)
                                 {
-                                    Door exitDoor = (door as Door);
-                                    if (exitDoor.type == Door.Type.ExitOpen)
+                                    ExitDoor exitDoor = (door as ExitDoor);
+                                    if (exitDoor.type == ExitDoor.Type.ExitOpen)
                                     {
                                         state = MovementState.Exit;
                                         timer[EXIT_ANIM_TIMER] = exitAnimationWaitTime;
@@ -985,7 +985,7 @@ namespace AXE.Game.Entities
                     vspeed = -jumpPower;
                     break;
                 case EXIT_ANIM_TIMER:
-                    Door door = (instancePlace(x, y, "items") as Door);
+                    ExitDoor door = (instancePlace(x, y, "items") as ExitDoor);
                     if (door != null)
                     {
                         if (door.onPlayerExit())

@@ -113,6 +113,7 @@
     <Compile Include="Game\Entities\Base\Axe.cs" />
     <Compile Include="Game\Entities\Base\Enemy.cs" />
     <Compile Include="Game\Entities\Base\IPlatformUser.cs" />
+    <Compile Include="Game\Entities\Contraptions\Door.cs" />
     <Compile Include="Game\Entities\Contraptions\MoveablePlatform.cs" />
     <Compile Include="Game\Entities\Enemies\Dagger.cs" />
     <Compile Include="Game\Entities\Enemies\Undead.cs" />
@@ -135,7 +136,7 @@
     <Compile Include="Game\Entities\Enemies\KillerRect.cs" />
     <Compile Include="Game\Entities\Entity.cs" />
     <Compile Include="Game\Entities\Base\IWeaponHolder.cs" />
-    <Compile Include="Game\Entities\Door.cs" />
+    <Compile Include="Game\Entities\ExitDoor.cs" />
     <Compile Include="Game\Entities\ItemGenerator.cs" />
     <Compile Include="Game\Entities\OneWayPlatform.cs" />
     <Compile Include="Game\Entities\Stairs.cs" />

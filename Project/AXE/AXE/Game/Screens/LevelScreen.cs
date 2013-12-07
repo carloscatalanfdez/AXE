@@ -90,6 +90,9 @@ namespace AXE.Game.Screens
             _add(levelMap, "solid"); // Adding to world performs init & loading
             name = levelMap.name;
 
+            // Load background
+            background = null;
+
             // Add players
             foreach (PlayerData pdata in GameData.get().playerData)
             {
@@ -367,7 +370,7 @@ namespace AXE.Game.Screens
                     _add(e, "onewaysolid");
                 else if (e is Stairs)
                     _add(e, "stairs");
-                else if (e is Door)
+                else if (e is ExitDoor)
                     _add(e, "items");
                 else if (e is Enemy)
                     _add(e, "enemy");
@@ -381,6 +384,8 @@ namespace AXE.Game.Screens
                     _add(e, "contraptions");
                 else if (e is MoveablePlatform)
                     _add(e, "onewaysolid");
+                else if (e is Door)
+                    _add(e, "solid");
                 // Contraptions and rewarders may be added before, but if they are not,
                 // we'll add them to these categories
                 else if (e is IContraption)

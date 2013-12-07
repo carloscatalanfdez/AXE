@@ -14,7 +14,7 @@ using AXE.Game.Control;
 
 namespace AXE.Game.Entities
 {
-    class Door : Entity, IRewarder
+    class ExitDoor : Entity, IRewarder
     {
         public const int EXIT_TRANSITION_TIMER = 2;
         public int exitTransitionWaitTime;
@@ -31,7 +31,7 @@ namespace AXE.Game.Entities
         public enum Type { Entry, ExitOpen, ExitClose };
         public Type type;
 
-        public Door(int x, int y, Type type)
+        public ExitDoor(int x, int y, Type type)
             : base(x, y)
         {
             this.type = type;
@@ -46,7 +46,7 @@ namespace AXE.Game.Entities
             mask.offsetx = 8;
             mask.offsety = 8;
 
-            spgraphic = new bSpritemap((game as AxeGame).res.sprDoorSheet, 24, 32);
+            spgraphic = new bSpritemap((game as AxeGame).res.sprExitDoorSheet, 24, 32);
             spgraphic.add(new bAnim("closed", new int[] { 0 }));
             spgraphic.add(new bAnim("open", new int[] { 1 }));
             if (type == Type.Entry || type == Type.ExitClose)

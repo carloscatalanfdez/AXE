@@ -397,5 +397,30 @@
       </ValueDefinitions>
       <NodesDefinition Enabled="false" Limit="-1" DrawMode="None" Ghost="false" />
     </EntityDefinition>
+    <EntityDefinition Name="Door" Limit="-1" ResizableX="false" ResizableY="false" Rotatable="false" RotateIncrement="15">
+      <Size>
+        <Width>8</Width>
+        <Height>40</Height>
+      </Size>
+      <Origin>
+        <X>-4</X>
+        <Y>0</Y>
+      </Origin>
+      <ImageDefinition DrawMode="Rectangle" ImagePath="" Tiled="false">
+        <RectColor A="255" R="0" G="255" B="255" />
+      </ImageDefinition>
+      <ValueDefinitions>
+        <ValueDefinition xsi:type="EnumValueDefinition" Name="lock">
+          <Elements>
+            <string>None</string>
+            <string>Yellow</string>
+            <string>Red</string>
+            <string>Green</string>
+            <string>Blue</string>
+          </Elements>
+        </ValueDefinition>
+      </ValueDefinitions>
+      <NodesDefinition Enabled="false" Limit="-1" DrawMode="None" Ghost="false" />
+    </EntityDefinition>
   </EntityDefinitions>
 </project>
