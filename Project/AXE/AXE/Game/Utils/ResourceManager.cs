@@ -99,6 +99,7 @@ namespace AXE.Game.Utils
             sprSignSheet    = loadSprite("sign-sheet");
             sprDoorSheet    = loadSprite("doors-sheet");
             sprLocksSheet   = loadSprite("locks-sheet");
+            sprKeysSheet    = loadSprite("keys-sheet");
 
                 // Enemies
             sprSlimeSheet   = loadSprite("corrosiveslime-sheet");
@@ -141,6 +142,9 @@ namespace AXE.Game.Utils
             sfxOpenDoor     = loadSfx("sfx-opendoor");
             sfxCloseDoor    = loadSfx("sfx-closedoor");
             sfxUnlock       = loadSfx("sfx-unlock");
+            sfxKeyA         = loadSfx("sfx-gotkey.1");
+            sfxKeyB         = loadSfx("sfx-gotkey.2");
+            sfxKeyC         = loadSfx("sfx-gotkey.3");
 
             sfxGreatBell    = loadSfx("sfx-bell");
             sfxBigBell      = loadSfx("sfx-bell.1");
@@ -171,6 +175,7 @@ namespace AXE.Game.Utils
         public Texture2D sprSignSheet;
         public Texture2D sprDoorSheet;
         public Texture2D sprLocksSheet;
+        public Texture2D sprKeysSheet;
 
         public Texture2D sprSlimeSheet;
         public Texture2D sprAxeThrowerSheet;
@@ -209,6 +214,9 @@ namespace AXE.Game.Utils
         public SoundEffect sfxOpenDoor;
         public SoundEffect sfxCloseDoor;
         public SoundEffect sfxUnlock;
+        public SoundEffect sfxKeyA;
+        public SoundEffect sfxKeyB;
+        public SoundEffect sfxKeyC;
 
         public SoundEffect sfxGreatBell;
         public SoundEffect sfxBigBell;

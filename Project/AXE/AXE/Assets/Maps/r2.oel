@@ -81,5 +81,25 @@
     <OneWayPlatform id="14" x="16" y="152" width="16" />
     <OneWayPlatform id="15" x="200" y="112" width="16" />
     <OneWayPlatform id="16" x="200" y="96" width="16" />
+    <KeyA id="17" x="64" y="232" />
+    <KeyA id="18" x="80" y="224" />
+    <KeyB id="19" x="48" y="224" />
+    <KeyB id="20" x="32" y="232" />
+    <KeyB id="21" x="16" y="232" />
+    <KeyB id="22" x="24" y="232" />
+    <KeyC id="23" x="8" y="200" />
+    <KeyC id="24" x="24" y="200" />
+    <KeyC id="25" x="24" y="144" />
+    <KeyC id="26" x="16" y="144" />
+    <KeyC id="27" x="288" y="176" />
+    <KeyC id="28" x="296" y="232" />
+    <KeyB id="29" x="168" y="176" />
+    <KeyB id="30" x="128" y="168" />
+    <KeyB id="31" x="96" y="168" />
+    <KeyB id="32" x="72" y="176" />
+    <KeyB id="33" x="112" y="136" />
+    <KeyA id="34" x="208" y="176" />
+    <KeyA id="35" x="200" y="120" />
+    <KeyA id="36" x="152" y="120" />
   </Entities>
 </level>

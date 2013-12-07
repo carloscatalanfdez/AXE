@@ -114,6 +114,7 @@
     <Compile Include="Game\Entities\Base\Enemy.cs" />
     <Compile Include="Game\Entities\Base\IPlatformUser.cs" />
     <Compile Include="Game\Entities\Contraptions\Door.cs" />
+    <Compile Include="Game\Entities\Contraptions\Key.cs" />
     <Compile Include="Game\Entities\Contraptions\MoveablePlatform.cs" />
     <Compile Include="Game\Entities\Enemies\Dagger.cs" />
     <Compile Include="Game\Entities\Enemies\Undead.cs" />

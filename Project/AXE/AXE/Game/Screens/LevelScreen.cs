@@ -386,6 +386,8 @@ namespace AXE.Game.Screens
                     _add(e, "onewaysolid");
                 else if (e is Door)
                     _add(e, "solid");
+                else if (e is Key)
+                    _add(e, "items");
                 // Contraptions and rewarders may be added before, but if they are not,
                 // we'll add them to these categories
                 else if (e is IContraption)
