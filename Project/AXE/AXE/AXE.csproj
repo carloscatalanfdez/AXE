@@ -236,6 +236,9 @@
     <None Include="Assets\Maps\r1.oel">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Assets\Maps\r2.oel">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Assets\Maps\test-1.oel">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

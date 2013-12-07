@@ -18,5 +18,13 @@ namespace AXE.Game.Utils
                 return new Color(random.Next(256), random.Next(256), random.Next(256));
             }
         }
+
+        public static string padString(string label, int width, char padder = ' ')
+        {
+            while (label.Length < width)
+                label = padder + label;
+
+            return label;
+        }
     }
 }

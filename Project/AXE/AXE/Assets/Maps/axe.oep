@@ -413,12 +413,11 @@
         <ValueDefinition xsi:type="EnumValueDefinition" Name="lock">
           <Elements>
             <string>None</string>
-            <string>Yellow</string>
-            <string>Red</string>
-            <string>Green</string>
-            <string>Blue</string>
+            <string>Key</string>
+            <string>Contraption</string>
           </Elements>
         </ValueDefinition>
+        <ValueDefinition xsi:type="IntValueDefinition" Name="key" Default="0" Min="0" Max="3" ShowSlider="true" />
       </ValueDefinitions>
       <NodesDefinition Enabled="false" Limit="-1" DrawMode="None" Ghost="false" />
     </EntityDefinition>

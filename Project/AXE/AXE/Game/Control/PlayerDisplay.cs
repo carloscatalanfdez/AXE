@@ -8,6 +8,7 @@ using AXE.Game.Entities.Base;
 using AXE.Common;
 using bEngine;
 using AXE.Game.Screens;
+using AXE.Game.Utils;
 
 namespace AXE.Game.Control
 {
@@ -24,6 +25,7 @@ namespace AXE.Game.Control
         string renderLine1, renderLine2;
         Color line1Color;
         Color line2Color;
+        bool displayKeys;
 
         Player player;
 
@@ -52,7 +54,7 @@ namespace AXE.Game.Control
             else
             {
                 line1Color = new Color(159, 127, 127);
-                pos = new Vector2(208, 0);
+                pos = new Vector2(200, 0);
             }
             line2Color = Color.White;
         }
@@ -67,17 +69,32 @@ namespace AXE.Game.Control
             base.update();
 
             renderLine1 = playerNumber + "UP";
+            displayKeys = false;
 
             if (playerData.playing)
             {
                 if (playerData.alive)
                 {
+                    // Line 1: 1UP POWERUPS
                     if ((playerData.powerUps & PowerUpPickable.HIGHFALLGUARD_EFFECT) != 0)
                     {
                         renderLine1 += " HF";
                     }
+                    else
+                        renderLine1 += " HF PS MD"; // Just testing
 
-                    renderLine2 = "       00 00";
+                    // Line 2: SCORE COINS KEYS
+                    renderLine2 = " ";
+                    string scoreStr = 
+                        (playerData.score == 0 ? "0" : "") + playerData.score;
+                    string coinsStr =
+                        (playerData.collectedCoins == 0 ? "0" : "") 
+                            + playerData.collectedCoins;
+                    renderLine2 += Tools.padString(scoreStr, 8);
+                    renderLine2 += " ";
+                    renderLine2 += Tools.padString(coinsStr, 2);
+
+                    displayKeys = true;
                 }
                 else
                 {
@@ -112,12 +129,22 @@ namespace AXE.Game.Control
             }
         }
 
+        void renderKeys(int x, int y, Microsoft.Xna.Framework.Graphics.SpriteBatch sb)
+        {
+            sb.DrawString(game.gameFont, "" + playerData.keys[PlayerData.KEY_YELLOW], new Vector2(x, y), Color.LightGoldenrodYellow);
+            sb.DrawString(game.gameFont, "" + playerData.keys[PlayerData.KEY_RED], new Vector2(x + 8, y), Color.IndianRed);
+            sb.DrawString(game.gameFont, "" + playerData.keys[PlayerData.KEY_BLUE], new Vector2(x + 16, y), Color.DodgerBlue);
+        }
+
         public override void render(GameTime dt, Microsoft.Xna.Framework.Graphics.SpriteBatch sb)
         {
             base.render(dt, sb);
 
             sb.DrawString(game.gameFont, renderLine1, pos, line1Color);
-            sb.DrawString(game.gameFont, renderLine2, new Vector2(x+8, y+8), line2Color);
+            sb.DrawString(game.gameFont, renderLine2, new Vector2(x, y+8), line2Color);
+
+            if (displayKeys)
+                renderKeys(x+96, 8, sb);
         }
     }
 }

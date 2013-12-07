@@ -210,10 +210,7 @@ namespace AXE.Game.Screens
 
         string padString(string label, int width, char padder = ' ')
         {
-            while (label.Length < width)
-                label = padder + label;
-
-            return label;
+            return Tools.padString(label, width, padder);
         }
 
         // Wrappers for shorter code

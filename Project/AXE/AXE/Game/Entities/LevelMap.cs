@@ -239,7 +239,24 @@ namespace AXE.Game.Entities
                     ge = new MoveablePlatform(x, y, width, nodes, steps, cycle);
                     break;
                 case "Door":
-                    ge = new Door(x, y);
+                    type = element.GetAttribute("lock");
+                    DoorLock.Type lockType = DoorLock.Type.None;
+                    if (type == "None")
+                    {
+                        lockType = DoorLock.Type.None;
+                        ge = new Door(x, y, lockType);
+                    }
+                    else if (type == "Key")
+                    {
+                        int key = int.Parse(element.GetAttribute("key"));
+                        lockType = DoorLock.Type.Key;
+                        ge = new KeyDoor(x, y, key);
+                    }
+                    else if (type == "Contraption")
+                    {
+                        lockType = DoorLock.Type.Contraption;
+                        ge = new Door(x, y, lockType);
+                    }
                     break;
                 case "HighGuardFallPowerUp":
                     ge = new PowerUpPickable(x, y, PowerUpPickable.Type.HighFallGuard);

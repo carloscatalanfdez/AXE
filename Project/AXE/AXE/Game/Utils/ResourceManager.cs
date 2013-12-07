@@ -140,6 +140,7 @@ namespace AXE.Game.Utils
 
             sfxOpenDoor     = loadSfx("sfx-opendoor");
             sfxCloseDoor    = loadSfx("sfx-closedoor");
+            sfxUnlock       = loadSfx("sfx-unlock");
 
             sfxGreatBell    = loadSfx("sfx-bell");
             sfxBigBell      = loadSfx("sfx-bell.1");
@@ -207,6 +208,7 @@ namespace AXE.Game.Utils
 
         public SoundEffect sfxOpenDoor;
         public SoundEffect sfxCloseDoor;
+        public SoundEffect sfxUnlock;
 
         public SoundEffect sfxGreatBell;
         public SoundEffect sfxBigBell;
