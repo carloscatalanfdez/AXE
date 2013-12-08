@@ -15,10 +15,11 @@ using AXE.Game.Entities.Contraptions;
 using AXE.Game.Entities.Base;
 using AXE.Game.Entities.Enemies;
 using AXE.Game.Entities.Axes;
+using AXE.Game.Utils;
 
 namespace AXE.Game.Entities
 {
-    class LevelMap : bEntity
+    class LevelMap : bEntity, IReloadable
     {
         int tileWidth = 8;
         int tileHeight = 8;
@@ -143,6 +144,13 @@ namespace AXE.Game.Entities
             (mask as bSolidGrid).parseSolids(solids);
 
             layer = 20;
+        }
+
+        /* IReloadable implementation */
+        public void reloadContent()
+        {
+            // TODO: unhardcode this
+            tilemap.tileset.texture = (game as AxeGame).res.tsetBasic;
         }
 
         public bEntity parseEntity(XmlReader element)

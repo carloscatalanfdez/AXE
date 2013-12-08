@@ -32,6 +32,12 @@ namespace AXE.Game.Entities.Contraptions
             _isOpen = open;
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            spgraphic.image = (game as AxeGame).res.sprTrapdoorSheet;
+        }
+
         override public void init()
         {
             base.init();

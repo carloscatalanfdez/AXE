@@ -26,6 +26,18 @@ namespace AXE.Game.Entities.Base
             this.type = type;
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            switch (type)
+            {
+                default:
+                case Type.HighFallGuard:
+                    spgraphic.image = (game as AxeGame).res.sprHighfallGuardSheet;
+                    break;
+            }
+        }
+
         public override void initParams()
         {
             switch (type)

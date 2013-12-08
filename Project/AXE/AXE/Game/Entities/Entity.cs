@@ -13,7 +13,7 @@ using AXE.Game.Entities.Base;
 
 namespace AXE.Game.Entities
 {
-    class Entity : bEntity, IPlatformUser
+    class Entity : bEntity, IPlatformUser, IReloadable
     {
         public const string ATTR_SOLID = "solid";
         public enum Dir { None, Left, Right };
@@ -685,6 +685,11 @@ namespace AXE.Game.Entities
                 previousPosition += delta;
                 pos += delta;
             }
+        }
+
+        /* IReloadable implementation */
+        virtual public void reloadContent()
+        {
         }
     }
 }

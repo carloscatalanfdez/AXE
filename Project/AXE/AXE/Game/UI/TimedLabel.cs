@@ -20,7 +20,7 @@ namespace AXE.Game.UI
         bool visible;
         int stepsToShow;
         public string label;
-        SoundEffect sound;
+        public SoundEffect sound;
 
         public TimedLabel(int x, int y, string label, int steps,
             SoundEffect sound = null)
@@ -76,9 +76,9 @@ namespace AXE.Game.UI
 
         bool visible;
         int stepsToShow;
-        Texture2D image;
-        SoundEffect sound;
-        bStamp graphic;
+        public Texture2D image;
+        public SoundEffect sound;
+        public bStamp graphic;
 
         public TimedStamp(int x, int y, Texture2D image, int steps,
             SoundEffect sound = null)

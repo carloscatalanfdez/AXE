@@ -43,5 +43,11 @@ namespace AXE.Game.Screens
             sb.Draw(bDummyRect.sharedDummyRect(game), game.getViewRectangle(), Color.Black);
             logo.render(sb, game.getWidth() / 2 - logo.width / 2, game.getHeight() / 2 - logo.height / 2);
         }
+
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            logo.image = game.Content.Load<Texture2D>("Assets/badladns_banner");
+        }
     }
 }

@@ -121,6 +121,17 @@ namespace AXE.Game.Entities
             this.mginput = GameInput.getInstance(data.id);
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            if (data.id == PlayerIndex.One)
+                spgraphic.image = (game as AxeGame).res.sprKnightASheet;
+            else
+                spgraphic.image = (game as AxeGame).res.sprKnightBSheet;
+
+            loadSoundEffects();
+        }
+
         override public void init()
         {
             base.init();

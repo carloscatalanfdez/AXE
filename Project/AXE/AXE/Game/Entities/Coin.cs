@@ -19,6 +19,12 @@ namespace AXE.Game.Entities
             this.value = value;
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            spgraphic.image = (game as AxeGame).res.sprCoinSheet;
+        }
+
         public override void initParams()
         {
             spgraphic = new bSpritemap((game as AxeGame).res.sprCoinSheet, 16, 17);

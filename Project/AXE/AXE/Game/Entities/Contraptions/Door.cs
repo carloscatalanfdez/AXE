@@ -27,6 +27,12 @@ namespace AXE.Game.Entities.Contraptions
             this.lockType = lockType;
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            sprite.image = (game as AxeGame).res.sprDoorSheet;
+        }
+
         public override void init()
         {
             base.init();
@@ -154,6 +160,12 @@ namespace AXE.Game.Entities.Contraptions
             : base(x, y)
         {
             this.type = type;
+        }
+
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            sprite.image = (game as AxeGame).res.sprLocksSheet;
         }
 
         public override void init()

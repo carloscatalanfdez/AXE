@@ -71,6 +71,12 @@ namespace AXE.Game.Entities.Enemies
         {
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            spgraphic.image = (game as AxeGame).res.sprZombieSheet;
+        }
+
         public override void init()
         {
             base.init();

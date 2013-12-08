@@ -69,6 +69,13 @@ namespace AXE.Game.Entities
         {
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            spgraphic.image = (game as AxeGame).res.sprStickSheet;
+            initSoundEffects();
+        }
+
         public override void init()
         {
             base.init();

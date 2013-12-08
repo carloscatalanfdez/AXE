@@ -63,6 +63,12 @@ namespace AXE.Game.Screens
             usesCamera = true;
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            cursor.image = (game as AxeGame).res.sprCursor;
+        }
+
         public override void init()
         {
             base.init();

@@ -43,6 +43,41 @@ namespace AXE.Game.Screens
         {
         }
 
+        protected void reloadLabel(TimedLabel label, SoundEffect sfx = null)
+        {
+            if (sfx == null)
+                sfx = (game as AxeGame).res.sfxMidBell;
+            label.sound = sfx;
+        }
+
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            reloadLabel(leftTitle, (game as AxeGame).res.sfxBigBell);
+            reloadLabel(rightTitle, (game as AxeGame).res.sfxBigBell);
+            reloadLabel(treausuresLabel); 
+            reloadLabel(killsLabel); 
+            reloadLabel(scoreLabel);
+            reloadLabel(soulsLabel);
+            reloadLabel(coinsLabel);
+            reloadLabel(treausuresValue); 
+            reloadLabel(killsValue); 
+            reloadLabel(scoreValue); 
+            reloadLabel(soulsValue);
+            reloadLabel(coinsValue);
+            reloadLabel(treausuresCoins); 
+            reloadLabel(killsCoins);
+            reloadLabel(scoreCoins); 
+            reloadLabel(soulsCoins);
+            reloadLabel(coinsCoins);
+            totalLine.sound = (game as AxeGame).res.sfxBigBell;
+            totalLine.image = (game as AxeGame).res.sprTotalLine;
+            totalLine.image = (game as AxeGame).res.sprTotalLine;
+            totalLine.graphic.image = totalLine.image;
+            reloadLabel(totalCoins, (game as AxeGame).res.sfxBigBell);
+            reloadLabel(pouchLabel, (game as AxeGame).res.sfxGreatBell);
+        }
+
         public override void init()
         {
             entities.Add("entities", new List<bEntity>());

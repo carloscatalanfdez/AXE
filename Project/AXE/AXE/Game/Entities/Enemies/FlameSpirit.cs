@@ -56,6 +56,13 @@ namespace AXE.Game.Entities.Enemies
         {
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            smgraphic.image = (game as AxeGame).res.sprFlamewrathSheet;
+            fgraphic.image = (game as AxeGame).res.sprFlameSheet;
+        }
+
         public override void init()
         {
             base.init();
@@ -426,6 +433,11 @@ namespace AXE.Game.Entities.Enemies
             this.flipped = flipped;
         }
 
+        override public void reloadContent()
+        {
+            sprite.image = (game as AxeGame).res.sprFlameBulletSheet;
+        }
+
         public override void init()
         {
             base.init();
@@ -484,6 +496,11 @@ namespace AXE.Game.Entities.Enemies
             this.frame = frame;
             this.flipped = flipped;
             layer = 2;
+        }
+
+        override public void reloadContent()
+        {
+            (graphic as bSpritemap).image = (game as AxeGame).res.sprFlameBulletSheet;
         }
 
         public override void init()

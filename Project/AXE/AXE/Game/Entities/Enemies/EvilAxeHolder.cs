@@ -61,6 +61,13 @@ namespace AXE.Game.Entities.Base
         {
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            spgraphic.image = (game as AxeGame).res.sprAxeThrowerSheet;
+            loadSoundEffects();
+        }
+
         public override void init()
         {
             base.init();
@@ -103,8 +110,7 @@ namespace AXE.Game.Entities.Base
             else
                 facing = Dir.Left;
 
-            sfxGrab = (game as AxeGame).res.sfxEvilPick;
-            sfxThrow = (game as AxeGame).res.sfxEvilThrow;
+            loadSoundEffects();
 
             state = State.None;
             changeState(State.Idle);
@@ -120,6 +126,12 @@ namespace AXE.Game.Entities.Base
                 -(int)(graphicHeight() * 0.25f));
 
             attributes.Add(ATTR_SOLID);
+        }
+
+        public void loadSoundEffects()
+        {
+            sfxGrab = (game as AxeGame).res.sfxEvilPick;
+            sfxThrow = (game as AxeGame).res.sfxEvilThrow;
         }
 
         public void changeState(State newState)

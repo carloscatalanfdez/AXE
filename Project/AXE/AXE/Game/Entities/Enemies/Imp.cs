@@ -71,6 +71,13 @@ namespace AXE.Game.Entities.Enemies
         {
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            spgraphic.image = (game as AxeGame).res.sprImpSheet;
+            loadSoundEffects();
+        }
+
         public override void init()
         {
             base.init();
@@ -129,16 +136,21 @@ namespace AXE.Game.Entities.Enemies
             attackTime = 8;
             weaponHitImage = new bStamp(spgraphic.image, new Rectangle(90, 64, 30, 32));
 
-            sfxSteps = new List<SoundEffect>();
-            sfxSteps.Add((game as AxeGame).res.sfxDirtstepA);
-            sfxSteps.Add((game as AxeGame).res.sfxDirtstepB);
-            sfxSteps.Add((game as AxeGame).res.sfxDirtstepC);
-            sfxHit = (game as AxeGame).res.sfxPlayerHit;
+            loadSoundEffects();
 
             state = State.None;
             changeState(State.Idle);
             
             attributes.Add(ATTR_SOLID);
+        }
+
+        public void loadSoundEffects()
+        {
+            sfxSteps = new List<SoundEffect>();
+            sfxSteps.Add((game as AxeGame).res.sfxDirtstepA);
+            sfxSteps.Add((game as AxeGame).res.sfxDirtstepB);
+            sfxSteps.Add((game as AxeGame).res.sfxDirtstepC);
+            sfxHit = (game as AxeGame).res.sfxPlayerHit;
         }
 
         public void changeState(State newState)

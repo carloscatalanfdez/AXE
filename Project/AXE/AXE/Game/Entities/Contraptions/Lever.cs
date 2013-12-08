@@ -26,6 +26,12 @@ namespace AXE.Game.Entities.Contraptions
         {
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            smgraphic.image = (game as AxeGame).res.sprLeverSheet;
+        }
+
         public override void init()
         {
             base.init();

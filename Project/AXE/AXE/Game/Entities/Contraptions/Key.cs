@@ -24,6 +24,12 @@ namespace AXE.Game.Entities.Contraptions
             this.type = type;
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            sprite.image = (game as AxeGame).res.sprKeysSheet;
+        }
+
         public override void init()
         {
             base.init();

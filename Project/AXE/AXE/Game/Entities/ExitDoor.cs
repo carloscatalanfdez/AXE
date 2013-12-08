@@ -37,6 +37,14 @@ namespace AXE.Game.Entities
             this.type = type;
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            spgraphic.image = (game as AxeGame).res.sprExitDoorSheet;
+            if (sign != null)
+                sign.image = (game as AxeGame).res.sprSignSheet;
+        }
+
         public override void init()
         {
             base.init();

@@ -14,6 +14,8 @@ using AXE.Game;
 using AXE.Game.Screens;
 using AXE.Game.Control;
 using AXE.Game.Utils;
+using System.Reflection;
+using System.Collections;
 
 namespace AXE
 {
@@ -40,6 +42,8 @@ namespace AXE
         bool switchFullscreenThisStep;
         VisualDebugger vizdeb;
         bool shouldDebugStepByStep = false;
+
+        bool needsReload = false;
 
         protected override void initSettings()
         {
@@ -84,6 +88,69 @@ namespace AXE
             effect.Parameters["Contrast"].SetValue(1.0f);
             effect.Parameters["Brightness"].SetValue(0.2f);
             effect.Parameters["DesaturationAmount"].SetValue(1.0f);
+
+            if (needsReload)
+            {
+                List<object> traversedItems = new List<object>();
+                traversedItems.Add(this);
+                traverseClassTree(this.world, (x) =>
+                {
+                    if (x is bGameState)
+                        needsReload = false;
+                    if (x is IReloadable)
+                    {
+                        (x as IReloadable).reloadContent();
+                        return true;
+                    }
+                    
+                    return false;
+                }, traversedItems);
+
+                needsReload = false;
+            }
+        }
+
+        public void traverseClassTree(object root, Func<object, bool> visitFunction, List<object> traversedObjects)
+        {
+            // Avoid repetition (not the most efficient way, but it's good enough)
+            if (root == null || traversedObjects.Contains(root))
+                return;
+            traversedObjects.Add(root);
+
+            Type t = root.GetType();
+
+            // Only check objects whithin our namespaces (otherwise we get a shitton of objects)
+            if (!t.Namespace.StartsWith("bEngine") && !t.Namespace.StartsWith("AXE") && !t.Namespace.StartsWith("System.Collections.Generic"))
+                return;
+
+            visitFunction(root);
+
+            // Is array? Probably not working, but who cares
+            if (t.IsArray)
+            {
+                foreach (object element in (root as Array))
+                {
+                    traverseClassTree(element, visitFunction, traversedObjects);
+                }
+            } 
+            // Is a collection?
+            else if (root is ICollection)
+            {
+                foreach (object value in (root as ICollection))
+                {
+                    traverseClassTree(value, visitFunction, traversedObjects);
+                }
+            }
+            // Is anything else?
+            else
+            {
+                FieldInfo[] fieldInfos = t.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
+                foreach (FieldInfo info in fieldInfos)
+                {
+                    object node = info.GetValue(root);
+                    traverseClassTree(node, visitFunction, traversedObjects);
+                }
+            }
         }
 
         protected override void UnloadContent()
@@ -91,6 +158,8 @@ namespace AXE
             base.UnloadContent();
             renderResult.Dispose();
             renderTarget.Dispose();
+
+            needsReload = true;
         }
 
         protected override void Initialize()

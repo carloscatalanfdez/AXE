@@ -45,6 +45,13 @@ namespace AXE.Game.Entities.Axes
             }
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            spgraphic.image = (game as AxeGame).res.sprAxeSheet;
+            initSoundEffects();
+        }
+
         protected override void initParams()
         {
             loadIdleMask();

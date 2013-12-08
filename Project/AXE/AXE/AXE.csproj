@@ -144,6 +144,7 @@
     <Compile Include="Game\Screens\GameOverScreen.cs" />
     <Compile Include="Game\Screens\WinScreen.cs" />
     <Compile Include="Game\UI\TimedLabel.cs" />
+    <Compile Include="Game\Utils\IReloadable.cs" />
     <Compile Include="Game\Utils\Range.cs" />
     <Compile Include="Game\Utils\Colors.cs" />
     <Compile Include="Game\Control\Controller.cs" />
