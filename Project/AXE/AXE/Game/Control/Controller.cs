@@ -18,8 +18,7 @@ namespace AXE.Game.Control
 {
     class Controller
     {
-        public bool testLaunch = false;
-
+        public bool testLaunch = true;
 
         static Controller _instance;
         public static Controller getInstance()
@@ -176,7 +175,7 @@ namespace AXE.Game.Control
 
         public bool canSwitchFullscreen()
         {
-            return (game.world is TitleScreen);
+            return true;
         }
 
         public void launch()

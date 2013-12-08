@@ -110,7 +110,7 @@ namespace AXE
             }
         }
 
-        public void traverseClassTree(object root, Func<object, bool> visitFunction, List<object> traversedObjects)
+        public static void traverseClassTree(object root, Func<object, bool> visitFunction, List<object> traversedObjects)
         {
             // Avoid repetition (not the most efficient way, but it's good enough)
             if (root == null || traversedObjects.Contains(root))
@@ -119,7 +119,7 @@ namespace AXE
 
             Type t = root.GetType();
 
-            // Only check objects whithin our namespaces (otherwise we get a shitton of objects)
+            // Only check objects whithin our namespaces (otherwise we get a shit-ton of objects)
             if (!t.Namespace.StartsWith("bEngine") && !t.Namespace.StartsWith("AXE") && !t.Namespace.StartsWith("System.Collections.Generic"))
                 return;
 
