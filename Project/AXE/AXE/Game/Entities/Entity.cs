@@ -287,6 +287,7 @@ namespace AXE.Game.Entities
                 if (!canMove)
                 {
                     tp.X = j;
+                    canMove = true;
                     break;
                 }
             }
@@ -333,6 +334,7 @@ namespace AXE.Game.Entities
                 if (!canMove)
                 {
                     tp.Y = j;
+                    canMove = true;
                     break;
                 }
             }

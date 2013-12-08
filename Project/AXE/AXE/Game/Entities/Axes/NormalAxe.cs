@@ -21,10 +21,10 @@ namespace AXE.Game.Entities.Axes
 
         override public void loadIdleMask()
         {
-            _mask.w = 14;
-            _mask.h = 15;
-            _mask.offsetx = 3;
-            _mask.offsety = 3;
+            _mask.w = 12;
+            _mask.h = 13;
+            _mask.offsetx = 4;
+            _mask.offsety = 4;
         }
 
         override public void loadFlyMask()
@@ -32,16 +32,16 @@ namespace AXE.Game.Entities.Axes
             if (facing == Player.Dir.Left)
             {
                 _mask.w = 1;
-                _mask.h = 15;
-                _mask.offsetx = 3;
-                _mask.offsety = 3;
+                _mask.h = 13;
+                _mask.offsetx = 4;
+                _mask.offsety = 4;
             }
             else
             {
                 _mask.w = 1;
-                _mask.h = 15;
-                _mask.offsetx = 16;
-                _mask.offsety = 3;
+                _mask.h = 13;
+                _mask.offsetx = 15;
+                _mask.offsety = 4;
             }
         }
 
