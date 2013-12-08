@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
 
 namespace AXE.Game.Utils
 {
@@ -35,6 +36,7 @@ namespace AXE.Game.Utils
         string tilesetsPath = "Tilesets";
         string spritesPath = "Sprites";
         string sfxPath = "Sfx";
+        string musicPath = "Music";
 
         public ResourceManager()
         {
@@ -47,6 +49,11 @@ namespace AXE.Game.Utils
             contentManager = game.Content;
 
             _ready = true;
+        }
+
+        protected Song loadMusic(string fname)
+        {
+            return contentManager.Load<Song>(resourcesPath + "/" + musicPath + "/" + fname);
         }
 
         protected SoundEffect loadSfx(string fname)
@@ -149,6 +156,8 @@ namespace AXE.Game.Utils
             sfxGreatBell    = loadSfx("sfx-bell");
             sfxBigBell      = loadSfx("sfx-bell.1");
             sfxMidBell      = loadSfx("sfx-bell.2");
+
+            ostGameOver = loadMusic("ost-gameover");
         }
 
         // Hardcoding resources for now to ease development
@@ -221,5 +230,8 @@ namespace AXE.Game.Utils
         public SoundEffect sfxGreatBell;
         public SoundEffect sfxBigBell;
         public SoundEffect sfxMidBell;
+
+        // Music
+        public Song ostGameOver;
     }
 }

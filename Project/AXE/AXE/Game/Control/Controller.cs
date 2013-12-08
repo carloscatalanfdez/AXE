@@ -11,11 +11,16 @@ using AXE.Common;
 using AXE.Game;
 using AXE.Game.Screens;
 using Microsoft.Xna.Framework;
+using AXE.Game.Utils;
+using Microsoft.Xna.Framework.Media;
 
 namespace AXE.Game.Control
 {
     class Controller
     {
+        public bool testLaunch = false;
+
+
         static Controller _instance;
         public static Controller getInstance()
         {
@@ -50,6 +55,11 @@ namespace AXE.Game.Control
         public void setGame(AxeGame game)
         {
             this.game = game;
+        }
+
+        public void onLogoStart()
+        {
+            game.changeWorld(new LogoScreen(), new FadeToColor(game, Color.Black));
         }
 
         public void onMenuStart()
@@ -92,6 +102,7 @@ namespace AXE.Game.Control
 
         public void onGameOver()
         {
+            MediaPlayer.Play(ResourceManager.get().ostGameOver);
             game.changeWorld(new GameOverScreen(), new FadeToColor(game, Color.Black, 120));
         }
 
@@ -166,6 +177,18 @@ namespace AXE.Game.Control
         public bool canSwitchFullscreen()
         {
             return (game.world is TitleScreen);
+        }
+
+        public void launch()
+        {
+            if (testLaunch)
+            {
+                onMenuStart();
+            }
+            else
+            {
+                onLogoStart();
+            }
         }
     }
 }

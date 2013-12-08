@@ -98,8 +98,7 @@ namespace AXE
             Tools.step = 0;
             // switchFullScreen();
             Controller.getInstance().setGame(this);
-            Controller.getInstance().onMenuStart();
-            // changeWorld(new LogoScreen());
+            Controller.getInstance().launch();
 
             base.Initialize();
         }
