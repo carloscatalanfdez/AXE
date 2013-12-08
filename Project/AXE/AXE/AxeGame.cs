@@ -39,6 +39,7 @@ namespace AXE
         Texture2D renderResult;
         bool switchFullscreenThisStep;
         VisualDebugger vizdeb;
+        bool shouldDebugStepByStep = false;
 
         protected override void initSettings()
         {
@@ -103,8 +104,32 @@ namespace AXE
             base.Initialize();
         }
 
+        protected override void Update(GameTime gameTime)
+        {
+            if (!shouldDebugStepByStep)
+                base.Update(gameTime);
+            else
+            {
+                input.update();
+
+                if (input.pressed(Keys.P))
+                {
+                    shouldDebugStepByStep = false;
+                }
+                else if (input.pressed(Keys.Right))
+                {
+                    base.Update(gameTime);
+                }
+            }
+        }
+
         public override void update(GameTime gameTime)
         {
+            if (input.pressed(Keys.P))
+            {
+                shouldDebugStepByStep = true;
+            }
+
             Common.GameInput.getInstance(PlayerIndex.One).update();
             Common.GameInput.getInstance(PlayerIndex.Two).update();
 
