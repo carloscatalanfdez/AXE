@@ -32,6 +32,7 @@ namespace AXE.Game.Entities
         public List<IContraption> linkedContraptions;
 
         public String name;
+        public int timeLimit = 10;
         public Vector2 playerStart;
 
         public LevelMap(String fname)

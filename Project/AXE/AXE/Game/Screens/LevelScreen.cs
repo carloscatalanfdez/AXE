@@ -30,6 +30,8 @@ namespace AXE.Game.Screens
         // Management
         public string id;
         public String name;
+        public int timeLimit;
+        public int timeCount;
         bool paused;
 
         public State state;
@@ -48,6 +50,7 @@ namespace AXE.Game.Screens
         public int playersThatLeft;
 
         // Screen text
+        public string timeLabel;
         public string stageLabel;
         public string infoLabel;
         PlayerDisplay[] playerDisplays;
@@ -95,6 +98,8 @@ namespace AXE.Game.Screens
             levelMap = new LevelMap(fname);
             _add(levelMap, "solid"); // Adding to world performs init & loading
             name = levelMap.name;
+            timeLimit = levelMap.timeLimit * (game as AxeGame).FramesPerSecond;
+            timeCount = timeLimit;
 
             // Load background
             background = null;
@@ -180,9 +185,25 @@ namespace AXE.Game.Screens
             return player;
         }
 
+        public void resetTimeLimit()
+        {
+            timeCount = timeLimit * (game as AxeGame).FramesPerSecond;
+        }
+
+        public void boostTtimeLimit(int howManySeconds)
+        {
+            timeCount += howManySeconds * (game as AxeGame).FramesPerSecond;
+        }
+
         public override void update(GameTime dt)
         {
-            base.update(dt);            
+            base.update(dt);
+
+            timeCount--;
+            if (timeCount == 0)
+            {
+                Controller.getInstance().onGameOver();
+            }
 
             foreach (String key in entities.Keys)
                 foreach (bEntity entity in entities[key])
@@ -266,6 +287,7 @@ namespace AXE.Game.Screens
                 playerDisplays[i].update();
 
             stageLabel = buildStageLabel();
+            timeLabel = String.Format("{0}", timeCount / (game as AxeGame).FramesPerSecond);
             infoLabel = "CREDITS: " + (GameData.get().credits) + " - COINS: " + (GameData.get().coins + " ( " + Controller.getInstance().activePlayers + ")");
         }
 
@@ -315,6 +337,7 @@ namespace AXE.Game.Screens
             for (int i = 0; i < playerDisplays.Length; i++)
                 playerDisplays[i].render(dt, sb);
             sb.DrawString(game.gameFont, stageLabel, new Vector2(game.getWidth() / 2 - stageLabel.Length * 8 / 2, 0), Color.White);
+            sb.DrawString(game.gameFont, timeLabel, new Vector2(game.getWidth() / 2 - timeLabel.Length * 8 / 2, 10), Color.White);
             sb.DrawString(game.gameFont, infoLabel, new Vector2(game.getWidth()/2-infoLabel.Length*8/2, game.getHeight()-8), Color.White);
 
             // Pause!
