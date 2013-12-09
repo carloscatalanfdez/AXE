@@ -32,7 +32,7 @@ namespace AXE.Game.Entities
         public List<IContraption> linkedContraptions;
 
         public String name;
-        public int timeLimit = 10;
+        public int timeLimit = 200;
         public Vector2 playerStart;
 
         public LevelMap(String fname)
@@ -80,6 +80,9 @@ namespace AXE.Game.Entities
                                     w = int.Parse(reader.GetAttribute("width"));
                                     h = int.Parse(reader.GetAttribute("height"));
                                     name = reader.GetAttribute("name");
+                                    int customTimeLimit = int.Parse(reader.GetAttribute("time"));
+                                    if (customTimeLimit > 0) // Only override default timeLimit if parameter makes sense
+                                        timeLimit = customTimeLimit;
                                     break;
                                 case "Tiles":
                                     tileset = reader.GetAttribute("tileset");

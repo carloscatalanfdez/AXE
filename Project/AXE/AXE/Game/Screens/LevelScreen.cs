@@ -16,6 +16,8 @@ using AXE.Game.Control;
 using AXE.Game.Entities.Axes;
 using AXE.Game.Entities.Contraptions;
 using AXE.Game.Entities.Base;
+using AXE.Game.Utils;
+using AXE.Game.UI;
 
 namespace AXE.Game.Screens
 {
@@ -50,7 +52,9 @@ namespace AXE.Game.Screens
         public int playersThatLeft;
 
         // Screen text
-        public string timeLabel;
+        public string timeLabelText;
+        public IntermittentLabel timeLabel;
+
         public string stageLabel;
         public string infoLabel;
         PlayerDisplay[] playerDisplays;
@@ -70,6 +74,7 @@ namespace AXE.Game.Screens
         override public void reloadContent()
         {
             cursor.image = (game as AxeGame).res.sprCursor;
+            timeLabel.sound = (game as AxeGame).res.sfxMidBell;
         }
 
         public override void init()
@@ -134,6 +139,9 @@ namespace AXE.Game.Screens
             }
 
             playersThatLeft = 0;
+
+            timeLabel = new IntermittentLabel(0, 10, "", Color.White, false, 15, (game as AxeGame).res.sfxMidBell);
+            timeLabel.game = game;
         }
 
         public Player spawnPlayer(PlayerData pdata)
@@ -198,12 +206,6 @@ namespace AXE.Game.Screens
         public override void update(GameTime dt)
         {
             base.update(dt);
-
-            timeCount--;
-            if (timeCount == 0)
-            {
-                Controller.getInstance().onGameOver();
-            }
 
             foreach (String key in entities.Keys)
                 foreach (bEntity entity in entities[key])
@@ -286,9 +288,28 @@ namespace AXE.Game.Screens
             for (int i = 0; i < playerDisplays.Length; i++)
                 playerDisplays[i].update();
 
+            timeLabelText = String.Format("{0}", timeCount / (game as AxeGame).FramesPerSecond);
+            timeLabel.x = game.getWidth() / 2 - timeLabelText.Length * 8 / 2;
+            timeLabel.label = timeLabelText;
+            timeLabel.update();
+
             stageLabel = buildStageLabel();
-            timeLabel = String.Format("{0}", timeCount / (game as AxeGame).FramesPerSecond);
             infoLabel = "CREDITS: " + (GameData.get().credits) + " - COINS: " + (GameData.get().coins + " ( " + Controller.getInstance().activePlayers + ")");
+
+            // Time limit!!
+            if (!paused)
+            {
+                timeCount--;
+                if ((timeCount / (float)(game as AxeGame).FramesPerSecond) <= 11 && !timeLabel.intermittent)
+                {
+                    timeLabel.intermittent = true;
+                }
+
+                if (timeCount == 0)
+                {
+                    Controller.getInstance().onGameOver();
+                }
+            }
         }
 
         public string buildStageLabel()
@@ -336,8 +357,9 @@ namespace AXE.Game.Screens
 
             for (int i = 0; i < playerDisplays.Length; i++)
                 playerDisplays[i].render(dt, sb);
+
+            timeLabel.render(dt, sb);
             sb.DrawString(game.gameFont, stageLabel, new Vector2(game.getWidth() / 2 - stageLabel.Length * 8 / 2, 0), Color.White);
-            sb.DrawString(game.gameFont, timeLabel, new Vector2(game.getWidth() / 2 - timeLabel.Length * 8 / 2, 10), Color.White);
             sb.DrawString(game.gameFont, infoLabel, new Vector2(game.getWidth()/2-infoLabel.Length*8/2, game.getHeight()-8), Color.White);
 
             // Pause!

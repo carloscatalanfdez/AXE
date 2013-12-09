@@ -129,7 +129,81 @@ namespace AXE.Game.UI
             if (visible)
                 graphic.render(sb, pos);
         }
+    }
 
+    class IntermittentLabel : bEntity
+    {
+        public const int FLASH_TIMER = 1;
+
+        public int flashSpeed;
+        public string label;
+        public SoundEffect sound;
+
+        private bool visible = true;
+        private bool _intermittent = false;
+        public bool intermittent
+        {
+            get { return _intermittent; }
+            set
+            {
+                if (value && !_intermittent) // go to intermittent
+                {
+                    visible = true;
+                    timer[FLASH_TIMER] = flashSpeed;
+                }
+                else if (!value && _intermittent)  // stop intermittent
+                {
+                    visible = true;
+                    timer[FLASH_TIMER] = -1;
+                }
+
+                _intermittent = value;
+            }
+        }
+
+        public IntermittentLabel(int x, int y, string label, Color color, bool intermittent = false, int flashSpeed = 15, SoundEffect sound = null)
+            : base(x, y)
+        {
+            this.flashSpeed = flashSpeed;
+            this.label = label;
+            this.sound = sound;
+            this.color = color;
+
+            _intermittent = intermittent;
+        }
+
+        public override void init()
+        {
+            base.init();
+
+            if (intermittent)
+                timer[FLASH_TIMER] = flashSpeed;
+        }
+
+        override public void onTimer(int n)
+        {
+            base.onTimer(n);
+
+            switch (n)
+            {
+                case FLASH_TIMER:
+                    visible = !visible;
+                    timer[n] = flashSpeed;
+
+                    if (visible && sound != null)
+                        sound.Play();
+
+                    break;
+            }
+        }
+
+        override public void render(GameTime dt, SpriteBatch sb)
+        {
+            base.render(dt, sb);
+
+            if (visible)
+                sb.DrawString(game.gameFont, label, pos, color);
+        }
     }
 }
 
