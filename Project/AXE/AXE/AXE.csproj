@@ -30,7 +30,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
+	<IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -113,6 +113,8 @@
     <Compile Include="Game\Entities\Base\Axe.cs" />
     <Compile Include="Game\Entities\Base\Enemy.cs" />
     <Compile Include="Game\Entities\Base\IPlatformUser.cs" />
+    <Compile Include="Game\Entities\Bosses\Boss.cs" />
+    <Compile Include="Game\Entities\Bosses\DragonBoss.cs" />
     <Compile Include="Game\Entities\Contraptions\Door.cs" />
     <Compile Include="Game\Entities\Contraptions\Key.cs" />
     <Compile Include="Game\Entities\Contraptions\MoveablePlatform.cs" />
@@ -181,7 +183,7 @@
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
       <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 y x64%29</ProductName>
+      <ProductName>Microsoft .NET Framework 4 Client Profile %28x86 and x64%29</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -250,6 +252,9 @@
     <None Include="Assets\SpriteConfs\knight-hotspots.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="AXE_1_TemporaryKey.pfx" />
+    <None Include="AXE_TemporaryKey.pfx" />
+    <None Include="Properties\app.manifest" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\XNA Game Studio\Microsoft.Xna.GameStudio.targets" />

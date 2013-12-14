@@ -56,6 +56,10 @@ namespace AXE.Game.Entities.Enemies
             return type;
         }
 
+        public virtual void onHit()
+        {
+        }
+
         public override void render(Microsoft.Xna.Framework.GameTime dt, Microsoft.Xna.Framework.Graphics.SpriteBatch sb)
         {
             base.render(dt, sb);

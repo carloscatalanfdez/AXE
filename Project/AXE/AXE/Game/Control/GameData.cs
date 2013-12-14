@@ -70,10 +70,10 @@ namespace AXE.Game.Control
 
         public void initPlayData()
         {
-            levels = new List<string>(new string[] {
+            levels = new List<string>(new string[] {                "r2",
                 "c0", 
                 "c1", 
-                "r2",
+
                 "r0", 
                 "r1", 
                 "base",

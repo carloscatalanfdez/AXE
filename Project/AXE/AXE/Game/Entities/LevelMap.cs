@@ -16,6 +16,7 @@ using AXE.Game.Entities.Base;
 using AXE.Game.Entities.Enemies;
 using AXE.Game.Entities.Axes;
 using AXE.Game.Utils;
+using AXE.Game.Entities.Bosses;
 
 namespace AXE.Game.Entities
 {
@@ -199,6 +200,9 @@ namespace AXE.Game.Entities
                     break;
                 case "Dagger":
                     ge = new Dagger(x, y);
+                    break;
+                case "DragonBoss":
+                    ge = new DragonBoss(x, y);
                     break;
                 case "EvilAxeHolder":
                     ge = new EvilAxeHolder(x, y);

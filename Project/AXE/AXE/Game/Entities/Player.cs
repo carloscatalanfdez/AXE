@@ -29,14 +29,16 @@ namespace AXE.Game.Entities
         Random random;
 
         // Some declarations
-        public enum MovementState { Idle, Walk, Jump, Ladder, Death, Attacking, Attacked, Activate, Exit, Revive };
-        public enum DeathState { None, Generic, Fall, ForceHit, Fire };
+        public enum MovementState { Idle, Walk, Jump, Ladder, Death, Attacking, Attacked, OnFire, Activate, Exit, Revive };
+        public enum DeathState { None, Generic, Fall, ForceHit, Fire, DeferredBurning };
         public enum ActionState { None, Squid };
         public enum BodyState { Standing, Crouching };
 
         public const int EXIT_ANIM_TIMER = 1;
         public const int ACTIVATION_TIME_TIMER = 3;
+        public const int DEATH_BY_FIRE_TIMER = 4;
         public int exitAnimationWaitTime;
+        public int deathByFireTime;
 
         // Data
         public PlayerData data;
@@ -173,6 +175,7 @@ namespace AXE.Game.Entities
             spgraphic.add(new bAnim("crouch-idle", new int[] { 6 }));
             spgraphic.add(new bAnim("crouch-walk", new int[] { 6, 7 }, 0.2f));
             spgraphic.add(new bAnim("crouch-squid", new int[] { 6 }));
+            spgraphic.add(new bAnim("onfire", new int[] { 48, 49, 50, 51 }, 0.35f));
 
             spgraphic.add(new bAnim("exit", new int[] { 4 }));
             // Hotspot config for anim frames
@@ -203,11 +206,11 @@ namespace AXE.Game.Entities
             exitAnimationWaitTime = 15;
             activationTime = 15;            
             hspeed = 1.5f;
-            gravity = 0.5f;
+            gravity = 0.6f;
             haccel = 0.2f;
             air_haccel = 0f;
             runSpeedFactor = 2;
-            jumpPower = 5.5f;
+            jumpPower = 6f;
             deathFallThreshold = 48;
 
             weaponCatchMask = new bMask(x, y, 
@@ -251,6 +254,8 @@ namespace AXE.Game.Entities
             jumpMaxSpeed = 3.0f;
             axeToCatch = null;
             actionPressedSteps = 0;
+
+            deathByFireTime = 60;
 
             currentPlatformDelta = Vector2.Zero;
         }
@@ -495,6 +500,8 @@ namespace AXE.Game.Entities
                     {
                         handleOnAirMovement();
                     }
+                    break;
+                case MovementState.OnFire:
                     break;
                 case MovementState.Death:
                     if (!waitingLanding)
@@ -821,6 +828,14 @@ namespace AXE.Game.Entities
                         spgraphic.currentAnim.pause();
 
                     break;
+                case MovementState.OnFire:
+                    spgraphic.play("onfire");
+
+                    if (facing == Dir.Right)
+                        spgraphic.flipped = false;
+                    else
+                        spgraphic.flipped = true;
+                    break;
                 case MovementState.Death:
                     break;
                 case MovementState.Exit:
@@ -1012,6 +1027,9 @@ namespace AXE.Game.Entities
                 case ACTIVATION_TIME_TIMER:
                     state = MovementState.Idle;
                     break;
+                case DEATH_BY_FIRE_TIMER:
+                    onDeath(DeathState.Generic);
+                    break;
             }
         }
 
@@ -1122,6 +1140,7 @@ namespace AXE.Game.Entities
                     IHazard hazard = (other as IHazard);
                     IHazardProvider killer = hazard.getOwner();
                     killer.onSuccessfulHit(this);
+                    hazard.onHit();
                     onDeath(hazard.getType());
                 }
             }
@@ -1181,7 +1200,6 @@ namespace AXE.Game.Entities
         {
             if (canDie())
             {
-                state = MovementState.Death;
                 // TODO: Use type to change anim
                 switch (type)
                 {
@@ -1189,7 +1207,8 @@ namespace AXE.Game.Entities
                     case DeathState.Generic:
                     case DeathState.Fall:
                     case DeathState.ForceHit:
-                    case DeathState.Fire:
+                        state = MovementState.Death;
+
                         sfxHit.Play();
                         deathCause = type;
                         if (onair && type != DeathState.Fire)
@@ -1206,6 +1225,13 @@ namespace AXE.Game.Entities
                                     weapon = null;
                                 }
                             }
+                        }
+                        break;
+                    case DeathState.DeferredBurning:
+                        if (state != MovementState.OnFire && state != MovementState.Death)
+                        {
+                            timer[DEATH_BY_FIRE_TIMER] = deathByFireTime;
+                            state = MovementState.OnFire;
                         }
                         break;
                 }

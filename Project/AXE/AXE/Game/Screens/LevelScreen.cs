@@ -142,6 +142,7 @@ namespace AXE.Game.Screens
 
             timeLabel = new IntermittentLabel(0, 10, "", Color.White, false, 15, (game as AxeGame).res.sfxMidBell);
             timeLabel.game = game;
+            timeLabel.mask.game = game;
         }
 
         public Player spawnPlayer(PlayerData pdata)

@@ -10,5 +10,6 @@ namespace AXE.Game.Entities.Base
         void setOwner(IHazardProvider owner);
         IHazardProvider getOwner();
         Player.DeathState getType();
+        void onHit();
     }
 }

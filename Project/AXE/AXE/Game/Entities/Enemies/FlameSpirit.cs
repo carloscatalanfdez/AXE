@@ -410,6 +410,10 @@ namespace AXE.Game.Entities.Enemies
             return Player.DeathState.Fire;
         }
 
+        public virtual void onHit()
+        {
+        }
+
         public void onSuccessfulHit(Player other)
         {
             // HA!

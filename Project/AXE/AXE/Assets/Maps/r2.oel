@@ -101,5 +101,6 @@
     <KeyA id="34" x="208" y="176" />
     <KeyA id="35" x="200" y="120" />
     <KeyA id="36" x="152" y="120" />
+    <DragonBoss id="37" x="8" y="48" rewarder="0" target="0" value="0" />
   </Entities>
 </level>
