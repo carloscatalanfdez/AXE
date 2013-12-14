@@ -213,6 +213,11 @@ namespace AXE.Game.Entities
                 case "CorrosiveSlime":
                     ge = new CorrosiveSlime(x, y);
                     break;
+                case "Gargoyle":
+                    attr = element.GetAttribute("flipped");
+                    bool flipped = attr != null ? bool.Parse(attr) : false;
+                    ge = new Gargoyle(x, y, flipped);
+                    break;
                 case "Coin":
                     ge = new Coin(x, y);
                     break;

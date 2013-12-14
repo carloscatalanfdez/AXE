@@ -48,7 +48,7 @@ namespace AXE.Game.Entities.Bosses
         /* IReloadable implementation */
         override public void reloadContent()
         {
-            spgraphic.image = (game as AxeGame).res.sprZombieSheet;
+            spgraphic.image = (game as AxeGame).res.sprDragonBossSheet;
         }
 
         public override void init()

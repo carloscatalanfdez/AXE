@@ -98,5 +98,6 @@
     <Door id="31" x="184" y="200" lock="Key" key="1" />
     <Door id="32" x="184" y="32" lock="Contraption" key="All" />
     <Door id="33" x="80" y="144" lock="Key" key="2" />
+    <Gargoyle id="34" x="280" y="216" flipped="True" />
   </Entities>
 </level>
