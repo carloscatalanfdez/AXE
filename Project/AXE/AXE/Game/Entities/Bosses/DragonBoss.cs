@@ -469,7 +469,7 @@ namespace AXE.Game.Entities.Bosses
 
     }
 
-     class FireBullet : KillerRect
+    class FireBullet : KillerRect
     {
         bSpritemap sprite;
 
@@ -496,9 +496,9 @@ namespace AXE.Game.Entities.Bosses
             base.init();
 
             mask.w = 15;
-            mask.h = 3;
+            mask.h = 8;
             mask.offsetx = 4;
-            mask.offsety = 2;
+            mask.offsety = 4;
 
             sprite = new bSpritemap((game as AxeGame).res.sprFireBulletSheet, 20, 16);
             sprite.add(new bAnim("idle", new int[] { 0, 1, 2, 3 }, 0.2f));

@@ -223,6 +223,11 @@ namespace AXE.Game.Entities
                     bool flipped = attr != null ? bool.Parse(attr) : false;
                     ge = new Gargoyle(x, y, flipped);
                     break;
+                case "VGargoyle":
+                    attr = element.GetAttribute("flipped");
+                    flipped = attr != null ? bool.Parse(attr) : false;
+                    ge = new VGargoyle(x, y, flipped);
+                    break;
                 case "Coin":
                     ge = new Coin(x, y);
                     break;

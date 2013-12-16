@@ -129,6 +129,7 @@
     <Compile Include="Game\Entities\Base\Item.cs" />
     <Compile Include="Game\Entities\Base\IWeapon.cs" />
     <Compile Include="Game\Entities\Enemies\FlameSpirit.cs" />
+    <Compile Include="Game\Entities\Enemies\VGargoyle.cs" />
     <Compile Include="Game\Entities\PowerUpPickable.cs" />
     <Compile Include="Game\Entities\Coin.cs" />
     <Compile Include="Game\Entities\Base\IContraption.cs" />

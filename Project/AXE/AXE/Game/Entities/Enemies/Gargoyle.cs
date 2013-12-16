@@ -37,12 +37,12 @@ namespace AXE.Game.Entities.Enemies
         {
             base.init();
 
-            mask.w = 22;
+            mask.w = 24;
             mask.h = 14;
             mask.offsetx = 0;
             mask.offsety = 1;
 
-            spgraphic = new bSpritemap((game as AxeGame).res.sprGargoyleSheet, 22, 16);
+            spgraphic = new bSpritemap((game as AxeGame).res.sprGargoyleSheet, 24, 16);
             spgraphic.add(new bAnim("1", new int[] { 0 }));
             spgraphic.play("1");
             spgraphic.flipped = flipped;
