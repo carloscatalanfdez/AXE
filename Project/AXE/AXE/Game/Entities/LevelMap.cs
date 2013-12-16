@@ -221,12 +221,26 @@ namespace AXE.Game.Entities
                 case "Gargoyle":
                     attr = element.GetAttribute("flipped");
                     bool flipped = attr != null ? bool.Parse(attr) : false;
-                    ge = new Gargoyle(x, y, flipped);
+
+                    attr = element.GetAttribute("fireDelay");
+                    int fireDelay = attr != null ? int.Parse(attr) : -1;
+
+                    if (fireDelay > 0)
+                        ge = new Gargoyle(x, y, flipped, fireDelay);
+                    else
+                        ge = new Gargoyle(x, y, flipped);
                     break;
                 case "VGargoyle":
                     attr = element.GetAttribute("flipped");
                     flipped = attr != null ? bool.Parse(attr) : false;
-                    ge = new VGargoyle(x, y, flipped);
+
+                    attr = element.GetAttribute("fireDelay");
+                    fireDelay = attr != null ? int.Parse(attr) : -1;
+
+                    if (fireDelay > 0)
+                        ge = new VGargoyle(x, y, flipped, fireDelay);
+                    else
+                        ge = new VGargoyle(x, y, flipped);
                     break;
                 case "Coin":
                     ge = new Coin(x, y);

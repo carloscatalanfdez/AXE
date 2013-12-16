@@ -123,6 +123,19 @@ namespace AXE.Game.Control
             return data.level;
         }
 
+        public int goToPreviousLevel()
+        {
+            GameData.saveGame();
+
+            // Handle level progression
+            data.level -= 1;
+            if (data.level < 0)
+                data.level += data.MaxLevels;
+            game.changeWorld(new LevelScreen(data.GetCurrentLevel), new FadeToColor(game, Colors.clear, 10));
+
+            return data.level;
+        }
+
         public void handlePlayerDeath(PlayerData who)
         {
             who.alive = false;

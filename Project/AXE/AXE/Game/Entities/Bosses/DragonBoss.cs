@@ -222,6 +222,15 @@ namespace AXE.Game.Entities.Bosses
                         }
                         break;
                     }
+                case State.Dead:
+                    spgraphic.play("death");
+                    float factor = (timer[DEAD_ANIM_TIMER] / (deathAnimDuration * 1f));
+                    color *= factor;
+                    if (color.A <= 0)
+                    {
+                        world.remove(this);
+                    }
+                    break;
                 case State.Attacked:
                     break;
             }

@@ -292,6 +292,8 @@ namespace AXE.Game.Screens
                 game.changeWorld(new LevelScreen(id));
             if (bGame.input.pressed(Microsoft.Xna.Framework.Input.Keys.N))
                 Controller.getInstance().goToNextLevel();
+            if (bGame.input.pressed(Microsoft.Xna.Framework.Input.Keys.M))
+                Controller.getInstance().goToPreviousLevel();
 
             for (int i = 0; i < playerDisplays.Length; i++)
                 playerDisplays[i].update();

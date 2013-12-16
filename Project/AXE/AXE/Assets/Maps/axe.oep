@@ -500,6 +500,7 @@
       </ImageDefinition>
       <ValueDefinitions>
         <ValueDefinition xsi:type="BoolValueDefinition" Name="flipped" Default="false" />
+        <ValueDefinition xsi:type="IntValueDefinition" Name="fireDelay" Default="-1" Min="0" Max="100" ShowSlider="false" />
       </ValueDefinitions>
       <NodesDefinition Enabled="false" Limit="-1" DrawMode="None" Ghost="false" />
     </EntityDefinition>
@@ -517,6 +518,7 @@
       </ImageDefinition>
       <ValueDefinitions>
         <ValueDefinition xsi:type="BoolValueDefinition" Name="flipped" Default="false" />
+        <ValueDefinition xsi:type="IntValueDefinition" Name="fireDelay" Default="-1" Min="0" Max="100" ShowSlider="false" />
       </ValueDefinitions>
       <NodesDefinition Enabled="false" Limit="-1" DrawMode="None" Ghost="false" />
     </EntityDefinition>

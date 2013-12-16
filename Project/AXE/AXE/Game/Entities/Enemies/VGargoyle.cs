@@ -23,9 +23,10 @@ namespace AXE.Game.Entities.Enemies
         bool flipped;
         int fireDelay;
 
-        public VGargoyle(int x, int y, bool flipped)
+        public VGargoyle(int x, int y, bool flipped, int fireDelay = 90)
             : base(x, y)
         {
+            this.fireDelay = fireDelay;
             this.flipped = flipped;
         }
 
@@ -48,7 +49,6 @@ namespace AXE.Game.Entities.Enemies
             spgraphic.play("1");
             spgraphic.vflipped = flipped;
 
-            fireDelay = 90;
             timer[0] = fireDelay;
         }
 
