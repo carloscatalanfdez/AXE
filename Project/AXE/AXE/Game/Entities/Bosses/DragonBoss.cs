@@ -27,16 +27,16 @@ namespace AXE.Game.Entities.Bosses
             set { _graphic = value; }
         }
 
-        bMask watchMask;
+        bMask idleWatchMask;
+        bMask sniffWatchMask;
 
         public State state;
-        public HeightLevel currHeight;
-        public HeightLevel prevHeight;
+        public State movementState { get { return state; } }
 
-        int attackTime;
+        public HeightLevel currHeight;
 
         int idleBaseTime, idleOptionalTime;
-        int throwIdleTime;
+        int coolDownTime;
 
         int deathAnimDuration;
 
@@ -56,38 +56,39 @@ namespace AXE.Game.Entities.Bosses
             base.init();
 
             spgraphic = new bSpritemap((game as AxeGame).res.sprDragonBossSheet, 136, 136);
-            spgraphic.add(new bAnim("idle", new int[] { 0 }));
-            spgraphic.add(new bAnim("attack-high", new int[] { 0 }, 1.0f, false));
-            spgraphic.add(new bAnim("attack-mid", new int[] { 0 }, 1.0f, false));
-            spgraphic.add(new bAnim("attack-low", new int[] { 0 }, 1.0f, false));
-            spgraphic.add(new bAnim("idle-high", new int[] { 0 }));
-            spgraphic.add(new bAnim("idle-mid", new int[] { 0 }));
-            spgraphic.add(new bAnim("idle-low", new int[] { 0 }));
-            spgraphic.add(new bAnim("high-to-idle", new int[] { 0 }, 1.0f, false));
-            spgraphic.add(new bAnim("mid-to-idle", new int[] { 0 }, 1.0f, false));
-            spgraphic.add(new bAnim("low-to-idle", new int[] { 0 }, 1.0f, false));
+            spgraphic.add(new bAnim("idle", new int[] { 0, 1, 2 }, 0.2f));
+            spgraphic.add(new bAnim("attack-high", new int[] { 9 }, 0.3f, false));
+            spgraphic.add(new bAnim("attack-mid", new int[] { 16 }, 0.3f, false));
+            spgraphic.add(new bAnim("attack-low", new int[] { 23 }, 0.3f, false));
+            spgraphic.add(new bAnim("idle-to-high", new int[] { 0, 7, 8 }, 0.4f, false));
+            spgraphic.add(new bAnim("idle-to-mid", new int[] { 0, 14, 15 }, 0.4f, false));
+            spgraphic.add(new bAnim("idle-to-low", new int[] { 0, 21, 22 }, 0.4f, false));
+            spgraphic.add(new bAnim("high-to-idle", new int[] { 8, 7, 0 }, 0.3f, false));
+            spgraphic.add(new bAnim("mid-to-idle", new int[] { 15, 14, 0 }, 0.3f, false));
+            spgraphic.add(new bAnim("low-to-idle", new int[] { 22, 21, 0 }, 0.3f, false));
             spgraphic.add(new bAnim("death", new int[] { 0 }));
             spgraphic.play("idle");
 
-            mask.w = 100;
-            mask.h = 8;
-            mask.offsetx = 8;
-            mask.offsety = 130;
+            mask.w = 70;
+            mask.h = 120;
+            mask.offsetx = 23;
+            mask.offsety = 16;
 
-            watchMask = new bMask(x, y, (world as LevelScreen).width, graphicWidth());
-            watchMask.game = game;
+            idleWatchMask = new bMask(x, y, (world as LevelScreen).width, graphicWidth());
+            idleWatchMask.game = game;
+
+            sniffWatchMask = new bMask(x, y, (world as LevelScreen).width, 40);
+            sniffWatchMask.game = game;
 
             idleBaseTime = 80;
             idleOptionalTime = 80;
             deathAnimDuration = 50;
 
-            throwIdleTime = 160;
+            coolDownTime = 30;
 
             facing = Dir.Right;
 
-            attackTime = 8;
-
-            currHeight = prevHeight = HeightLevel.None;
+            currHeight = HeightLevel.None;
             state = State.None;
 
             changeState(State.Idle);
@@ -100,13 +101,19 @@ namespace AXE.Game.Entities.Bosses
             if (newState != state)
             {
                 bool performChange = true;
+                timer[CHANGE_STATE_TIMER] = -1;
                 switch (newState)
                 {
                     case State.Idle:
                         timer[CHANGE_STATE_TIMER] = idleBaseTime + Tools.random.Next(idleOptionalTime) - idleOptionalTime;
                         break;
                     case State.Attacked:
-                        timer[CHANGE_STATE_TIMER] = throwIdleTime;
+                        timer[CHANGE_STATE_TIMER] = coolDownTime;
+                        break;
+                    case State.IdleTransition:
+                        currHeight = HeightLevel.None;
+                        break;
+                    default:
                         break;
                 }
 
@@ -132,9 +139,32 @@ namespace AXE.Game.Entities.Bosses
                     {
                         case State.Idle:
                             // Sniff random height
+                            int random = Tools.random.Next(300);
+                            switch (random)
+                            {
+                                case 0:
+                                    moveToHeight(HeightLevel.High);
+                                    break;
+                                case 1:
+                                    moveToHeight(HeightLevel.Mid);
+                                    break;
+                                case 2:
+                                    moveToHeight(HeightLevel.Low);
+                                    break;
+                            }
+
                             break;
                         case State.Attacked:
-                            changeState(State.Idle);
+                            HeightLevel resultHeight = sniff();
+                            if (resultHeight != HeightLevel.None)
+                            {
+                                // Again!
+                                changeState(State.Attacking);
+                            }
+                            else
+                            {
+                                moveToHeight(HeightLevel.None);
+                            }
                             break;
                     }
                     break;
@@ -152,24 +182,48 @@ namespace AXE.Game.Entities.Bosses
             switch (state)
             {
                 case State.Idle:
-                    spgraphic.play("idle");
-                    break;
-                case State.Attacking:
-                    if (spgraphic.currentAnim.finished)
                     {
-                        shoot();
-                        changeState(State.Attacked);
-                    }
-                    break;
-            }
+                        spgraphic.play("idle");
 
-            if (state == State.Idle)
-            {
-                if (isPlayerOnSight(facing, false, new String[] { "solid" }, watchMask, null))
-                {
-                    // Yeah, let's go
-                    changeState(State.Attacking);
-                }
+                        HeightLevel resultHeight = sniff();
+                        if (resultHeight != HeightLevel.None)
+                        {
+                            moveToHeight(resultHeight);
+                            changeState(State.AttackingTransition);
+                        }
+                        else
+                        {
+                            currHeight = HeightLevel.None;
+                        }
+                        break;
+                    }
+                case State.IdleTransition:
+                    {
+                        if (spgraphic.currentAnim.finished)
+                        {
+                            changeState(State.Idle);
+                        }
+                        break;
+                    }
+                case State.AttackingTransition:
+                    {
+                        if (spgraphic.currentAnim.finished)
+                        {
+                            changeState(State.Attacking);
+                        }
+                        break;
+                    }
+                case State.Attacking:
+                    {
+                        if (spgraphic.currentAnim.finished)
+                        {
+                            shoot();
+                            changeState(State.Attacked);
+                        }
+                        break;
+                    }
+                case State.Attacked:
+                    break;
             }
 
             handleSoundEffects();
@@ -184,44 +238,161 @@ namespace AXE.Game.Entities.Bosses
             switch (state)
             {
                 case State.Attacking:
-                    // switch depending on height
-                    spgraphic.play("attack-mid");
+                    switch (currHeight)
+                    {
+                        case HeightLevel.High:
+                            spgraphic.play("attack-high");
+                            break;
+                        case HeightLevel.Mid:
+                            spgraphic.play("attack-mid");
+                            break;
+                        case HeightLevel.Low:
+                            spgraphic.play("attack-low");
+                            break;
+                    }
+                    break;
+                case State.AttackingTransition:
+                    switch (currHeight)
+                    {
+                        case HeightLevel.High:
+                            spgraphic.play("idle-to-high");
+                            break;
+                        case HeightLevel.Mid:
+                            spgraphic.play("idle-to-mid");
+                            break;
+                        case HeightLevel.Low:
+                            spgraphic.play("idle-to-low");
+                            break;
+                    }
+                    break;
+                case State.IdleTransition:
+                    switch (currHeight)
+                    {
+                        case HeightLevel.High:
+                            spgraphic.play("high-to-idle");
+                            break;
+                        case HeightLevel.Mid:
+                            spgraphic.play("mid-to-idle");
+                            break;
+                        case HeightLevel.Low:
+                            spgraphic.play("low-to-idle");
+                            break;
+                    }
+                    break;
+                case State.Dead:
+                    spgraphic.play("death");
                     break;
                 default:
+                case State.Idle:
                     spgraphic.play("idle");
                     break;
             }
         }
 
-        public void sniffHeight(HeightLevel height)
+        public void moveToHeight(HeightLevel height)
         {
-            prevHeight = currHeight;
+            if (currHeight != HeightLevel.None)
+            {
+                if (height != HeightLevel.None)
+                {
+                    changeState(State.IdleTransition);
+                }
+                else
+                {
+                    changeState(State.Idle);
+                }
+            }
+            else
+            {
+                if (height != HeightLevel.None)
+                {
+                    changeState(State.AttackingTransition);
+                }
+                else
+                {
+                    changeState(State.Idle);
+                }
+            }
+
             currHeight = height;
-            state = State.IdleTransition;
+        }
+
+        private HeightLevel sniff()
+        {
+            bMask holdMyMaskPlease = _mask;
+            bMask watchMask;
+
+            switch (currHeight)
+            {
+                case HeightLevel.High:
+                    sniffWatchMask.y = 50;
+                    watchMask = sniffWatchMask;
+                    watchMask.y = 50;
+                    break;
+                case HeightLevel.Mid:
+                    sniffWatchMask.y = 110;
+                    watchMask = sniffWatchMask;
+                    break;
+                case HeightLevel.Low:
+                    sniffWatchMask.y = 170;
+                    watchMask = sniffWatchMask;
+                    break;
+                default:
+                case HeightLevel.None:
+                    watchMask = idleWatchMask;
+                    break;
+            }
+
+            mask = watchMask;
+            bEntity spottedEntity = instancePlace(x, y, "player", null, alivePlayerCondition);
+            mask = holdMyMaskPlease; // thank you!
+
+            if (spottedEntity != null && spottedEntity is Player)
+            {
+                if (spottedEntity.y < 72)
+                {
+                    return HeightLevel.High;
+                }
+                else if (spottedEntity.y < 130)
+                {
+                   return HeightLevel.Mid;
+                }
+                else if (spottedEntity.y < 190)
+                {
+                    return HeightLevel.Low;
+                }
+                else
+                {
+                    // no idea man
+                }
+            }
+
+            return HeightLevel.None;
         }
 
         private void shoot()
         {
             // spawn dagger
             int spawnX =  _mask.offsetx + _mask.w;
-            FireBullet bullet = new FireBullet(x + spawnX, y + 15, false /* not flipped */);
+
+            int spawnY;
+            switch (currHeight)
+            {
+                case HeightLevel.High:
+                    spawnY = 50;
+                    break;
+                case HeightLevel.Mid:
+                    spawnY = 110;
+                    break;
+                default:
+                case HeightLevel.Low:
+                    spawnY = 170;
+                    break;
+            }
+
+            FireBullet bullet = new FireBullet(x + spawnX, spawnY, false /* not flipped */);
             bullet.setOwner(this);
             world.add(bullet, "hazard");
-        }
-
-        private HeightLevel getHeightFromInt(int value)
-        {
-            switch (value)
-            {
-                case 0:
-                    return HeightLevel.Low;
-                case 1:
-                    return HeightLevel.Mid;
-                case 2:
-                    return HeightLevel.High;
-                default:
-                    return HeightLevel.None;
-            }
         }
 
         public override void render(GameTime dt, SpriteBatch sb)
@@ -230,7 +401,8 @@ namespace AXE.Game.Entities.Bosses
 
             if (bConfig.DEBUG)
             {
-                watchMask.render(sb);
+                //idleWatchMask.render(sb);
+                sniffWatchMask.render(sb);
             }
 
             spgraphic.color = color;
