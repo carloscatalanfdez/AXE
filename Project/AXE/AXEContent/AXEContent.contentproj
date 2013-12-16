@@ -442,14 +442,14 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Music\ost-dungeon-boss.wma">
+    <Compile Include="Assets\Music\ost-dungeon-boss.mp3">
       <Name>ost-dungeon-boss</Name>
-      <Importer>WmaImporter</Importer>
+      <Importer>Mp3Importer</Importer>
       <Processor>SongProcessor</Processor>
     </Compile>
-    <Compile Include="Assets\Music\ost-dungeon.wma">
+    <Compile Include="Assets\Music\ost-dungeon.mp3">
       <Name>ost-dungeon</Name>
-      <Importer>WmaImporter</Importer>
+      <Importer>Mp3Importer</Importer>
       <Processor>SongProcessor</Processor>
     </Compile>
   </ItemGroup>

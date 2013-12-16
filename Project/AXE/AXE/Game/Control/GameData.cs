@@ -82,7 +82,8 @@ namespace AXE.Game.Control
                 "2", 
                 "3", 
                 "test-1",
-                "r2"
+                "r2",
+                "d0"
             });
             level = 0;
         }
