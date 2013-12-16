@@ -150,6 +150,7 @@ namespace AXE.Game.Screens
 
             bgMusic = (game as AxeGame).res.getSong(levelMap.bgMusicName);
             MediaPlayer.Play(bgMusic);
+            MediaPlayer.IsRepeating = true;
         }
 
         public Player spawnPlayer(PlayerData pdata)
