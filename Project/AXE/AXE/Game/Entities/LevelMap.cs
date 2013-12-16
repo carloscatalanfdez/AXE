@@ -35,6 +35,7 @@ namespace AXE.Game.Entities
         public String name;
         public int timeLimit = 200;
         public Vector2 playerStart;
+        public String bgMusicName;
 
         public LevelMap(String fname)
             : base(0, 0)
@@ -84,6 +85,10 @@ namespace AXE.Game.Entities
                                     int customTimeLimit = int.Parse(reader.GetAttribute("time"));
                                     if (customTimeLimit > 0) // Only override default timeLimit if parameter makes sense
                                         timeLimit = customTimeLimit;
+                                    name = reader.GetAttribute("name");
+                                    bgMusicName = reader.GetAttribute("bgmusic");
+                                    if (bgMusicName == null)
+                                        bgMusicName = "dungeon";
                                     break;
                                 case "Tiles":
                                     tileset = reader.GetAttribute("tileset");

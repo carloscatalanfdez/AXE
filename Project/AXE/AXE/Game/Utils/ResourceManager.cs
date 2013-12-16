@@ -163,6 +163,20 @@ namespace AXE.Game.Utils
             sfxMidBell      = loadSfx("sfx-bell.2");
 
             ostGameOver = loadMusic("ost-gameover");
+            ostDungeon = loadMusic("ost-dungeon");
+            ostDungeonBoss = loadMusic("ost-dungeon-boss");
+        }
+
+        public Song getSong(String name)
+        {
+            switch (name)
+            {
+                case "dungeon-boss":
+                    return ostDungeonBoss;
+                case "dungeon":
+                default:
+                    return ostDungeon;
+            }
         }
 
         // Hardcoding resources for now to ease development
@@ -241,5 +255,7 @@ namespace AXE.Game.Utils
 
         // Music
         public Song ostGameOver;
+        public Song ostDungeon;
+        public Song ostDungeonBoss;
     }
 }

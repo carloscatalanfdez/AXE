@@ -18,6 +18,7 @@ using AXE.Game.Entities.Contraptions;
 using AXE.Game.Entities.Base;
 using AXE.Game.Utils;
 using AXE.Game.UI;
+using Microsoft.Xna.Framework.Media;
 
 namespace AXE.Game.Screens
 {
@@ -59,6 +60,8 @@ namespace AXE.Game.Screens
         public string infoLabel;
         PlayerDisplay[] playerDisplays;
 
+        Song bgMusic;
+
         // Debug
         // String msg;
         public bStamp cursor;
@@ -75,6 +78,7 @@ namespace AXE.Game.Screens
         {
             cursor.image = (game as AxeGame).res.sprCursor;
             timeLabel.sound = (game as AxeGame).res.sfxMidBell;
+            bgMusic = (game as AxeGame).res.getSong(levelMap.bgMusicName);
         }
 
         public override void init()
@@ -143,6 +147,9 @@ namespace AXE.Game.Screens
             timeLabel = new IntermittentLabel(0, 10, "", Color.White, false, 15, (game as AxeGame).res.sfxMidBell);
             timeLabel.game = game;
             timeLabel.mask.game = game;
+
+            bgMusic = (game as AxeGame).res.getSong(levelMap.bgMusicName);
+            MediaPlayer.Play(bgMusic);
         }
 
         public Player spawnPlayer(PlayerData pdata)

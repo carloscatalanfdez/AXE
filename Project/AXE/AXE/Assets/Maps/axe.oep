@@ -27,6 +27,7 @@
   <LevelValueDefinitions>
     <ValueDefinition xsi:type="StringValueDefinition" Name="name" Default="" MaxChars="-1" MultiLine="false" />
     <ValueDefinition xsi:type="IntValueDefinition" Name="time" Default="99" Min="0" Max="0" ShowSlider="false" />
+    <ValueDefinition xsi:type="StringValueDefinition" Name="bgmusic" Default="dungeon" MaxChars="-1" MultiLine="false" />
   </LevelValueDefinitions>
   <LayerDefinitions>
     <LayerDefinition xsi:type="TileLayerDefinition">
@@ -468,8 +469,8 @@
     </EntityDefinition>
     <EntityDefinition Name="DragonBoss" Limit="-1" ResizableX="false" ResizableY="false" Rotatable="false" RotateIncrement="15">
       <Size>
-        <Width>116</Width>
-        <Height>138</Height>
+        <Width>136</Width>
+        <Height>136</Height>
       </Size>
       <Origin>
         <X>0</X>

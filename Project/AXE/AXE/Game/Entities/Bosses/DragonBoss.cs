@@ -56,7 +56,7 @@ namespace AXE.Game.Entities.Bosses
             base.init();
 
             spgraphic = new bSpritemap((game as AxeGame).res.sprDragonBossSheet, 136, 136);
-            spgraphic.add(new bAnim("idle", new int[] { 0, 1, 2 }, 0.2f));
+            spgraphic.add(new bAnim("idle", new int[] { 0, 1, 2 }, 0.05f));
             spgraphic.add(new bAnim("attack-high", new int[] { 9 }, 0.3f, false));
             spgraphic.add(new bAnim("attack-mid", new int[] { 16 }, 0.3f, false));
             spgraphic.add(new bAnim("attack-low", new int[] { 23 }, 0.3f, false));
