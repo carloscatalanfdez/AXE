@@ -16,10 +16,11 @@ namespace AXE.Game.Entities.Bosses
 {
     class DragonBoss : Boss, IHazardProvider
     {
-        public enum State { None, Idle, IdleTransition, AttackingTransition, Attacking, Attacked, Dead }
+        public enum State { Rest, Shriek, Idle, IdleTransition, AttackingTransition, Attacking, Attacked, Dead }
         public enum HeightLevel { None, Low, Mid, High }
         const int CHANGE_STATE_TIMER = 0;
         const int DEAD_ANIM_TIMER = 1;
+        const int INIT_TIMER = 2;
 
         public bSpritemap spgraphic
         {
@@ -37,6 +38,7 @@ namespace AXE.Game.Entities.Bosses
 
         int idleBaseTime, idleOptionalTime;
         int coolDownTime;
+        int initTime;
 
         int deathAnimDuration;
 
@@ -56,6 +58,7 @@ namespace AXE.Game.Entities.Bosses
             base.init();
 
             spgraphic = new bSpritemap((game as AxeGame).res.sprDragonBossSheet, 136, 136);
+            spgraphic.add(new bAnim("none", new int[] { 28, 28, 29, 30, 29 }, 0.1f));
             spgraphic.add(new bAnim("idle", new int[] { 0, 1, 2 }, 0.05f));
             spgraphic.add(new bAnim("attack-high", new int[] { 9 }, 0.3f, false));
             spgraphic.add(new bAnim("attack-mid", new int[] { 16 }, 0.3f, false));
@@ -66,13 +69,13 @@ namespace AXE.Game.Entities.Bosses
             spgraphic.add(new bAnim("high-to-idle", new int[] { 8, 7, 0 }, 0.3f, false));
             spgraphic.add(new bAnim("mid-to-idle", new int[] { 15, 14, 0 }, 0.3f, false));
             spgraphic.add(new bAnim("low-to-idle", new int[] { 22, 21, 0 }, 0.3f, false));
+            spgraphic.add(new bAnim("shriek", new int[] { 35, 36, 37, 37, 37, 37, 37, 37,
+                                                                  37, 37, 37, 37, 37, 37,
+                                                                  36 }, 0.3f, false));
             spgraphic.add(new bAnim("death", new int[] { 0 }));
-            spgraphic.play("idle");
+            spgraphic.play("none");
 
-            mask.w = 70;
-            mask.h = 120;
-            mask.offsetx = 23;
-            mask.offsety = 16;
+            loadRestMask();
 
             idleWatchMask = new bMask(x, y, (world as LevelScreen).width, graphicWidth());
             idleWatchMask.game = game;
@@ -85,15 +88,33 @@ namespace AXE.Game.Entities.Bosses
             deathAnimDuration = 50;
 
             coolDownTime = 30;
+            initTime = 20;
 
             facing = Dir.Right;
 
             currHeight = HeightLevel.None;
-            state = State.None;
-
-            changeState(State.Idle);
+            state = State.Rest;
             
             attributes.Add(ATTR_SOLID);
+
+            // I'll tell you when to play it
+            (world as LevelScreen).shouldPlayMusicOnInit = false;
+        }
+
+        public void loadRestMask()
+        {
+            _mask.w = 110;
+            _mask.h = 50;
+            _mask.offsetx = 13;
+            _mask.offsety = 86;
+        }
+
+        public void loadIdleMask()
+        {
+            _mask.w = 70;
+            _mask.h = 120;
+            _mask.offsetx = 23;
+            _mask.offsety = 16;
         }
 
         public void changeState(State newState)
@@ -104,6 +125,12 @@ namespace AXE.Game.Entities.Bosses
                 timer[CHANGE_STATE_TIMER] = -1;
                 switch (newState)
                 {
+                    case State.Rest:
+                        loadRestMask();
+                        break;
+                    case State.Shriek:
+                        loadIdleMask();
+                        break;
                     case State.Idle:
                         timer[CHANGE_STATE_TIMER] = idleBaseTime + Tools.random.Next(idleOptionalTime) - idleOptionalTime;
                         break;
@@ -153,6 +180,8 @@ namespace AXE.Game.Entities.Bosses
                                     break;
                             }
 
+                            changeState(State.Idle);  // resets the timer
+
                             break;
                         case State.Attacked:
                             HeightLevel resultHeight = sniff();
@@ -183,17 +212,18 @@ namespace AXE.Game.Entities.Bosses
             {
                 case State.Idle:
                     {
-                        spgraphic.play("idle");
-
-                        HeightLevel resultHeight = sniff();
-                        if (resultHeight != HeightLevel.None)
+                        if (timer[INIT_TIMER] < 0)
                         {
-                            moveToHeight(resultHeight);
-                            changeState(State.AttackingTransition);
-                        }
-                        else
-                        {
-                            currHeight = HeightLevel.None;
+                            HeightLevel resultHeight = sniff();
+                            if (resultHeight != HeightLevel.None)
+                            {
+                                moveToHeight(resultHeight);
+                                changeState(State.AttackingTransition);
+                            }
+                            else
+                            {
+                                currHeight = HeightLevel.None;
+                            }
                         }
                         break;
                     }
@@ -210,6 +240,22 @@ namespace AXE.Game.Entities.Bosses
                         if (spgraphic.currentAnim.finished)
                         {
                             changeState(State.Attacking);
+                        }
+                        break;
+                    }
+                case State.Rest:
+                    break;
+                case State.Shriek:
+                    {
+                        if (spgraphic.currentAnim.frameIndex == 2)
+                        {
+                            (world as LevelScreen).playBGMusic();
+                            (game as AxeGame).res.sfxDragonShriek.Play();
+                        }
+                        else if (spgraphic.currentAnim.finished)
+                        {
+                            timer[INIT_TIMER] = initTime;
+                            changeState(State.Idle);
                         }
                         break;
                     }
@@ -290,6 +336,12 @@ namespace AXE.Game.Entities.Bosses
                     break;
                 case State.Dead:
                     spgraphic.play("death");
+                    break;
+                case State.Shriek:
+                    spgraphic.play("shriek");
+                    break;
+                case State.Rest:
+                    spgraphic.play("none");
                     break;
                 default:
                 case State.Idle:
@@ -421,6 +473,16 @@ namespace AXE.Game.Entities.Bosses
                 sb.DrawString(game.gameFont, state.ToString() + " [" + timer[0] + "]", new Vector2(x, y - 8), Color.White);
         }
 
+        public override void onCollision(string type, bEntity other)
+        {
+            base.onCollision(type, other);
+
+            if (other is Player && state == State.Rest)
+            {
+                changeState(State.Shriek);
+            }
+        }
+
         public override int graphicWidth()
         {
             return spgraphic.width;
@@ -451,21 +513,29 @@ namespace AXE.Game.Entities.Bosses
 
             if (other is Axe)
             {
-                onDeath();
-
-                if (rewarder != null)
+                if (state == State.Idle)
                 {
-                    if (contraptionRewardData.target == null)
-                    {
-                        contraptionRewardData.target = ((other as NormalAxe).thrower as bEntity);
-                    }
-                }
-                onSolved();
+                    onDeath();
 
-                return true;
+                    if (rewarder != null)
+                    {
+                        if (contraptionRewardData.target == null)
+                        {
+                            contraptionRewardData.target = ((other as NormalAxe).thrower as bEntity);
+                        }
+                    }
+                    onSolved();
+
+                    return true;
+                }
             }
 
-            return false;
+            if (state == State.Rest)
+            {
+                changeState(State.Shriek);
+            }
+                
+            return true;
         }
 
         /**

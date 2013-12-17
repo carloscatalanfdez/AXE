@@ -60,6 +60,7 @@ namespace AXE.Game.Screens
         public string infoLabel;
         PlayerDisplay[] playerDisplays;
 
+        public bool shouldPlayMusicOnInit = true;
         Song bgMusic;
 
         // Debug
@@ -149,8 +150,24 @@ namespace AXE.Game.Screens
             timeLabel.mask.game = game;
 
             bgMusic = (game as AxeGame).res.getSong(levelMap.bgMusicName);
-            MediaPlayer.Play(bgMusic);
-            MediaPlayer.IsRepeating = true;
+
+            if (shouldPlayMusicOnInit)
+            {
+                playBGMusic();
+            }
+            else
+            {
+                MediaPlayer.Stop();
+            }
+        }
+
+        public void playBGMusic()
+        {
+            if (MediaPlayer.Queue.ActiveSong != bgMusic)
+            {
+                MediaPlayer.Play(bgMusic);
+                MediaPlayer.IsRepeating = true;
+            }
         }
 
         public Player spawnPlayer(PlayerData pdata)

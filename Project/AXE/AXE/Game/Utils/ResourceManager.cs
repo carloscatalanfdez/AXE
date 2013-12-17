@@ -163,6 +163,8 @@ namespace AXE.Game.Utils
             sfxBigBell      = loadSfx("sfx-bell.1");
             sfxMidBell      = loadSfx("sfx-bell.2");
 
+            sfxDragonShriek = loadSfx("dragon-shriek");
+
             ostGameOver = loadMusic("ost-gameover");
             ostDungeon = loadMusic("ost-dungeon");
             ostDungeonBoss = loadMusic("ost-dungeon-boss");
@@ -254,6 +256,8 @@ namespace AXE.Game.Utils
         public SoundEffect sfxGreatBell;
         public SoundEffect sfxBigBell;
         public SoundEffect sfxMidBell;
+
+        public SoundEffect sfxDragonShriek;
 
         // Music
         public Song ostGameOver;
