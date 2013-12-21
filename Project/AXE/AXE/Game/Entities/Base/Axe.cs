@@ -97,18 +97,20 @@ namespace AXE.Game.Entities
 
         virtual public void loadFlyMask()
         {
+            int flyingWidth = (int)Math.Min(Math.Abs(current_hspeed), traveledFlightDistance);
+            flyingWidth = Math.Max(1, flyingWidth);
             if (facing == Player.Dir.Left)
             {
-                _mask.w = 1;
+                _mask.w = flyingWidth;
                 _mask.h = 14;
                 _mask.offsetx = 0;
                 _mask.offsety = 0;
             }
             else
             {
-                _mask.w = 1;
+                _mask.w = flyingWidth;
                 _mask.h = 14;
-                _mask.offsetx = 13;
+                _mask.offsetx = 14 - flyingWidth;
                 _mask.offsety = 0;
             }
         }
@@ -237,15 +239,15 @@ namespace AXE.Game.Entities
                     moveTo.Y += current_vspeed;
 
                     Vector2 remnant;
-                    if (justLaunched)
+                    traveledFlightDistance += (int)Math.Abs(pos.X - moveTo.X);
+
+                    if (false)//justLaunched)
                     {
                         pos = moveTo;
                     }
                     else
                     {
                         remnant = moveToContact(moveTo, "solid");
-
-                        traveledFlightDistance += (int)Math.Abs(pos.X - moveTo.X);
 
                         // We have been stopped
                         if (remnant.X != 0 || remnant.Y != 0)
@@ -255,6 +257,7 @@ namespace AXE.Game.Entities
                             onHitSolid(entity);
                         }
                     }
+
                     break;
                 case MovementState.Bouncing:
                     wrapCount = 0;
@@ -459,7 +462,7 @@ namespace AXE.Game.Entities
 
         public virtual void onHitSolid(bEntity entity)
         {
-            if (justLaunched)
+            if (justLaunched && entity is Player)
                 return;
 
             // notify other entity
@@ -472,7 +475,7 @@ namespace AXE.Game.Entities
 
         public virtual void onStuck(bEntity entity)
         {
-            if (justLaunched)
+            if (justLaunched && entity is Player)
                 return;
 
             current_hspeed = current_vspeed = 0;

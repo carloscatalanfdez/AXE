@@ -41,7 +41,7 @@ namespace AXE.Game.Control
             playing = false;
             alive = false;
 
-            weapon = Weapons.None;
+            weapon = Weapons.Axe;
             powerUps = 0;
             keys = new Dictionary<int, int>();
             keys.Add(KEY_YELLOW, 0);
