@@ -434,7 +434,7 @@ namespace AXE.Game.Entities.Base
             return spgraphic.height;
         }
 
-        public void onDeath()
+        public override void onDeath()
         {
             if (state != State.Dead)
             {

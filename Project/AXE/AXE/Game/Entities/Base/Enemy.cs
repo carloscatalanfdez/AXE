@@ -7,6 +7,7 @@ using bEngine;
 using Microsoft.Xna.Framework;
 using AXE.Game.Utils;
 using AXE.Game.Screens;
+using AXE.Game.Entities.Enemies;
 
 namespace AXE.Game.Entities.Base
 {
@@ -143,5 +144,20 @@ namespace AXE.Game.Entities.Base
                 rewarder.onReward(this);
             }
         }
+
+        public virtual void onDeath()
+        {
+
+        }
+
+        public override void onCollision(string type, bEntity other)
+        {
+            base.onCollision(type, other);
+            if (other is FlameSpiritBullet)
+            {
+                onDeath();
+            }
+        }
+            
     }
 }

@@ -19,6 +19,7 @@ using AXE.Game.Screens;
 using AXE.Game.Entities.Base;
 using AXE.Game.Utils;
 using Microsoft.Xna.Framework.Media;
+using AXE.Game.Entities.Enemies;
 
 namespace AXE.Game.Entities
 {
@@ -210,7 +211,7 @@ namespace AXE.Game.Entities
             haccel = 0.2f;
             air_haccel = 0f;
             runSpeedFactor = 2;
-            jumpPower = 6f;
+            jumpPower = 3.75842f;
             deathFallThreshold = 48;
 
             weaponCatchMask = new bMask(x, y, 
@@ -750,6 +751,15 @@ namespace AXE.Game.Entities
                                         // timer[ACTIVATION_TIME_TIMER] = activationTime;
                                     }
                                 }
+                                else
+                                {
+                                    // spawn dagger
+                                    int spawnX = facing == Dir.Left ? 0 : _mask.offsetx + _mask.w;
+                                    FlameSpiritBullet bullet =
+                                        new FlameSpiritBullet(x + spawnX, y + 15, spgraphic.flipped);
+                                    
+                                    world.add(bullet, "hazard");
+                                }
                             }
                         }
                     }
@@ -1139,9 +1149,17 @@ namespace AXE.Game.Entities
                 {
                     IHazard hazard = (other as IHazard);
                     IHazardProvider killer = hazard.getOwner();
-                    killer.onSuccessfulHit(this);
-                    hazard.onHit();
-                    onDeath(hazard.getType());
+                    if (killer != null)
+                    {
+                        killer.onSuccessfulHit(this);
+                        hazard.onHit();
+                        onDeath(hazard.getType());
+                    }
+                    else
+                    {
+                     //   hazard.onHit();
+                     //   onDeath(DeathState.Generic);
+                    }
                 }
             }
             else if (type == "axe")

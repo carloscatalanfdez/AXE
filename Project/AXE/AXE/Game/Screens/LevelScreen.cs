@@ -280,6 +280,16 @@ namespace AXE.Game.Screens
                         }
                 }
 
+                foreach (bEntity e in entities["enemy"])
+                {
+                    foreach (bEntity w in entities["hazard"])
+                        if (e.collides(w))
+                        {
+                            e.onCollision("hazard", w);
+                            w.onCollision("enemy", e);
+                        }
+                }
+
                 foreach (bEntity w in entities["axe"])
                 {
                     foreach (bEntity e in entities["enemy"])

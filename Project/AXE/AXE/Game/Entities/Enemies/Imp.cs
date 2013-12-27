@@ -543,7 +543,7 @@ namespace AXE.Game.Entities.Enemies
             }
         }
 
-        public void onDeath()
+        public override void onDeath()
         {
             if (state != State.Dead)
             {
