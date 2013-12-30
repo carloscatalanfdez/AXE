@@ -303,14 +303,17 @@ namespace AXE.Game.Entities
                         ge = new Door(x, y, lockType);
                     }
                     break;
+                case "Key":
+                    ge = new Key(x, y);
+                    break;
                 case "KeyA":
-                    ge = new Key(x, y, 1);
+                    ge = new _Key(x, y, 1);
                     break;
                 case "KeyB":
-                    ge = new Key(x, y, 2);
+                    ge = new _Key(x, y, 2);
                     break;
                 case "KeyC":
-                    ge = new Key(x, y, 3);
+                    ge = new _Key(x, y, 3);
                     break;
                 case "HighGuardFallPowerUp":
                     ge = new PowerUpPickable(x, y, PowerUpPickable.Type.HighFallGuard);

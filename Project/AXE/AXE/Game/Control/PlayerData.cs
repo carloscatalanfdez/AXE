@@ -26,7 +26,7 @@ namespace AXE.Game.Control
         // Status
         public Weapons weapon;
         public int powerUps;
-        public Dictionary<int, int> keys;
+        public int keys;
 
         // Session achievements
         public int collectedCoins;
@@ -43,15 +43,7 @@ namespace AXE.Game.Control
 
             weapon = Weapons.Axe;
             powerUps = 0;
-/*            keys = new Dictionary<int, int>();
-            keys.Add(KEY_YELLOW, 0);
-            keys.Add(KEY_RED, 0);
-            keys.Add(KEY_BLUE, 0);*/
-
-            // DEBUG
-            /*keys[KEY_YELLOW] += Tools.random.Next(3);
-            keys[KEY_RED] += Tools.random.Next(3);
-            keys[KEY_BLUE] += Tools.random.Next(3);*/
+            keys = 0;
 
             collectedCoins = 0;
             kills = 0;

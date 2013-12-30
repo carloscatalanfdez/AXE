@@ -96,7 +96,7 @@ namespace AXE.Game.Entities.Axes
                 if ((entity as Entity).onHit(this))
                 {
                     onHit(entity as Entity);
-                    onBounce(false);
+                    // onBounce(false);
                 }
                 else
                 {

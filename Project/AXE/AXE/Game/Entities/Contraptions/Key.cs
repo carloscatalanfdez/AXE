@@ -7,7 +7,7 @@ using AXE.Game.Control;
 
 namespace AXE.Game.Entities.Contraptions
 {
-    class Key : Entity
+    class _Key : Entity
     {
         bSpritemap sprite
         {
@@ -18,7 +18,7 @@ namespace AXE.Game.Entities.Contraptions
         int type;
         public bool collected;
 
-        public Key(int x, int y, int type)
+        public _Key(int x, int y, int type)
             : base(x, y)
         {
             this.type = type;
@@ -67,15 +67,10 @@ namespace AXE.Game.Entities.Contraptions
             if (other is Player)
             {
                 PlayerData data = (other as Player).data;
-                if (data.keys[type] < 9)
+                if (data.keys < 9)
                 {
-                    data.keys[type]++;
-                    if (type == 0)
-                        Game.res.sfxKeyA.Play();
-                    else if (type == 1)
-                        Game.res.sfxKeyB.Play();
-                    else
-                        Game.res.sfxKeyC.Play();
+                    data.keys++;
+                    Game.res.sfxKeyA.Play();                    
                     collected = true;
                     world.remove(this);
                 }

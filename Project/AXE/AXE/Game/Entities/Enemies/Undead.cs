@@ -522,6 +522,7 @@ namespace AXE.Game.Entities.Enemies
         {
             if (state != State.Dead)
             {
+                Game.res.sfxPlayerHit.Play();
                 state = State.Dead;
                 color = new Color(164, 0, 0, 255);
                 timer[DEAD_ANIM_TIMER] = deathAnimDuration;

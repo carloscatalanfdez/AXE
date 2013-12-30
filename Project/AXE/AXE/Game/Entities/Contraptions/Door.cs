@@ -132,11 +132,11 @@ namespace AXE.Game.Entities.Contraptions
                 Player player = instancePlace(x - 1, y, "player") as Player;
                 if (player != null)
                 {
-                    if (player.data.keys[key] > 0)
+                    /*if (player.data.keys[key] > 0)
                     {
-                        player.data.keys[key]--;
+                        player.data.keys[key]--;*/
                         lockedBy.unlock();
-                    }
+                    //}
                 }
                 mask.w -= 3;
             }

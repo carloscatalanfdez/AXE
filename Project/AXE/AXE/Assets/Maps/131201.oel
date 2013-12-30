@@ -81,7 +81,7 @@
 0000000000000000000000000000000000000000</Solids>
   <Entities>
     <PlayerStart id="4" x="40" y="40" />
-    <ExitDoor id="5" x="256" y="264" open="True" />
+    <ExitDoor id="5" x="256" y="264" open="False" />
     <OneWayPlatform id="0" x="16" y="128" width="16" />
     <OneWayPlatform id="1" x="280" y="72" width="16" />
     <OneWayPlatform id="2" x="288" y="184" width="16" />
@@ -109,5 +109,6 @@
     <Undead id="26" x="160" y="264" />
     <Undead id="27" x="184" y="264" />
     <Undead id="28" x="216" y="256" />
+    <Key id="29" x="240" y="104" />
   </Entities>
 </level>

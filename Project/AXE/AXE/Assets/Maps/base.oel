@@ -85,6 +85,7 @@
     <OneWayPlatform id="2" x="0" y="128" width="320" />
     <OneWayPlatform id="3" x="0" y="72" width="320" />
     <PlayerStart id="4" x="40" y="40" />
-    <ExitDoor id="5" x="256" y="264" open="True" />
+    <ExitDoor id="5" x="256" y="264" open="False" />
+    <Key id="6" x="152" y="168" />
   </Entities>
 </level>

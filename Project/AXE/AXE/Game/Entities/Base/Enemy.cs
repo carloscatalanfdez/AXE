@@ -147,7 +147,6 @@ namespace AXE.Game.Entities.Base
 
         public virtual void onDeath()
         {
-
         }
 
         public override void onCollision(string type, bEntity other)

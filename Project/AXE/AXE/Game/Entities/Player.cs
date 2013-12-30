@@ -407,17 +407,21 @@ namespace AXE.Game.Entities
                                 isLanding = false;
                                 current_hspeed = 0;
                             }
-                            else if (mginput.check(PadButton.up) && placeMeeting(x, y, "items"))
+                            else if (mginput.pressed(PadButton.up) && placeMeeting(x, y, "items"))
                             {
                                 bEntity door = (bEntity)instancePlace(x, y, "items");
                                 if (door is ExitDoor)
                                 {
                                     ExitDoor exitDoor = (door as ExitDoor);
-                                    if (exitDoor.type == ExitDoor.Type.ExitOpen)
+                                    if (exitDoor.isOpen())
                                     {
                                         state = MovementState.Exit;
                                         timer[EXIT_ANIM_TIMER] = exitAnimationWaitTime;
                                     }
+                                    /*else
+                                    {
+                                        
+                                    }*/
                                 }
                             }
 
@@ -1023,7 +1027,7 @@ namespace AXE.Game.Entities
                     ExitDoor door = (instancePlace(x, y, "items") as ExitDoor);
                     if (door != null)
                     {
-                        if (door.onPlayerExit())
+                        if (door.onPlayerExit(this))
                         {
                             if (weapon != null)
                                 world.remove((weapon as bEntity));
@@ -1171,33 +1175,12 @@ namespace AXE.Game.Entities
                     axe.onGrab(this);
                     data.weapon = axe.type;
                 }
-                /*if (axe.state == Axe.MovementState.Flying && !axe.justLaunched)
-                {
-                    axeToCatch = (other as Axe);
-                    if (actionPressedSteps > 0 && actionPressedSteps < weaponCatchThreshold)
-                    {
-                        if (state != MovementState.Attacking && state != MovementState.Attacked && state != MovementState.Activate)
-                        {
-                            // Console.WriteLine("Got axe by onCollision");
-                            bEntity entity = other;
-                            if (entity != null)
-                            {
-                                if ((entity as Axe).holder != null)
-                                {
-                                    ((entity as Axe).holder).onAxeStolen();
-                                    (entity as Axe).holder = null;
-                                }
-                                (entity as Axe).onGrab(this);
-                                data.weapon = (entity as Axe).type;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        axeToCatch.onHitSolid(this);
-                        onDeath(DeathState.Generic);
-                    }
-                }*/
+            }
+            else if (type == "items" && other is ExitDoor)
+            {
+                ExitDoor door = (other as ExitDoor);
+                if (!door.isOpen())
+                    door.tryOpen(this);
             }
         }
 

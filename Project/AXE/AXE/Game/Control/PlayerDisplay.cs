@@ -131,9 +131,8 @@ namespace AXE.Game.Control
 
         void renderKeys(int x, int y, Microsoft.Xna.Framework.Graphics.SpriteBatch sb)
         {
-            sb.DrawString(game.gameFont, "" + playerData.keys[PlayerData.KEY_YELLOW], new Vector2(x, y), Color.LightGoldenrodYellow);
-            sb.DrawString(game.gameFont, "" + playerData.keys[PlayerData.KEY_RED], new Vector2(x + 8, y), Color.IndianRed);
-            sb.DrawString(game.gameFont, "" + playerData.keys[PlayerData.KEY_BLUE], new Vector2(x + 16, y), Color.DodgerBlue);
+            if (playerData.keys > 0)
+                sb.DrawString(game.gameFont, "K", new Vector2(x, y), Color.Gold);
         }
 
         public override void render(GameTime dt, Microsoft.Xna.Framework.Graphics.SpriteBatch sb)
@@ -143,8 +142,8 @@ namespace AXE.Game.Control
             sb.DrawString(game.gameFont, renderLine1, pos, line1Color);
             sb.DrawString(game.gameFont, renderLine2, new Vector2(x, y+8), line2Color);
 
-            /*if (displayKeys)
-                renderKeys(x+96, 8, sb);*/
+            if (displayKeys)
+                renderKeys(x+96, 8, sb);
         }
     }
 }
