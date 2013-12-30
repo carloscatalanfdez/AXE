@@ -84,13 +84,14 @@ namespace AXE.Game.Utils
             sprTotalLine    = loadSprite("total-line");
 
             // Spritesheets
-            sprCursor = loadSprite("cursor");
+            sprCursor       = loadSprite("cursor");
 
                 // Player
             sprKnightASheet = loadSprite("knight-sheet");
             sprKnightBSheet = loadSprite("knight-sheet-alt");
 
                 // Weapons
+            sprWeaponsSheet = loadSprite("weapons-sheet");
             sprAxeSheet     = loadSprite("axe-sheet");
             sprStickSheet   = loadSprite("stick-sheet");
             
@@ -105,6 +106,10 @@ namespace AXE.Game.Utils
             sprExitDoorSheet= loadSprite("door-sheet");
             sprSignSheet    = loadSprite("sign-sheet");
             sprDoorSheet    = loadSprite("doors-sheet");
+
+            sprLockSheet = loadSprite("door-lock");
+            sprKeySheet = loadSprite("door-key");
+
             sprLocksSheet   = loadSprite("locks-sheet");
             sprKeysSheet    = loadSprite("keys-sheet");
 
@@ -194,6 +199,7 @@ namespace AXE.Game.Utils
         public Texture2D sprKnightASheet;
         public Texture2D sprKnightBSheet;
 
+        public Texture2D sprWeaponsSheet;
         public Texture2D sprAxeSheet;
         public Texture2D sprStickSheet;
 
@@ -205,6 +211,9 @@ namespace AXE.Game.Utils
         public Texture2D sprExitDoorSheet;
         public Texture2D sprSignSheet;
         public Texture2D sprDoorSheet;
+        public Texture2D sprLockSheet;
+        public Texture2D sprKeySheet;
+
         public Texture2D sprLocksSheet;
         public Texture2D sprKeysSheet;
 

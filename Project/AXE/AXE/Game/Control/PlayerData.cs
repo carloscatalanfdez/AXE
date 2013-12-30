@@ -13,7 +13,7 @@ namespace AXE.Game.Control
     public class PlayerData
     {
         // Defs
-        public enum Weapons { None, Stick, Axe };
+        public enum Weapons { None, Stick, Axe, Small };
         public const int KEY_YELLOW  = 1;
         public const int KEY_RED     = 2;
         public const int KEY_BLUE    = 3;
@@ -43,15 +43,15 @@ namespace AXE.Game.Control
 
             weapon = Weapons.Axe;
             powerUps = 0;
-            keys = new Dictionary<int, int>();
+/*            keys = new Dictionary<int, int>();
             keys.Add(KEY_YELLOW, 0);
             keys.Add(KEY_RED, 0);
-            keys.Add(KEY_BLUE, 0);
+            keys.Add(KEY_BLUE, 0);*/
 
             // DEBUG
-            keys[KEY_YELLOW] += Tools.random.Next(3);
+            /*keys[KEY_YELLOW] += Tools.random.Next(3);
             keys[KEY_RED] += Tools.random.Next(3);
-            keys[KEY_BLUE] += Tools.random.Next(3);
+            keys[KEY_BLUE] += Tools.random.Next(3);*/
 
             collectedCoins = 0;
             kills = 0;

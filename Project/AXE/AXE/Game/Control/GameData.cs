@@ -71,19 +71,7 @@ namespace AXE.Game.Control
         public void initPlayData()
         {
             levels = new List<string>(new string[] {
-                "r2",
-                "r0",
-                "c0", 
-                "c1", 
-                "r1", 
-                "base",
-                "0", 
-                "1", 
-                "2", 
-                "3", 
-                "test-1",
-                "r2",
-                "d0"
+                "131201","base"
             });
             level = 0;
         }

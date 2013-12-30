@@ -109,6 +109,7 @@
   <ItemGroup>
     <Compile Include="Game\Control\PlayerData.cs" />
     <Compile Include="Game\Control\PlayerDisplay.cs" />
+    <Compile Include="Game\Entities\Axes\SmallAxe.cs" />
     <Compile Include="Game\Entities\Axes\NormalAxe.cs" />
     <Compile Include="Game\Entities\Base\Axe.cs" />
     <Compile Include="Game\Entities\Base\Enemy.cs" />
@@ -213,6 +214,9 @@
   <ItemGroup>
     <None Include="Assets\Maps\1.oel">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Assets\Maps\131201.oel">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Assets\Maps\2.oel">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

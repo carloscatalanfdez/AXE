@@ -20,6 +20,7 @@ using AXE.Game.Entities.Base;
 using AXE.Game.Utils;
 using Microsoft.Xna.Framework.Media;
 using AXE.Game.Entities.Enemies;
+using AXE.Game.Entities.Axes;
 
 namespace AXE.Game.Entities
 {
@@ -159,24 +160,29 @@ namespace AXE.Game.Entities
             spgraphic.add(new bAnim("walk", new int[] { 1, 2, 3, 2 }, 0.2f));
             spgraphic.add(new bAnim("jump", new int[] { 8 }, 0.0f));
             spgraphic.add(new bAnim("activate", new int[] { 5 }));
-            spgraphic.add(new bAnim("death", new int[] { 24, 25, 26, 27, 27, 27, 28, 28, 29, 29, 29, 29, 29 }, 0.2f, false));
-            spgraphic.add(new bAnim("death-forcehit", new int[] { 24, 25, 26, 27, 27, 27, 28, 28, 29, 29, 29, 29, 29}, 0.2f, false));
+            spgraphic.add(new bAnim("death", new int[] { 24, 25, 26, 27, 27, 27, 28, 28, 29, 29, 29, 29, 29 }, 0.5f, false));
+            spgraphic.add(new bAnim("death-forcehit", new int[] { 24, 25, 26, 27, 27, 27, 28, 28, 29, 29, 29, 29, 29}, 0.5f, false));
             int[] dissolveDeathFrames = new int[15];
             for (int i = 32; i < (32 + 15); i++)
                 dissolveDeathFrames[i - 32] = i;
-            spgraphic.add(new bAnim("death-dissolve", dissolveDeathFrames, 0.5f, false));
-            spgraphic.add(new bAnim("revive", new int[] { 29, 28, 27, 26, 25, 24 }, 0.1f, false));
+            spgraphic.add(new bAnim("death-dissolve", dissolveDeathFrames, 0.75f, false));
+            spgraphic.add(new bAnim("revive", new int[] { 29, 28, 27, 26, 25, 24 }, 0.25f, false));
             spgraphic.add(new bAnim("squid", new int[] { 9 }));
             spgraphic.add(new bAnim("fall", new int[] { 12 } ));
             spgraphic.add(new bAnim("ladder", new int[] { 10, 11 }, 0.1f));
-            spgraphic.add(new bAnim("readyweapon", new int[] { 0, 16, 17, 17, 17 }, 0.5f, false));
-            spgraphic.add(new bAnim("air-readyweapon", new int[] { 8, 19, 20, 20, 20 }, 0.6f, false));
-            spgraphic.add(new bAnim("thrownweapon", new int[] { 18, 18 }, 0.2f, false));
+            spgraphic.add(new bAnim("readyweapon", new int[] { 0, 16, 17, 17, 17 }, 0.8f, false));
+            spgraphic.add(new bAnim("air-readyweapon", new int[] { 8, 19, 20, 20, 20 }, 0.85f, false));
+            spgraphic.add(new bAnim("thrownweapon", new int[] { 18, 18 }, 0.4f, false));
             spgraphic.add(new bAnim("air-thrownweapon", new int[] { 18, 18 }, 0.2f, false));
             spgraphic.add(new bAnim("crouch-idle", new int[] { 6 }));
             spgraphic.add(new bAnim("crouch-walk", new int[] { 6, 7 }, 0.2f));
             spgraphic.add(new bAnim("crouch-squid", new int[] { 6 }));
             spgraphic.add(new bAnim("onfire", new int[] { 48, 49, 50, 51 }, 0.35f));
+
+            spgraphic.add(new bAnim("small-readyweapon", new int[] { 0, 16, 17 }, 0.8f, false));
+            spgraphic.add(new bAnim("air-small-readyweapon", new int[] { 8, 19, 20 }, 0.85f, false));
+            spgraphic.add(new bAnim("small-thrownweapon", new int[] { 18 }, 0.4f, false));
+            spgraphic.add(new bAnim("air-small-thrownweapon", new int[] { 18 }, 0.2f, false));
 
             spgraphic.add(new bAnim("exit", new int[] { 4 }));
             // Hotspot config for anim frames
@@ -550,6 +556,20 @@ namespace AXE.Game.Entities
                             else
                                 spgraphic.play("air-thrownweapon");
                         }
+                        else
+                        {
+                            if (!onair)
+                                spgraphic.play("small-thrownweapon");
+                            else
+                                spgraphic.play("air-small-thrownweapon");
+
+                            Vector2 handPos = getHandPosition();
+                            handPos.Y -= 4;
+                            int spawnX = facing == Dir.Left ? 0 : _mask.offsetx + _mask.w;
+                            SmallAxe axe = new SmallAxe(x + spawnX, y + 15, this, facing, handPos);
+                            state = MovementState.Attacked;
+                            world.add(axe, "hazard");
+                        }
                     }
                     else
                     {
@@ -689,77 +709,56 @@ namespace AXE.Game.Entities
                 {
                     if (weapon != null)
                     {
-                        if (!onair)
+                        if (state != MovementState.Attacking && state != MovementState.Attacked)
                         {
-                            if (state != MovementState.Attacking && state != MovementState.Attacked)
+                            if (!onair)
                             {
-                                state = MovementState.Attacking;
                                 spgraphic.play("readyweapon");
-                                sfxCharge.Play();
                             }
-                        }
-                        else
-                        {
-                            if (state != MovementState.Attacking && state != MovementState.Attacked)
-                            {
-                                state = MovementState.Attacking;
+                            else
+                            {                                
                                 spgraphic.play("air-readyweapon");
-                                sfxCharge.Play();
                             }
+
+                            state = MovementState.Attacking;
+                            // sfxCharge.Play();
                         }
                     }
-                    else // No weapon, pick / activate
+                    else // No weapon: activate or attack
                     {
-                        bool pickedWeapon = false;
-
-                        if (state != MovementState.Attacking && state != MovementState.Attacked && state != MovementState.Activate)
+                        // Check if we can activate something
+                        IActivable activable = null;
+                        if (state == MovementState.Idle || state == MovementState.Walk)
                         {
-                            // generateWrappedMask will give us our current mask or the wrapped one, depends on where we are
-                            // TODO: to wrap or not to wrap is reused from the player mask (showWrapEffect var), and not from this one. Should we fix?
-                            bMask wrappedMask = generateWrappedMask(weaponCatchMask);
-                            bEntity entity = instancePlace(wrappedMask, "axe");
-                            if (entity != null)
+                            activable = (instancePlace(x, y, "contraptions", null, activableCondition) as IActivable);
+                            if (activable != null)
                             {
-                                // Console.WriteLine("Got axe by handleActionButton");
-
-                                // Can't steal from other player, you moron!
-                                if (!((entity as Axe).holder is Player))
+                                if (activable.activate(this))
                                 {
-                                    if ((entity as Axe).holder != null)
-                                    {
-                                        ((entity as Axe).holder).onAxeStolen();
-                                        (entity as Axe).holder = null;
-                                    }
-                                    (entity as Axe).onGrab(this);
-                                    data.weapon = (entity as Axe).type;
-                                    pickedWeapon = true;
+                                    state = MovementState.Activate;
+                                    // Will wait for end notification
+                                    // timer[ACTIVATION_TIME_TIMER] = activationTime;
                                 }
                             }
                         }
-
-                        if (!pickedWeapon)
+                        
+                        // We couldn't, can we attack? (protip: probably)
+                        if (activable == null && 
+                            state == MovementState.Idle || state == MovementState.Walk ||
+                            state == MovementState.Jump)
                         {
-                            if (state == MovementState.Idle || state == MovementState.Walk)
+                            if (world.instanceNumber(typeof(SmallAxe)) < 3)
                             {
-                                IActivable activable = (instancePlace(x, y, "contraptions", null, activableCondition) as IActivable);
-                                if (activable != null)
+                                if (!onair)
                                 {
-                                    if (activable.activate(this))
-                                    {
-                                        state = MovementState.Activate;
-                                        // Will wait for end notification
-                                        // timer[ACTIVATION_TIME_TIMER] = activationTime;
-                                    }
+                                    spgraphic.play("small-readyweapon");
                                 }
                                 else
                                 {
-                                    // spawn dagger
-                                    int spawnX = facing == Dir.Left ? 0 : _mask.offsetx + _mask.w;
-                                    FlameSpiritBullet bullet =
-                                        new FlameSpiritBullet(x + spawnX, y + 15, spgraphic.flipped);
-                                    
-                                    world.add(bullet, "hazard");
+                                    spgraphic.play("air-small-readyweapon");
                                 }
+
+                                state = MovementState.Attacking;
                             }
                         }
                     }
@@ -1165,7 +1164,14 @@ namespace AXE.Game.Entities
             else if (type == "axe")
             {
                 Axe axe = (other as Axe);
-                if (axe.state == Axe.MovementState.Flying && !axe.justLaunched)
+                if (axe.state != Axe.MovementState.Grabbed && axe.state != Axe.MovementState.Flying
+                    ||
+                    (axe.state == Axe.MovementState.Flying && !axe.justLaunched))
+                {
+                    axe.onGrab(this);
+                    data.weapon = axe.type;
+                }
+                /*if (axe.state == Axe.MovementState.Flying && !axe.justLaunched)
                 {
                     axeToCatch = (other as Axe);
                     if (actionPressedSteps > 0 && actionPressedSteps < weaponCatchThreshold)
@@ -1191,7 +1197,7 @@ namespace AXE.Game.Entities
                         axeToCatch.onHitSolid(this);
                         onDeath(DeathState.Generic);
                     }
-                }
+                }*/
             }
         }
 

@@ -143,8 +143,8 @@ namespace AXE.Game.Control
             sb.DrawString(game.gameFont, renderLine1, pos, line1Color);
             sb.DrawString(game.gameFont, renderLine2, new Vector2(x, y+8), line2Color);
 
-            if (displayKeys)
-                renderKeys(x+96, 8, sb);
+            /*if (displayKeys)
+                renderKeys(x+96, 8, sb);*/
         }
     }
 }

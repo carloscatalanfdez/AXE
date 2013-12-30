@@ -163,11 +163,11 @@ namespace AXE.Game.Screens
 
         public void playBGMusic()
         {
-            if (MediaPlayer.Queue.ActiveSong != bgMusic)
+            /*if (MediaPlayer.Queue.ActiveSong != bgMusic)
             {
                 MediaPlayer.Play(bgMusic);
                 MediaPlayer.IsRepeating = true;
-            }
+            }*/
         }
 
         public Player spawnPlayer(PlayerData pdata)

@@ -191,7 +191,8 @@ namespace AXE.Game.Entities
             else if (type == "enemy" && state == MovementState.Flying)
             {
                 Entity entity = other as Entity;
-                onHitSolid(entity);
+                if (other.collidable)
+                    onHitSolid(entity);
             }
             else if (type == "axe" && state == MovementState.Flying && (other as Axe).state == MovementState.Flying)
             {
