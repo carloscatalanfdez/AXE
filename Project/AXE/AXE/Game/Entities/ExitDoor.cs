@@ -225,6 +225,12 @@ namespace AXE.Game.Entities
             layer = 18;
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+            sprite.image = (game as AxeGame).res.sprLockSheet;
+        }
+
         public override void onUpdate()
         {
             base.onUpdate();

@@ -30,6 +30,7 @@ namespace AXE.Game.Entities.Axes
         {
             base.init();
 
+            wrappable = false;
             onThrow(10, facing, handPos);
         }
 
@@ -64,7 +65,7 @@ namespace AXE.Game.Entities.Axes
         /* IReloadable implementation */
         override public void reloadContent()
         {
-            spgraphic.image = (game as AxeGame).res.sprAxeSheet;
+            spgraphic.image = (game as AxeGame).res.sprWeaponsSheet;
             initSoundEffects();
         }
 
