@@ -109,6 +109,7 @@
   <ItemGroup>
     <Compile Include="Game\Control\PlayerData.cs" />
     <Compile Include="Game\Control\PlayerDisplay.cs" />
+    <Compile Include="Game\Control\ScoreManager.cs" />
     <Compile Include="Game\Entities\Axes\SmallAxe.cs" />
     <Compile Include="Game\Entities\Axes\NormalAxe.cs" />
     <Compile Include="Game\Entities\Base\Axe.cs" />
@@ -261,8 +262,6 @@
     <None Include="Assets\SpriteConfs\knight-hotspots.cfg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="AXE_1_TemporaryKey.pfx" />
-    <None Include="AXE_TemporaryKey.pfx" />
     <None Include="Properties\app.manifest" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

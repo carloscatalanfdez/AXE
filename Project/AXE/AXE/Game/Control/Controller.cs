@@ -13,6 +13,7 @@ using AXE.Game.Screens;
 using Microsoft.Xna.Framework;
 using AXE.Game.Utils;
 using Microsoft.Xna.Framework.Media;
+using AXE.Game.Entities;
 
 namespace AXE.Game.Control
 {
@@ -202,5 +203,29 @@ namespace AXE.Game.Control
                 onLogoStart();
             }
         }
+
+        public void applyScore(Entity receiver, Object scoreable)
+        {
+            // Only reward players if we know one of them killed them,
+            // or if we don't know anything
+            if (receiver == null || receiver is Player)
+            {
+                int score = ScoreManager.getScore(scoreable);
+
+                // If we don't know who killed it, reward both
+                if (receiver == null)
+                {
+                    if (GameData.get().playerAData.playing)
+                        GameData.get().playerAData.score += score;
+                    if (GameData.get().playerBData.playing)
+                        GameData.get().playerBData.score += score;
+                }
+                // If we do, reward both
+                else
+                {
+                    (receiver as Player).data.score += score;
+                }
+            }
+        }    
     }
 }

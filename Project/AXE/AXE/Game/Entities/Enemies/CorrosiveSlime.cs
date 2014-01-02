@@ -219,7 +219,8 @@ namespace AXE.Game.Entities.Enemies
         {
             base.onHit(other);
 
-            onDeath();
+            Entity killer = other.getKillOwner();
+            onDeath(killer);
 
             if (rewarder != null)
             {
@@ -330,7 +331,7 @@ namespace AXE.Game.Entities.Enemies
                 case State.Explode:
                     if (spgraphic.currentAnim.finished)
                     {
-                        onDeath();
+                        onDeath(null);
                     }
                     break;
                 case State.Dead:
@@ -446,7 +447,7 @@ namespace AXE.Game.Entities.Enemies
         {
         }
 
-        public override void onDeath()
+        public override void onDeath(Entity killer)
         {
             if (state != State.Dead)
             {
@@ -455,6 +456,8 @@ namespace AXE.Game.Entities.Enemies
                 color = new Color(164, 0, 0, 255);
                 timer[DEAD_ANIM_TIMER] = deathAnimDuration;
             }
+
+            base.onDeath(killer);
         }
     }
 }

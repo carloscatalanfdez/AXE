@@ -496,5 +496,20 @@ namespace AXE.Game.Entities
                 sfxHit.Play();
             }
         }
+
+        public override Entity getKillOwner()
+        {
+            Entity killer = this;
+            if (holder != null && holder is Entity)
+            {
+                killer = holder as Entity;
+            }
+            else if (this.thrower != null && thrower is Entity)
+            {
+                killer = thrower as Entity;
+            }
+
+            return killer;
+        }
     }
 }

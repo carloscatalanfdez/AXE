@@ -691,5 +691,13 @@ namespace AXE.Game.Entities
         virtual public void reloadContent()
         {
         }
+
+        /**
+         * If this entity killed something, who's to blame?
+         */
+        public virtual Entity getKillOwner()
+        {
+            return this;
+        }
     }
 }

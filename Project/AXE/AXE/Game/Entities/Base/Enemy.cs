@@ -8,11 +8,13 @@ using Microsoft.Xna.Framework;
 using AXE.Game.Utils;
 using AXE.Game.Screens;
 using AXE.Game.Entities.Enemies;
+using AXE.Game.Control;
 
 namespace AXE.Game.Entities.Base
 {
     class Enemy : Entity, IContraption
     {
+
         public IRewarder rewarder;
         public ContraptionRewardData contraptionRewardData;
 
@@ -145,8 +147,9 @@ namespace AXE.Game.Entities.Base
             }
         }
 
-        public virtual void onDeath()
+        public virtual void onDeath(Entity killer)
         {
+            Controller.getInstance().applyScore(killer, this);
         }
 
         public override void onCollision(string type, bEntity other)
@@ -154,7 +157,8 @@ namespace AXE.Game.Entities.Base
             base.onCollision(type, other);
             if (other is FlameSpiritBullet)
             {
-                onDeath();
+                Entity killer = (other as Entity).getKillOwner();
+                onDeath(killer);
             }
         }
             

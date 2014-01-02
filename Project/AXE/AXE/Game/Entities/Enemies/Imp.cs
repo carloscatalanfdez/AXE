@@ -333,7 +333,7 @@ namespace AXE.Game.Entities.Enemies
                     else
                     {
                         if (fallingToDeath)
-                            onDeath(); // You'd be dead, buddy!
+                            onDeath(null); // You'd be dead, buddy!
                         changeState(State.Idle);
                     }
 
@@ -543,7 +543,7 @@ namespace AXE.Game.Entities.Enemies
             }
         }
 
-        public override void onDeath()
+        public override void onDeath(Entity killer)
         {
             if (state != State.Dead)
             {
@@ -552,6 +552,8 @@ namespace AXE.Game.Entities.Enemies
                 color = new Color(164, 0, 0, 255);
                 timer[DEAD_ANIM_TIMER] = deathAnimDuration;
             }
+
+            base.onDeath(killer);
         }
 
         public override bool onHit(Entity other)
@@ -560,7 +562,8 @@ namespace AXE.Game.Entities.Enemies
 
             if (other is NormalAxe)
             {
-                onDeath();
+                Entity killer = other.getKillOwner();
+                onDeath(killer);
 
                 if (rewarder != null)
                 {

@@ -10,8 +10,10 @@ using Microsoft.Xna.Framework;
 using AXE.Game.Utils;
 using AXE.Game.Screens;
 using AXE.Game.Entities.Axes;
+using AXE.Game.Entities.Base;
+using AXE.Game.Entities;
 
-namespace AXE.Game.Entities.Base
+namespace AXE.Game.Entities.Enemies
 {
     class EvilAxeHolder : Enemy, IWeaponHolder
     {
@@ -274,7 +276,7 @@ namespace AXE.Game.Entities.Base
                     else
                     {
                         if (fallingToDeath)
-                            onDeath(); // You'd be dead, buddy!
+                            onDeath(null); // You'd be dead, buddy!
                         changeState(State.Idle);
                     }
 
@@ -434,7 +436,7 @@ namespace AXE.Game.Entities.Base
             return spgraphic.height;
         }
 
-        public override void onDeath()
+        public override void onDeath(Entity killer)
         {
             if (state != State.Dead)
             {
@@ -447,6 +449,8 @@ namespace AXE.Game.Entities.Base
                     weapon.onDrop();
                 }
             }
+
+            base.onDeath(killer);
         }
 
         public override bool onHit(Entity other)
@@ -455,7 +459,8 @@ namespace AXE.Game.Entities.Base
 
             if (other is NormalAxe)
             {
-                onDeath();
+                Entity killer = other.getKillOwner();
+                onDeath(killer);
 
                 if (rewarder != null)
                 {
