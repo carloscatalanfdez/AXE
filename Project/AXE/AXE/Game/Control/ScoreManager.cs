@@ -11,6 +11,7 @@ namespace AXE.Game.Control
         public static Dictionary<String, int> scoreMap = new Dictionary<String, int>()
         {
             { typeof(Undead).Name, 10},
+            { typeof(Zombie).Name, 10},
             { typeof(CorrosiveSlime).Name, 20},
             { typeof(Dagger).Name, 30},
             { typeof(EvilAxeHolder).Name, 40},

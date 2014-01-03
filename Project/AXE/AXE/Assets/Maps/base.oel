@@ -87,5 +87,8 @@
     <PlayerStart id="4" x="40" y="40" />
     <ExitDoor id="5" x="256" y="264" open="False" />
     <Key id="6" x="152" y="168" />
+    <Zombie id="7" x="240" y="40" />
+    <Zombie id="8" x="80" y="96" />
+    <Zombie id="9" x="240" y="152" />
   </Entities>
 </level>

@@ -203,6 +203,9 @@ namespace AXE.Game.Entities
                 case "Undead":
                     ge = new Undead(x, y);
                     break;
+                case "Zombie":
+                    ge = new Zombie(x, y);
+                    break;
                 case "Dagger":
                     ge = new Dagger(x, y);
                     break;
