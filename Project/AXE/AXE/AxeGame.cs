@@ -49,11 +49,13 @@ namespace AXE
         {
             base.initSettings();
 
-            horizontalZoom = 3;
-            verticalZoom = 3;
-
             width = 320;
             height = 320;
+
+            uint scale = getHighestScale(1, 3);
+            horizontalZoom = scale;
+            verticalZoom = scale;
+
             fullscreen = true;
 
             bgColor = Color.DarkGray;
@@ -65,6 +67,22 @@ namespace AXE
             res.init(this);
 
             vizdeb = VisualDebugger.get(this);
+        }
+
+        /**
+         * Returns the highest scale of the game (between [llimit, hlimit] 
+         * that fits the screen
+         */
+        protected uint getHighestScale(uint llimit, uint hlimit)
+        {
+            DisplayMode screenRes = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode;
+            for (uint i = hlimit; i > llimit; i--)
+            {
+                if (width * i < screenRes.Width && height * i < screenRes.Height)
+                    return i;
+            }
+
+            return llimit;
         }
 
         protected void generateRenderTarget()
