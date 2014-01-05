@@ -74,14 +74,14 @@ namespace AXE.Game.Entities.Enemies
         /* IReloadable implementation */
         override public void reloadContent()
         {
-            spgraphic.image = (game as AxeGame).res.sprZombieSheet;
+            spgraphic.image = (game as AxeGame).res.sprUndeadSheet;
         }
 
         public override void init()
         {
             base.init();
 
-            spgraphic = new bSpritemap((game as AxeGame).res.sprZombieSheet, 30, 32);
+            spgraphic = new bSpritemap((game as AxeGame).res.sprUndeadSheet, 30, 32);
             spgraphic.add(new bAnim("idle", new int[] { 4 }));
             spgraphic.add(new bAnim("walk", new int[] { 0, 1, 2, 3 }, 0.1f));
             spgraphic.add(new bAnim("chase-reacting", new int[] { 4 }));

@@ -363,10 +363,11 @@ namespace AXE
                             RasterizerState.CullCounterClockwise,
                             effect);
                         Rectangle rect = new Rectangle(0, 0, renderResult.Width, renderResult.Height);
-                            //(int) ((graphics.PreferredBackBufferWidth / 2) - (width * horizontalZoom / 2)),
-                            //(int) ((graphics.PreferredBackBufferHeight / 2) - (height * verticalZoom / 2)),
-                            //(int) (width * horizontalZoom),
-                            //(int) (height * verticalZoom));
+                        //Rectangle rect = new Rectangle(
+                        //    (int)((graphics.PreferredBackBufferWidth / 2) - (width * horizontalZoom / 2)),
+                        //    (int)((graphics.PreferredBackBufferHeight / 2) - (height * verticalZoom / 2)),
+                        //    (int)(width * horizontalZoom),
+                        //    (int)(height * verticalZoom));
                         sprite.Draw(renderResult, new Vector2(rect.X, rect.Y), rect, 
                             Color.White, 0, new Vector2(0, 0), 1f, 
                             SpriteEffects.None, 1);

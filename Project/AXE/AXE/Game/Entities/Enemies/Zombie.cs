@@ -62,11 +62,11 @@ namespace AXE.Game.Entities.Enemies
 
             spgraphic = new bSpritemap((game as AxeGame).res.sprZombieSheet, 30, 32);
             spgraphic.add(new bAnim("invisible", new int[] { 17 }));
-            spgraphic.add(new bAnim("walk", new int[] { 0, 1, 2, 3 }, 0.1f));
-            spgraphic.add(new bAnim("out", new int[] { 5, 6 }, 0.4f, false));
-            spgraphic.add(new bAnim("in", new int[] { 7 }, 0.4f, false));
-            spgraphic.add(new bAnim("jump", new int[] { 16 }));
-            spgraphic.add(new bAnim("death", new int[] { 16 }));
+            spgraphic.add(new bAnim("walk", new int[] { 5, 6 }, 0.3f));
+            spgraphic.add(new bAnim("out", new int[] { 2, 1, 0, 1, 0 }, 0.4f, false));
+            spgraphic.add(new bAnim("in", new int[] { 0, 1, 0, 1, 0, 1, 2, 3, 4, 4, 4, 4 }, 0.4f, false));
+            spgraphic.add(new bAnim("jump", new int[] { 10 }));
+            spgraphic.add(new bAnim("death", new int[] { 10 }));
             spgraphic.play("invisible");
 
             mask.w = 16;
@@ -110,10 +110,6 @@ namespace AXE.Game.Entities.Enemies
                     case State.Invisible:
                         collidable = false;
                         timer[CHANGE_STATE_TIMER] = invisibleBaseTime + Tools.random.Next(invisibleOptionalTime) - invisibleOptionalTime;
-                        break;
-                    case State.In:
-                    case State.Out:
-                        collidable = true;
                         break;
                     case State.Walk:
                         collidable = true;
@@ -179,95 +175,127 @@ namespace AXE.Game.Entities.Enemies
             switch (state)
             {
                 case State.Invisible:
-                    spgraphic.play("invisible");
-                    break;
+                    {
+                        spgraphic.play("invisible");
+
+                        // Allow movement here too
+                        Vector2 nextPosition = new Vector2(x + directionToSign(facing) * hspeed, y);
+                        bool wontFall = checkForGround(
+                                (int)(nextPosition.X + directionToSign(facing) * graphicWidth() / 2),
+                                (int)nextPosition.Y);
+                        bool wontCollide = !placeMeeting(
+                                (int)nextPosition.X,
+                                (int)nextPosition.Y, new String[] { "solid" });
+                        if (wontFall && wontCollide)
+                            moveTo.X += directionToSign(facing) * (hspeed / 3f);
+
+                        break;
+                    }
                 case State.In:
-                    spgraphic.play("in");
-
-                    if (spgraphic.currentAnim.finished)
                     {
-                        Dir facingDir = facing;
-                        if (facingDir == Dir.Left)
-                            watchMask.offsetx = _mask.offsetx - watchMask.w;
-                        else
-                            watchMask.offsetx = _mask.offsetx + _mask.w;
-                        watchMask.offsety = (graphicHeight() - watchMask.h);
+                        spgraphic.play("in");
 
-                        // Is he were I'm looking?
-                        if (!isPlayerOnSight(facingDir, false, new String[] { "solid" }, watchMask, watchWrappedMask))
+                        if (spgraphic.currentAnim.finished)
                         {
-                            // well then turn
-                            turn();
-                        }
+                            Dir facingDir = facing;
+                            if (facingDir == Dir.Left)
+                                watchMask.offsetx = _mask.offsetx - watchMask.w;
+                            else
+                                watchMask.offsetx = _mask.offsetx + _mask.w;
+                            watchMask.offsety = (graphicHeight() - watchMask.h);
 
-                        changeState(State.Walk);
+                            // Is he were I'm looking?
+                            if (!isPlayerOnSight(facingDir, false, new String[] { "solid" }, watchMask, watchWrappedMask))
+                            {
+                                // well then turn
+                                turn();
+                            }
+
+                            changeState(State.Walk);
+                        }
+                        else if (spgraphic.currentAnim.frame == 2)
+                        {
+                            collidable = true;
+                        }
+                        break;
                     }
-                    break;
                 case State.Walk:
-                    spgraphic.play("walk");
+                    {
+                        spgraphic.play("walk");
 
-                    Vector2 nextPosition = new Vector2(x + directionToSign(facing) * hspeed, y);
-                    bool wontFall = checkForGround(
-                            (int)(nextPosition.X + directionToSign(facing) * graphicWidth() / 2),
-                            (int)nextPosition.Y);
-                    bool wontCollide = !placeMeeting(
-                            (int)nextPosition.X,
-                            (int)nextPosition.Y, new String[] { "solid" });
-                    if (wontFall && wontCollide)
-                        moveTo.X += directionToSign(facing) * hspeed;
+                        Vector2 nextPosition = new Vector2(x + directionToSign(facing) * hspeed, y);
+                        bool wontFall = checkForGround(
+                                (int)(nextPosition.X + directionToSign(facing) * graphicWidth() / 2),
+                                (int)nextPosition.Y);
+                        bool wontCollide = !placeMeeting(
+                                (int)nextPosition.X,
+                                (int)nextPosition.Y, new String[] { "solid" });
+                        if (wontFall && wontCollide)
+                            moveTo.X += directionToSign(facing) * hspeed;
 
-                    if (!wontFall || !wontCollide)
-                        changeState(State.Out);
+                        if (!wontFall || !wontCollide)
+                            changeState(State.Out);
 
-                    break;
+                        break;
+                    }
                 case State.Out:
-                    spgraphic.play("out");
-
-                    if (spgraphic.currentAnim.finished)
                     {
-                        changeState(State.Invisible);
-                    }
+                        spgraphic.play("out");
 
-                    break;
+                        if (spgraphic.currentAnim.finished)
+                        {
+                            changeState(State.Invisible);
+                        }
+                        else if (spgraphic.currentAnim.frame == 1)
+                        {
+                            collidable = false;
+                        }
+
+                        break;
+                    }
                 case State.Falling:
-                    spgraphic.play("jump");
-
-                    if (onAir)
                     {
-                        vspeed += gravity;
-                        if (vspeed > 0 && fallingFrom == Vector2.Zero)
+                        spgraphic.play("jump");
+
+                        if (onAir)
                         {
-                            fallingToDeath = false;
-                            fallingFrom = pos;
+                            vspeed += gravity;
+                            if (vspeed > 0 && fallingFrom == Vector2.Zero)
+                            {
+                                fallingToDeath = false;
+                                fallingFrom = pos;
+                            }
+
+                            if (vspeed > 0 && pos.Y - fallingFrom.Y >= deathFallThreshold)
+                            {
+                                fallingToDeath = true;
+                            }
+                        }
+                        else
+                        {
+                            if (fallingToDeath)
+                                onDeath(null); // You'd be dead, buddy!
+                            changeState(State.Walk);
                         }
 
-                        if (vspeed > 0 && pos.Y - fallingFrom.Y >= deathFallThreshold)
-                        {
-                            fallingToDeath = true;
-                        }
-                    }
-                    else
-                    {
-                        if (fallingToDeath)
-                            onDeath(null); // You'd be dead, buddy!
-                        changeState(State.Walk);
-                    }
+                        moveTo.Y += vspeed;
 
-                    moveTo.Y += vspeed;
-
-                    break;
+                        break;
+                    }
                 case State.Dead:
-                    spgraphic.play("death");
-                    float factor = (timer[DEAD_ANIM_TIMER] / (deathAnimDuration * 1f));
-                    color *= factor;
-                    if (color.A <= 0)
                     {
-                        world.remove(this);
+                        spgraphic.play("death");
+                        float factor = (timer[DEAD_ANIM_TIMER] / (deathAnimDuration * 1f));
+                        color *= factor;
+                        if (color.A <= 0)
+                        {
+                            world.remove(this);
+                        }
+                        break;
                     }
-                    break;
             }
 
-            if (state == State.Walk || state == State.Falling)
+            if (state == State.Walk || state == State.Falling || state == State.Invisible)
             {
                 int currentX = (int)Math.Round(pos.X);
                 int nextX = (int)Math.Round(moveTo.X);
