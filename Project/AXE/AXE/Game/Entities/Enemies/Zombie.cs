@@ -83,7 +83,7 @@ namespace AXE.Game.Entities.Enemies
             watchWrappedMask = new bMaskList(new bMask[] { maskL, maskR }, 0, 0, false);
             watchWrappedMask.game = game;
 
-            hspeed = 2f;// 0.2f;
+            hspeed = 1.5f;// 0.2f;
             vspeed = 0f;
             gravity = 0.5f;
             deathFallThreshold = 5;
@@ -197,6 +197,8 @@ namespace AXE.Game.Entities.Enemies
 
                         if (spgraphic.currentAnim.finished)
                         {
+                            collidable = true;
+
                             Dir facingDir = facing;
                             if (facingDir == Dir.Left)
                                 watchMask.offsetx = _mask.offsetx - watchMask.w;
@@ -213,10 +215,10 @@ namespace AXE.Game.Entities.Enemies
 
                             changeState(State.Walk);
                         }
-                        else if (spgraphic.currentAnim.frame == 2)
+                        /*else if (spgraphic.currentAnim.frame == 2)
                         {
                             collidable = true;
-                        }
+                        }*/
                         break;
                     }
                 case State.Walk:

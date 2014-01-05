@@ -1074,7 +1074,7 @@ namespace AXE.Game.Entities
                 if (type == "player")
                     Console.WriteLine("PVP " + this.data.id + " vs " + (other as Player).data.id);
                 // First, reposition
-                if (other.attributes.Contains(ATTR_SOLID))
+                if (other.collidable && other.attributes.Contains(ATTR_SOLID))
                 {
                     pos.X = stepInitialPosition.X;
                     // Allow ethereal entities
