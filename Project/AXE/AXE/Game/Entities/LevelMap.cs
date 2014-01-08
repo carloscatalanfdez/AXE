@@ -206,6 +206,11 @@ namespace AXE.Game.Entities
                 case "Zombie":
                     ge = new Zombie(x, y);
                     break;
+                case "TerritorialRapier":
+                    attr = element.GetAttribute("flipped");
+                    bool flipped = attr != null ? bool.Parse(attr) : false;
+                    ge = new TerritorialRapier(x, y, flipped);
+                    break;
                 case "Dagger":
                     ge = new Dagger(x, y);
                     break;
@@ -223,7 +228,7 @@ namespace AXE.Game.Entities
                     break;
                 case "Gargoyle":
                     attr = element.GetAttribute("flipped");
-                    bool flipped = attr != null ? bool.Parse(attr) : false;
+                    flipped = attr != null ? bool.Parse(attr) : false;
 
                     attr = element.GetAttribute("fireDelay");
                     int fireDelay = attr != null ? int.Parse(attr) : -1;
