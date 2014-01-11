@@ -85,6 +85,11 @@ namespace AXE.Game.Entities.Decoration
         {
         }
 
+        override public void reloadContent()
+        {
+            sprite.image = (game as AxeGame).res.sprTorchSheet;
+        }
+
         protected override void initSprite()
         {
             sprite = new bSpritemap(Game.res.sprTorchSheet, 8, 32);
@@ -100,6 +105,11 @@ namespace AXE.Game.Entities.Decoration
         {
         }
 
+        override public void reloadContent()
+        {
+            sprite.image = (game as AxeGame).res.sprCandleSheet;
+        }
+
         protected override void initSprite()
         {
             sprite = new bSpritemap(Game.res.sprCandleSheet, 16, 16);
@@ -113,6 +123,11 @@ namespace AXE.Game.Entities.Decoration
         public DecoCandlestick(int x, int y)
             : base(x, y)
         {
+        }
+
+        override public void reloadContent()
+        {
+            sprite.image = (game as AxeGame).res.sprCandlestickSheet;
         }
 
         protected override void initSprite()
