@@ -16,7 +16,7 @@
     <Width>1280</Width>
     <Height>1024</Height>
   </LevelMaximumSize>
-  <Filename>D:\Dev\thebadlands\AXE\Coding\AXE\Project\AXE\AXE\Assets\Maps\axe.oep</Filename>
+  <Filename>C:\Users\Carlos\code\games\AXE\Project\AXE\AXE\Assets\Maps\axe.oep</Filename>
   <AngleMode>Radians</AngleMode>
   <CameraEnabled>false</CameraEnabled>
   <CameraSize>
@@ -550,6 +550,23 @@
         <RectColor A="255" R="255" G="0" B="0" />
       </ImageDefinition>
       <ValueDefinitions />
+      <NodesDefinition Enabled="false" Limit="-1" DrawMode="None" Ghost="false" />
+    </EntityDefinition>
+    <EntityDefinition Name="TerritorialRapier" Limit="-1" ResizableX="false" ResizableY="false" Rotatable="false" RotateIncrement="15">
+      <Size>
+        <Width>42</Width>
+        <Height>32</Height>
+      </Size>
+      <Origin>
+        <X>0</X>
+        <Y>0</Y>
+      </Origin>
+      <ImageDefinition DrawMode="Image" ImagePath="..\..\..\AXEContent\Assets\Sprites\rapier-sheet.png" Tiled="true">
+        <RectColor A="255" R="255" G="0" B="0" />
+      </ImageDefinition>
+      <ValueDefinitions>
+        <ValueDefinition xsi:type="BoolValueDefinition" Name="flipped" Default="false" />
+      </ValueDefinitions>
       <NodesDefinition Enabled="false" Limit="-1" DrawMode="None" Ghost="false" />
     </EntityDefinition>
   </EntityDefinitions>

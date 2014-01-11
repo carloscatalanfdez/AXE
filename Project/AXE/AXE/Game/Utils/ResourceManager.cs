@@ -132,6 +132,7 @@ namespace AXE.Game.Utils
             sprVFireBulletSheet = loadSprite("vfire-bullet-sheet");
             sprGargoyleSheet = loadSprite("gargoyle-sheet");
             sprVGargoyleSheet = loadSprite("vgargoyle-sheet");
+            sprRapierSheet = loadSprite("rapier-sheet");
 
             // Tilesets
             tsetBasic       = loadTileset("basic");
@@ -232,6 +233,7 @@ namespace AXE.Game.Utils
         public Texture2D sprFireBulletSheet;
         public Texture2D sprVFireBulletSheet;
         public Texture2D sprVGargoyleSheet;
+        public Texture2D sprRapierSheet;
         // Tileset
         public Texture2D tsetBasic;
 

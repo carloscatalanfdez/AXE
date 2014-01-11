@@ -122,6 +122,7 @@
     <Compile Include="Game\Entities\Contraptions\MoveablePlatform.cs" />
     <Compile Include="Game\Entities\Enemies\Dagger.cs" />
     <Compile Include="Game\Entities\Enemies\Gargoyle.cs" />
+    <Compile Include="Game\Entities\Enemies\TerritorialRapier.cs" />
     <Compile Include="Game\Entities\Enemies\Undead.cs" />
     <Compile Include="Game\Entities\Enemies\CorrosiveSlime.cs" />
     <Compile Include="Game\Entities\Enemies\EvilAxeHolder.cs" />
