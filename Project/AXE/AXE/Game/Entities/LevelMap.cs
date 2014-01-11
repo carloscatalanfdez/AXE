@@ -17,6 +17,7 @@ using AXE.Game.Entities.Enemies;
 using AXE.Game.Entities.Axes;
 using AXE.Game.Utils;
 using AXE.Game.Entities.Bosses;
+using AXE.Game.Entities.Decoration;
 
 namespace AXE.Game.Entities
 {
@@ -66,7 +67,8 @@ namespace AXE.Game.Entities
                 {
                     if (reader.NodeType == XmlNodeType.Element)
                     {
-                        if (parseStack.Count > 0 && parseStack.Peek() == "Entities")
+                        if (parseStack.Count > 0 && 
+                            (parseStack.Peek() == "Entities" || parseStack.Peek() == "Decoration"))
                         {
                             bEntity e = parseEntity(reader);
                             if (e != null)
@@ -97,6 +99,8 @@ namespace AXE.Game.Entities
                                     exportMode = reader.GetAttribute("exportMode");
                                     break;
                                 case "Entities":
+                                    break;
+                                case "Decoration":
                                     break;
                             }
                         }
@@ -325,6 +329,15 @@ namespace AXE.Game.Entities
                     break;
                 case "HighGuardFallPowerUp":
                     ge = new PowerUpPickable(x, y, PowerUpPickable.Type.HighFallGuard);
+                    break;
+                case "Torch":
+                    ge = new DecoTorch(x, y);
+                    break;
+                case "Candle":
+                    ge = new DecoCandle(x, y);
+                    break;
+                case "Candlestick":
+                    ge = new DecoCandlestick(x, y);
                     break;
             }
 

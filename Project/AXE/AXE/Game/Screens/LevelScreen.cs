@@ -19,6 +19,7 @@ using AXE.Game.Entities.Base;
 using AXE.Game.Utils;
 using AXE.Game.UI;
 using Microsoft.Xna.Framework.Media;
+using AXE.Game.Entities.Decoration;
 
 namespace AXE.Game.Screens
 {
@@ -102,6 +103,7 @@ namespace AXE.Game.Screens
             entities.Add("stairs", new List<bEntity>());
             entities.Add("contraptions", new List<bEntity>());
             entities.Add("rewarders", new List<bEntity>());
+            entities.Add("decoration", new List<bEntity>());
 
             // Load level
             String fname = id.ToString();
@@ -483,6 +485,8 @@ namespace AXE.Game.Screens
                     _add(e, "contraptions");
                 else if (e is IRewarder)
                     _add(e, "rewarders");
+                else if (e is Decoration)
+                    _add(e, "decoration");
             }
         }
 

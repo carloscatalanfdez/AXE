@@ -107,8 +107,8 @@ namespace AXE.Game.Utils
             sprSignSheet    = loadSprite("sign-sheet");
             sprDoorSheet    = loadSprite("doors-sheet");
 
-            sprLockSheet = loadSprite("door-lock");
-            sprKeySheet = loadSprite("door-key");
+            sprLockSheet    = loadSprite("door-lock");
+            sprKeySheet     = loadSprite("door-key");
 
             sprLocksSheet   = loadSprite("locks-sheet");
             sprKeysSheet    = loadSprite("keys-sheet");
@@ -124,15 +124,27 @@ namespace AXE.Game.Utils
                             = loadSprite("flamewrath-bullet-sheet");
             sprImpSheet     = loadSprite("imp-sheet");
             sprZombieSheet  = loadSprite("zombie-sheet");
-            sprUndeadSheet = loadSprite("undead-sheet");
-            sprDaggerSheet = loadSprite("dagger-sheet");
+            sprUndeadSheet  = loadSprite("undead-sheet");
+            sprDaggerSheet  = loadSprite("dagger-sheet");
 
-            sprDragonBossSheet = loadSprite("dragonboss-sheet");
-            sprFireBulletSheet = loadSprite("fire-bullet-sheet");
-            sprVFireBulletSheet = loadSprite("vfire-bullet-sheet");
-            sprGargoyleSheet = loadSprite("gargoyle-sheet");
-            sprVGargoyleSheet = loadSprite("vgargoyle-sheet");
-            sprRapierSheet = loadSprite("rapier-sheet");
+            sprDragonBossSheet 
+                            = loadSprite("dragonboss-sheet");
+            sprFireBulletSheet 
+                            = loadSprite("fire-bullet-sheet");
+            sprVFireBulletSheet 
+                            = loadSprite("vfire-bullet-sheet");
+            sprGargoyleSheet 
+                            = loadSprite("gargoyle-sheet");
+            sprVGargoyleSheet 
+                            = loadSprite("vgargoyle-sheet");
+            sprRapierSheet 
+                            = loadSprite("rapier-sheet");
+
+                // Decoration
+            sprTorchSheet   = loadSprite("torch-sheet");
+            sprCandlestickSheet 
+                            = loadSprite("candlestick-sheet");
+            sprCandleSheet  = loadSprite("candle-sheet");
 
             // Tilesets
             tsetBasic       = loadTileset("basic");
@@ -234,6 +246,11 @@ namespace AXE.Game.Utils
         public Texture2D sprVFireBulletSheet;
         public Texture2D sprVGargoyleSheet;
         public Texture2D sprRapierSheet;
+
+        public Texture2D sprTorchSheet;
+        public Texture2D sprCandlestickSheet;
+        public Texture2D sprCandleSheet;
+
         // Tileset
         public Texture2D tsetBasic;
 

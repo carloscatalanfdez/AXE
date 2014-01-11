@@ -103,7 +103,7 @@ namespace AXE.Game.Control
         public void onGameOver()
         {
             MediaPlayer.Play(ResourceManager.get().ostGameOver);
-            game.changeWorld(new GameOverScreen(), new FadeToColor(game, Color.Black, 120));
+            game.changeWorld(new GameOverScreen(), new FadeToColor(game, Color.Black, 40/*120*/));
         }
 
         public void onGameWin()

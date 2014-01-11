@@ -241,22 +241,15 @@ namespace AXE.Game.Entities
 
                     Vector2 remnant;
                     traveledFlightDistance += (int)Math.Abs(pos.X - moveTo.X);
+                        
+                    remnant = moveToContact(moveTo, "solid");
 
-                    if (false)//justLaunched)
+                    // We have been stopped
+                    if (remnant.X != 0 || remnant.Y != 0)
                     {
-                        pos = moveTo;
-                    }
-                    else
-                    {
-                        remnant = moveToContact(moveTo, "solid");
-
-                        // We have been stopped
-                        if (remnant.X != 0 || remnant.Y != 0)
-                        {
-                            // Stop accelerating if we have stopped
-                            bEntity entity = instancePlace(moveTo, "solid");
-                            onHitSolid(entity);
-                        }
+                        // Stop accelerating if we have stopped
+                        bEntity entity = instancePlace(moveTo, "solid");
+                        onHitSolid(entity);
                     }
 
                     break;

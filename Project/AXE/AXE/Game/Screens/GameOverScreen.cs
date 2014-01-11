@@ -260,6 +260,8 @@ namespace AXE.Game.Screens
 
         int atd(int d)
         {
+            // ! just speeding things up...
+            d = 0;
             return addTimeDelta(d);
         }
 
