@@ -113,8 +113,6 @@ namespace AXE
                 traversedItems.Add(this);
                 traverseClassTree(this.world, (x) =>
                 {
-                    if (x is bGameState)
-                        needsReload = false;
                     if (x is IReloadable)
                     {
                         (x as IReloadable).reloadContent();

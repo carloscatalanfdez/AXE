@@ -31,8 +31,11 @@ namespace AXE.Game.Entities.Enemies
         float vspeed;
 
         Vector2 moveTo;
+
         bMask watchMask;
         bMaskList watchWrappedMask;
+        bMask attackZoneMask;
+        bMaskList attackZoneWrappedMask;
 
         public State state;
 
@@ -52,7 +55,7 @@ namespace AXE.Game.Entities.Enemies
         /* IReloadable implementation */
         override public void reloadContent()
         {
-            spgraphic.image = (game as AxeGame).res.sprZombieSheet;
+            spgraphic.image = (game as AxeGame).res.sprRapierSheet;
         }
 
         public override void init()
