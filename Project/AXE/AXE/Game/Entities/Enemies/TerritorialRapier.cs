@@ -153,9 +153,9 @@ namespace AXE.Game.Entities.Enemies
 
                         int xx, yy = 4;
                         if (facing == Dir.Right)
-                            xx = 20;
+                            xx = 25;
                         else
-                            xx = -10;
+                            xx = -2;
                         weaponHitZone = new KillerRect(x + xx, y + yy, 20, 27, Player.DeathState.ForceHit);
                         weaponHitZone.setOwner(this);
                         world.add(weaponHitZone, "hazard");
