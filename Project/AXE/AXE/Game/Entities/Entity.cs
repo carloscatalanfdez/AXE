@@ -666,6 +666,32 @@ namespace AXE.Game.Entities
                 sb.Draw(bDummyRect.sharedDummyRect(game), mask.rect, Color.Snow);
         }
 
+        /**
+         * Gets the position of this entity in relation of another position, ignoring wrapping
+         * If this entity is wrapped at the beginning of the screen, and referencePos is at the end,
+         * then the result will be a x coordinate at the end of the screen
+         */
+        public int getRelativeXPos(int referenceXPos)
+        {
+            int relativeXPos = mask.x;
+            if (showWrapEffect != Dir.None)
+            {
+                bool isXReferenceToTheRight = (referenceXPos > (world as LevelScreen).width / 2);
+                // we are at the left end of the screen, but the other entity is at the other side
+                if (isXReferenceToTheRight && (showWrapEffect == Dir.Right))
+                { 
+                    relativeXPos = mask.x + (world as LevelScreen).width;
+                }
+                // we are at the right side of the screen, but the other entity is at the left side
+                else if (!isXReferenceToTheRight && (showWrapEffect == Dir.Left))
+                {
+                    relativeXPos = mask.x - (world as LevelScreen).width;
+                }
+            }
+
+            return relativeXPos;
+        }
+
         public int setTimer(int timer, int min, int max)
         {
             return setTimer(timer, new Range(min, max));

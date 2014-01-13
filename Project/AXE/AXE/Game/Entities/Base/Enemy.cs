@@ -82,7 +82,7 @@ namespace AXE.Game.Entities.Base
                     yDestination = mask.y;
                     if (dir == Dir.Right)
                     {
-                        if (spottedEntity.mask.x < mask.x)  // spottedEntity wrapped t the left!
+                        if (spottedEntity.mask.x < mask.x)  // spottedEntity wrapped to the left!
                             xDestination = (world as LevelScreen).width + spottedEntity.mask.x - mask.w;
                         else
                             xDestination = spottedEntity.mask.x - mask.w;
