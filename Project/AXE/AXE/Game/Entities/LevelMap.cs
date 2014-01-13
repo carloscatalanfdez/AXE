@@ -198,7 +198,7 @@ namespace AXE.Game.Entities
                     break;
                 case "OneWayPlatform":
                     string attr = element.GetAttribute("width");
-                    width = attr != null ? int.Parse(element.GetAttribute("width")) : 16;
+                    width = attr != null ? int.Parse(attr) : 16;
                     ge = new OneWayPlatform(x, y, width);
                     break;
                 case "Imp":
@@ -206,6 +206,12 @@ namespace AXE.Game.Entities
                     break;
                 case "Undead":
                     ge = new Undead(x, y);
+                    break;
+                case "ZombieSpawner":
+                    attr = element.GetAttribute("spawnableZombies");
+                    int nzombies = attr != null ? int.Parse(attr) : 1;
+
+                    ge = new ZombieSpawner(x, y, nzombies);
                     break;
                 case "Zombie":
                     ge = new Zombie(x, y);
