@@ -237,7 +237,9 @@ namespace AXE.Game.Entities.Enemies
                             moveTo.X += directionToSign(facing) * hspeed;
 
                         if (!wontFall || !wontCollide)
-                            changeState(State.Out);
+                        {
+                            turn();
+                        }
 
                         break;
                     }
