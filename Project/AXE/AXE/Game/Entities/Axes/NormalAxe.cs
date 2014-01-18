@@ -21,30 +21,13 @@ namespace AXE.Game.Entities.Axes
 
         override public void loadIdleMask()
         {
-            _mask.w = 12;
-            _mask.h = 13;
-            _mask.offsetx = 4;
-            _mask.offsety = 4;
-        }
+            if (idleMask == null)
+            {
+                idleMask = new bMask(x, y, 12, 13, 4, 4);
+                idleMask.game = game;
+            }
 
-        override public void loadFlyMask()
-        {
-            int flyingWidth = (int)Math.Min(Math.Abs(current_hspeed), traveledFlightDistance);
-            flyingWidth = Math.Max(1, flyingWidth);
-            if (facing == Player.Dir.Left)
-            {
-                _mask.w = flyingWidth;
-                _mask.h = 13;
-                _mask.offsetx = 4;
-                _mask.offsety = 4;
-            }
-            else
-            {
-                _mask.w = flyingWidth;
-                _mask.h = 13;
-                _mask.offsetx = 16 - flyingWidth;
-                _mask.offsety = 4;
-            }
+            _mask = idleMask;
         }
 
         /* IReloadable implementation */

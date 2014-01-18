@@ -29,6 +29,8 @@ namespace AXE.Game.Entities
         }
 
         public PlayerData.Weapons type;
+        public bMask flyingMask;
+        public bMask idleMask;
 
         // Misc
         public int wrapCount;
@@ -89,30 +91,41 @@ namespace AXE.Game.Entities
 
         virtual public void loadIdleMask()
         {
-            _mask.w = 14;
-            _mask.h = 14;
-            _mask.offsetx = 0;
-            _mask.offsety = 0;
+            if (idleMask == null)
+            {
+                idleMask = new bMask(x, y, 14, 14, 0, 0);
+                idleMask.game = game;
+            }
+
+            _mask = idleMask;
         }
 
         virtual public void loadFlyMask()
         {
+            if (flyingMask == null)
+            {
+                flyingMask = new bMask(0, 0, 0, 0);
+                flyingMask.game = game;
+            }
+
             int flyingWidth = (int)Math.Min(Math.Abs(current_hspeed), traveledFlightDistance);
             flyingWidth = Math.Max(1, flyingWidth);
             if (facing == Player.Dir.Left)
             {
-                _mask.w = flyingWidth;
-                _mask.h = 14;
-                _mask.offsetx = 0;
-                _mask.offsety = 0;
+                flyingMask.w = flyingWidth;
+                flyingMask.h = idleMask.h;
+                flyingMask.offsetx = idleMask.offsetx;
+                flyingMask.offsety = idleMask.offsety;
             }
             else
             {
-                _mask.w = flyingWidth;
-                _mask.h = 14;
-                _mask.offsetx = 14 - flyingWidth;
-                _mask.offsety = 0;
+                flyingMask.w = flyingWidth;
+                flyingMask.h = idleMask.h;
+                flyingMask.offsetx = idleMask.offsetx + idleMask.w - flyingWidth;
+                flyingMask.offsety = 0;
             }
+
+            _mask = flyingMask;
         }
 
         protected virtual void initParams()
@@ -233,65 +246,72 @@ namespace AXE.Game.Entities
                     pos = holder.getHandPosition() - getGrabPosition();
                     break;
                 case MovementState.Flying:
-                    if (justLaunched && !collides(thrower as bEntity))
-                        justLaunched = false;
-
-                    moveTo.X += current_hspeed;
-                    moveTo.Y += current_vspeed;
-
-                    Vector2 remnant;
-                    traveledFlightDistance += (int)Math.Abs(pos.X - moveTo.X);
-                        
-                    remnant = moveToContact(moveTo, "solid");
-
-                    // We have been stopped
-                    if (remnant.X != 0 || remnant.Y != 0)
                     {
-                        // Stop accelerating if we have stopped
-                        bEntity entity = instancePlace(moveTo, "solid");
-                        onHitSolid(entity);
-                    }
+                        if (justLaunched && !collides(thrower as bEntity))
+                        {
+                            justLaunched = false;
+                        }
 
-                    break;
+                        moveTo.X += current_hspeed;
+                        moveTo.Y += current_vspeed;
+
+                        traveledFlightDistance += (int)Math.Abs(pos.X - moveTo.X);
+
+                        Vector2 remnant;
+                        remnant = moveToContact(moveTo, "solid");
+
+                        // We have been stopped
+                        if (remnant.X != 0 || remnant.Y != 0)
+                        {
+                            // Stop accelerating if we have stopped
+                            bEntity entity = instancePlace(moveTo, "solid");
+                            onHitSolid(entity);
+                        }
+
+                        break;
+                    }
                 case MovementState.Bouncing:
-                    wrapCount = 0;
-                    traveledFlightDistance = 0;
-                    wrappable = true;
-
-                    current_vspeed += gravity;
-
-                    moveTo.Y += current_vspeed;
-                    moveTo.X += current_hspeed;
-                    Vector2 oldPos = pos;
-                    Vector2 remnantOneWay = moveToContact(moveTo, "onewaysolid", onewaysolidCondition);
-                    Vector2 posOneWay = pos;
-                    pos = oldPos;
-                    Vector2 remnantSolid = moveToContact(moveTo, "solid");
-                    Vector2 posSolid = pos;
-                    if (remnantOneWay.Length() > remnantSolid.Length())
                     {
-                        remnant = remnantOneWay;
-                        pos = posOneWay;
-                    }
-                    else
-                    {
-                        remnant = remnantSolid;
-                        pos = posSolid;
-                    }
+                        Vector2 remnant;
 
-                    if (remnant.Y != 0 && current_vspeed < 0)
-                    {
-                        // Touched ceiling
-                        current_vspeed = 0;
-                    }
-                    else if (remnant.Y != 0 && current_vspeed > 0)
-                    {
-                        current_vspeed = 0;
-                        state = MovementState.Idle;
-                        sfxDrop.Play();
-                    }
+                        wrapCount = 0;
+                        traveledFlightDistance = 0;
+                        wrappable = true;
 
-                    break;
+                        current_vspeed += gravity;
+
+                        moveTo.Y += current_vspeed;
+                        moveTo.X += current_hspeed;
+                        Vector2 oldPos = pos;
+                        Vector2 remnantOneWay = moveToContact(moveTo, "onewaysolid", onewaysolidCondition);
+                        Vector2 posOneWay = pos;
+                        pos = oldPos;
+                        Vector2 remnantSolid = moveToContact(moveTo, "solid");
+                        Vector2 posSolid = pos;
+                        if (remnantOneWay.Length() > remnantSolid.Length())
+                        {
+                            remnant = remnantOneWay;
+                            pos = posOneWay;
+                        }
+                        else
+                        {
+                            remnant = remnantSolid;
+                            pos = posSolid;
+                        }
+
+                        if (remnant.Y != 0 && current_vspeed < 0)
+                        {
+                            // Touched ceiling
+                            current_vspeed = 0;
+                        }
+                        else if (remnant.Y != 0 && current_vspeed > 0)
+                        {
+                            current_vspeed = 0;
+                            state = MovementState.Idle;
+                            sfxDrop.Play();
+                        }
+                        break;
+                    }
                 case MovementState.Stuck:
                     wrapCount = 0;
                     traveledFlightDistance = 0;

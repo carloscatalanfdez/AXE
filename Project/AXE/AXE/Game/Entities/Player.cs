@@ -550,18 +550,21 @@ namespace AXE.Game.Entities
                     {
                         if (weapon != null)
                         {
-                            // Update the axe pos, just in case
-                            Vector2 handPos = getHandPosition();
-                            weapon.onThrow(10, facing, getHandPosition());
-                            data.weapon = PlayerData.Weapons.None;
-                            state = MovementState.Attacked;
+                            // Play anim now, so that the hotspot is updated
                             if (!onair)
                                 spgraphic.play("thrownweapon");
                             else
                                 spgraphic.play("air-thrownweapon");
+
+                            // Update the axe pos, just in case
+                            Vector2 handPos = getHandPosition();
+                                weapon.onThrow(10, facing, getHandPosition());
+                            data.weapon = PlayerData.Weapons.None;
+                            state = MovementState.Attacked;
                         }
                         else
-                        {
+                        { 
+                            // Play anim now, so that the hotspot is updated
                             if (!onair)
                                 spgraphic.play("small-thrownweapon");
                             else
