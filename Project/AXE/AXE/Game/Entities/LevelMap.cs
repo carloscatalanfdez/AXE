@@ -180,9 +180,6 @@ namespace AXE.Game.Entities
             // Create entitiy by element name
             switch (element.Name)
             {
-                case "Entry":
-                    // TODO: handle entry
-                    break;
                 case "ExitDoor":
                     bool open = bool.Parse(element.GetAttribute("open"));
                     ge = new ExitDoor(x, y, open ? ExitDoor.Type.ExitOpen : ExitDoor.Type.ExitClose);
@@ -191,6 +188,8 @@ namespace AXE.Game.Entities
                     playerStart = new Vector2(x, y);
                     ge = new ExitDoor(x, y, ExitDoor.Type.Entry);
                     break;
+
+
                 case "Ladder":
                     int width = int.Parse(element.GetAttribute("width"));
                     int height = int.Parse(element.GetAttribute("height"));
@@ -201,6 +200,8 @@ namespace AXE.Game.Entities
                     width = attr != null ? int.Parse(attr) : 16;
                     ge = new OneWayPlatform(x, y, width);
                     break;
+
+
                 case "Imp":
                     ge = new Imp(x, y);
                     break;
@@ -260,9 +261,23 @@ namespace AXE.Game.Entities
                     else
                         ge = new VGargoyle(x, y, flipped);
                     break;
+                case "SinefloaterSpawner":
+                    height = int.Parse(element.GetAttribute("height"));
+                    int delay = int.Parse(element.GetAttribute("delay"));
+                    AXE.Game.Entities.Entity.Dir direction = (element.GetAttribute("direction") == "Left" ?
+                        AXE.Game.Entities.Entity.Dir.Left :
+                        AXE.Game.Entities.Entity.Dir.Right);
+                    int hspeed = int.Parse(element.GetAttribute("critterspeed"));
+                    float delta = float.Parse(element.GetAttribute("angledelta"));
+                    
+                    ge = new SineFloaterSpawner(x, y, height, delay, direction, hspeed, delta);
+                    break;
+
+
                 case "Coin":
                     ge = new Coin(x, y);
                     break;
+
                 case "FinishLevelContraption":
                     ge = new FinishLevelContraption();
                     break;
@@ -270,6 +285,8 @@ namespace AXE.Game.Entities
                     string type = element.GetAttribute("type");
                     ge = new ItemGenerator(type);
                     break;
+
+
                 case "TrapDoor":
                     bool trapdoorOpen = bool.Parse(element.GetAttribute("open"));
                     ge = new TrapDoor(x, y, trapdoorOpen);
@@ -277,9 +294,12 @@ namespace AXE.Game.Entities
                 case "Lever":
                     ge = new Lever(x, y);
                     break;
+
                 case "NormalAxe":
                     ge = new NormalAxe(x, y, null);
                     break;
+
+
                 case "MoveablePlatform":
                     attr = element.GetAttribute("width");
                     width = attr != null ? int.Parse(attr) : 16;
@@ -321,6 +341,8 @@ namespace AXE.Game.Entities
                         ge = new Door(x, y, lockType);
                     }
                     break;
+
+
                 case "Key":
                     ge = new Key(x, y);
                     break;
@@ -336,6 +358,8 @@ namespace AXE.Game.Entities
                 case "HighGuardFallPowerUp":
                     ge = new PowerUpPickable(x, y, PowerUpPickable.Type.HighFallGuard);
                     break;
+
+
                 case "Torch":
                     ge = new DecoTorch(x, y);
                     break;

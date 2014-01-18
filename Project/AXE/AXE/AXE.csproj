@@ -123,6 +123,8 @@
     <Compile Include="Game\Entities\Decoration\Decorations.cs" />
     <Compile Include="Game\Entities\Enemies\Dagger.cs" />
     <Compile Include="Game\Entities\Enemies\Gargoyle.cs" />
+    <Compile Include="Game\Entities\Enemies\SineFloater.cs" />
+    <Compile Include="Game\Entities\Enemies\SineFloaterSpawner.cs" />
     <Compile Include="Game\Entities\Enemies\TerritorialRapier.cs" />
     <Compile Include="Game\Entities\Enemies\Undead.cs" />
     <Compile Include="Game\Entities\Enemies\CorrosiveSlime.cs" />
@@ -228,6 +230,7 @@
     </None>
     <None Include="Assets\Maps\20140111.oel">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Assets\Maps\3.oel">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
