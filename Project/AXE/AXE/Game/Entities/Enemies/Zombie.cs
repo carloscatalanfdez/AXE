@@ -197,7 +197,8 @@ namespace AXE.Game.Entities.Enemies
 
                         if (spgraphic.currentAnim.finished)
                         {
-                            collidable = true;
+                            // collidable = true;
+                            attributes.Add(ATTR_SOLID);
 
                             Dir facingDir = facing;
                             if (facingDir == Dir.Left)
@@ -250,7 +251,8 @@ namespace AXE.Game.Entities.Enemies
                         }
                         else if (spgraphic.currentAnim.frame == 1)
                         {
-                            collidable = false;
+                            // collidable = false;
+                            attributes.Remove(ATTR_SOLID);
                         }
 
                         break;

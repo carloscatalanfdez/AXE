@@ -137,8 +137,9 @@ namespace AXE.Game.Utils
                             = loadSprite("gargoyle-sheet");
             sprVGargoyleSheet 
                             = loadSprite("vgargoyle-sheet");
-            sprRapierSheet 
-                            = loadSprite("rapier-sheet");
+            sprRapierSheet  = loadSprite("rapier-sheet");
+            sprSkullfloaterSheet
+                            = loadSprite("skullfloater-sheet");
 
                 // Decoration
             sprTorchSheet   = loadSprite("torch-sheet");
@@ -246,6 +247,7 @@ namespace AXE.Game.Utils
         public Texture2D sprVFireBulletSheet;
         public Texture2D sprVGargoyleSheet;
         public Texture2D sprRapierSheet;
+        public Texture2D sprSkullfloaterSheet;
 
         public Texture2D sprTorchSheet;
         public Texture2D sprCandlestickSheet;

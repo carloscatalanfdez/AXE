@@ -230,17 +230,17 @@ namespace AXE.Game.Entities
 
         protected void initStandingMask()
         {
-            _mask.w = 16;
+            _mask.w = 14;
             _mask.h = 24;
-            _mask.offsetx = 7;
+            _mask.offsetx = 8;
             _mask.offsety = 8;
         }
 
         protected void initCrouchMask()
         {
-            _mask.w = 16;
+            _mask.w = 14;
             _mask.h = 17;
-            _mask.offsetx = 7;
+            _mask.offsetx = 8;
             _mask.offsety = 15;
         }
 
