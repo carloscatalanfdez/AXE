@@ -24,6 +24,11 @@ namespace AXE.Game.Screens
         {
         }
 
+        /* IReloadable implementation */
+        override public void reloadContent()
+        {
+        }
+
         public override void init()
         {
             message = "AXE THROWING ARCADE";
@@ -59,6 +64,7 @@ namespace AXE.Game.Screens
 
         public override void render(GameTime dt, SpriteBatch sb, Matrix matrix)
         {
+
             base.render(dt, sb, matrix);
             sb.Draw(bDummyRect.sharedDummyRect(game), game.getViewRectangle(), Color.Black);
             sb.DrawString(game.gameFont, message, new Vector2(game.getWidth() / 2 - message.Length / 2 * 8, game.getHeight() / 4), Color.White);

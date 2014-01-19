@@ -180,12 +180,12 @@ namespace AXE
 
         protected override void Initialize()
         {
+            base.Initialize();
+
             Tools.step = 0;
             // switchFullScreen();
             Controller.getInstance().setGame(this);
             Controller.getInstance().launch();
-
-            base.Initialize();
         }
 
         protected override void Update(GameTime gameTime)
