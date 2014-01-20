@@ -409,10 +409,10 @@ namespace AXE.Game.Entities
                             }
                             else if (mginput.pressed(PadButton.up) && placeMeeting(x, y, "items"))
                             {
-                                bEntity door = (bEntity)instancePlace(x, y, "items");
-                                if (door is ExitDoor)
+                                bEntity item = (bEntity)instancePlace(x, y, "items");
+                                if (item is ExitDoor)
                                 {
-                                    ExitDoor exitDoor = (door as ExitDoor);
+                                    ExitDoor exitDoor = (item as ExitDoor);
                                     if (exitDoor.isOpen())
                                     {
                                         state = MovementState.Exit;
@@ -422,6 +422,14 @@ namespace AXE.Game.Entities
                                     {
                                         
                                     }*/
+                                }
+                                else if (item is TreasureChest)
+                                {
+                                    TreasureChest treasureChest = (item as TreasureChest);
+                                    if (treasureChest.isClosed())
+                                    {
+                                        treasureChest.tryOpen(this);
+                                    }
                                 }
                             }
 

@@ -198,14 +198,14 @@ namespace AXE.Game.Entities
 
     class Lock : Entity
     {
-        bSpritemap sprite
+        protected bSpritemap sprite
         {
             get { return graphic as bSpritemap; }
             set { graphic = value; }
         }
 
-        bool opened;
-        float vspeed;
+        protected bool opened;
+        protected float vspeed;
 
         public Lock(int x, int y) : base(x, y)
         {

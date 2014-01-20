@@ -463,6 +463,8 @@ namespace AXE.Game.Screens
                     _add(e, "stairs");
                 else if (e is ExitDoor)
                     _add(e, "items");
+                else if (e is TreasureChest)
+                    _add(e, "items");
                 else if (e is Enemy)
                     _add(e, "enemy");
                 else if (e is Axe)

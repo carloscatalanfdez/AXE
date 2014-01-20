@@ -108,5 +108,6 @@
     <Zombie id="35" x="16" y="264" />
     <TerritorialRapier id="10" x="152" y="264" flipped="False" />
     <SinefloaterSpawner id="16" x="-8" y="80" height="48" delay="120" direction="Right" critterspeed="1" angledelta="4" />
+    <TreasureChest id="11" x="120" y="56" treasure="coin" />
   </Entities>
 </level>

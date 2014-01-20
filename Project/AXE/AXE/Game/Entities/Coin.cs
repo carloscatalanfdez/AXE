@@ -25,9 +25,19 @@ namespace AXE.Game.Entities
             spgraphic.image = (game as AxeGame).res.sprCoinSheet;
         }
 
+        public override int graphicWidth()
+        {
+            return 16;
+        }
+
+        public override int graphicHeight()
+        {
+            return 17;
+        }
+
         public override void initParams()
         {
-            spgraphic = new bSpritemap((game as AxeGame).res.sprCoinSheet, 16, 17);
+            spgraphic = new bSpritemap((game as AxeGame).res.sprCoinSheet, graphicWidth(), graphicHeight());
             spgraphic.add(new bAnim("idle", new int[] { 0, 1, 2 }, 0.2f));
             spgraphic.play("idle");
 

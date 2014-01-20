@@ -113,6 +113,9 @@ namespace AXE.Game.Utils
             sprLocksSheet   = loadSprite("locks-sheet");
             sprKeysSheet    = loadSprite("keys-sheet");
 
+            sprTreasureChestSheet = loadSprite("treasurechest-sheet");
+            sprSmallLockSheet = loadSprite("smalllock-sheet");
+
                 // Enemies
             sprSlimeSheet   = loadSprite("corrosiveslime-sheet");
             sprAxeThrowerSheet 
@@ -228,6 +231,9 @@ namespace AXE.Game.Utils
         public Texture2D sprDoorSheet;
         public Texture2D sprLockSheet;
         public Texture2D sprKeySheet;
+
+        public Texture2D sprTreasureChestSheet;
+        public Texture2D sprSmallLockSheet;
 
         public Texture2D sprLocksSheet;
         public Texture2D sprKeysSheet;

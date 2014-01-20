@@ -272,12 +272,13 @@ namespace AXE.Game.Entities
                     
                     ge = new SineFloaterSpawner(x, y, height, delay, direction, hspeed, delta);
                     break;
-
-
                 case "Coin":
                     ge = new Coin(x, y);
                     break;
-
+                case "TreasureChest":
+                    string treasure = element.GetAttribute("treasure");
+                    ge = new TreasureChest(x, y, treasure != null ? treasure : "coin");
+                    break;
                 case "FinishLevelContraption":
                     ge = new FinishLevelContraption();
                     break;

@@ -52,7 +52,7 @@ namespace AXE
             width = 320;
             height = 320;
 
-            uint scale = getHighestScale(1, 3);
+            uint scale = getHighestScale(3, 3);
             horizontalZoom = scale;
             verticalZoom = scale;
 
