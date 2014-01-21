@@ -579,7 +579,6 @@ namespace AXE.Game.Entities
                                 spgraphic.play("air-small-thrownweapon");
 
                             Vector2 handPos = getHandPosition();
-                            handPos.Y -= 4;
                             int spawnX = facing == Dir.Left ? 0 : _mask.offsetx + _mask.w;
                             SmallAxe axe = new SmallAxe(x + spawnX, y + 15, this, facing, handPos);
                             state = MovementState.Attacked;
