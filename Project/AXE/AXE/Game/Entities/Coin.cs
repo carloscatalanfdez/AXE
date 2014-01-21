@@ -27,22 +27,22 @@ namespace AXE.Game.Entities
 
         public override int graphicWidth()
         {
-            return 16;
+            return 9;
         }
 
         public override int graphicHeight()
         {
-            return 17;
+            return 9;
         }
 
         public override void initParams()
         {
             spgraphic = new bSpritemap((game as AxeGame).res.sprCoinSheet, graphicWidth(), graphicHeight());
-            spgraphic.add(new bAnim("idle", new int[] { 0, 1, 2 }, 0.2f));
+            spgraphic.add(new bAnim("idle", new int[] { 0, 0, 0, 0, 1, 2, 3 }, 0.2f));
             spgraphic.play("idle");
 
-            mask.w = 14;
-            mask.h = 15;
+            mask.w = 7;
+            mask.h = 7;
             mask.offsetx = 1;
             mask.offsety = 1;
 

@@ -88,7 +88,7 @@ namespace AXE.Game.Entities
             if (reward != null)
             {
                 int rewardxoffset = 8;
-                int rewardyoffset = 10;
+                int rewardyoffset = 8;
                 reward.x = x + rewardxoffset - reward.graphicWidth() / 2;
                 reward.y = y + rewardyoffset - reward.graphicHeight();
                 world.add(reward, "items");
