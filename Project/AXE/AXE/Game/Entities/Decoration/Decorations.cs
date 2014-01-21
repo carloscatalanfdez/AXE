@@ -30,6 +30,11 @@ namespace AXE.Game.Entities.Decoration
             layer = 19;
         }
 
+        override public void reloadContent()
+        {
+            sprite.image = bDummyRect.sharedDummyRect(game);
+        }
+
         protected virtual void initSprite()
         {
             sprite = new bSpritemap(bDummyRect.sharedDummyRect(game), 8, 8);
