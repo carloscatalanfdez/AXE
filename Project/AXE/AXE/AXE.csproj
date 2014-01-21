@@ -233,6 +233,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
+    <None Include="Assets\Maps\20140120.oel">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Assets\Maps\3.oel">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

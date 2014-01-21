@@ -217,7 +217,7 @@ namespace AXE.Game.Entities
             haccel = 0.2f;
             air_haccel = 0f;
             runSpeedFactor = 2;
-            jumpPower = 3.75842f;
+            jumpPower = 4.19842f;
             deathFallThreshold = 48;
 
             weaponCatchMask = new bMask(x, y, 
