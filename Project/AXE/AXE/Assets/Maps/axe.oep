@@ -175,8 +175,8 @@
     </EntityDefinition>
     <EntityDefinition Name="Coin" Limit="-1" ResizableX="false" ResizableY="false" Rotatable="false" RotateIncrement="15">
       <Size>
-        <Width>16</Width>
-        <Height>17</Height>
+        <Width>9</Width>
+        <Height>9</Height>
       </Size>
       <Origin>
         <X>0</X>
@@ -185,7 +185,26 @@
       <ImageDefinition DrawMode="Image" ImagePath="..\..\..\AXEContent\Assets\Sprites\coin-sheet.png" Tiled="true">
         <RectColor A="255" R="255" G="0" B="0" />
       </ImageDefinition>
-      <ValueDefinitions />
+      <ValueDefinitions>
+        <ValueDefinition xsi:type="IntValueDefinition" Name="value" Default="1" Min="1" Max="100" ShowSlider="false" />
+      </ValueDefinitions>
+      <NodesDefinition Enabled="false" Limit="-1" DrawMode="None" Ghost="false" />
+    </EntityDefinition>
+    <EntityDefinition Name="Treasure" Limit="-1" ResizableX="false" ResizableY="false" Rotatable="false" RotateIncrement="15">
+      <Size>
+        <Width>9</Width>
+        <Height>9</Height>
+      </Size>
+      <Origin>
+        <X>0</X>
+        <Y>0</Y>
+      </Origin>
+      <ImageDefinition DrawMode="Image" ImagePath="..\..\..\AXEContent\Assets\Sprites\coin-sheet.png" Tiled="true">
+        <RectColor A="255" R="255" G="0" B="0" />
+      </ImageDefinition>
+      <ValueDefinitions>
+        <ValueDefinition xsi:type="IntValueDefinition" Name="value" Default="10" Min="10" Max="1000" ShowSlider="false" />
+      </ValueDefinitions>
       <NodesDefinition Enabled="false" Limit="-1" DrawMode="None" Ghost="false" />
     </EntityDefinition>
     <EntityDefinition Name="FinishLevelContraption" Limit="-1" ResizableX="false" ResizableY="false" Rotatable="false" RotateIncrement="15">

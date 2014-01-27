@@ -40,12 +40,12 @@ namespace AXE.Game.Entities.Base
             // Default behaviour, collect on touch
             if (type == "player" && state == State.Idle)
             {
-                onCollected();
+                onCollected(other as Player);
                 (other as Player).onCollectItem(this);
             }
         }
 
-        public virtual void onCollected()
+        public virtual void onCollected(Player collector)
         {
         }
 

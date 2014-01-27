@@ -153,6 +153,7 @@
     <Compile Include="Game\Entities\ItemGenerator.cs" />
     <Compile Include="Game\Entities\OneWayPlatform.cs" />
     <Compile Include="Game\Entities\Stairs.cs" />
+    <Compile Include="Game\Entities\Treasure.cs" />
     <Compile Include="Game\Entities\TreasureChest.cs" />
     <Compile Include="Game\Screens\GameOverScreen.cs" />
     <Compile Include="Game\Screens\WinScreen.cs" />

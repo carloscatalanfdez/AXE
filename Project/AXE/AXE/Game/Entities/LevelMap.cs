@@ -273,8 +273,19 @@ namespace AXE.Game.Entities
                     ge = new SineFloaterSpawner(x, y, height, delay, direction, hspeed, delta);
                     break;
                 case "Coin":
-                    ge = new Coin(x, y);
-                    break;
+                    {
+                        string valueAttr = element.GetAttribute("value");
+                        int value = valueAttr != null ? int.Parse(valueAttr) : 1;
+                        ge = new Coin(x, y, value);
+                        break;
+                    }
+                case "Treasure":
+                    {
+                        string valueAttr = element.GetAttribute("value");
+                        int value = valueAttr != null ? int.Parse(valueAttr) : 1;
+                        ge = new Treasure(x, y, value);
+                        break;
+                    }
                 case "TreasureChest":
                     string treasure = element.GetAttribute("treasure");
                     ge = new TreasureChest(x, y, treasure != null ? treasure : "coin");

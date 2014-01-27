@@ -63,7 +63,7 @@ namespace AXE.Game.Entities.Base
             layer = 11;
         }
 
-        public override void onCollected()
+        public override void onCollected(Player collector)
         {
             state = State.Taken;
             onDisappear();

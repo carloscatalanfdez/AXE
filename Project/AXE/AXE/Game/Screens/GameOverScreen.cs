@@ -30,7 +30,7 @@ namespace AXE.Game.Screens
         TimedLabel totalCoins;
         TimedLabel pouchLabel;
 
-        int treausures, kills, score, souls, coins;
+        int treasures, kills, score, souls, coins;
         string scoreUnits;
         int cTreausures, cKills, cScore, cSouls, cCoins;
         int cTotal, pouch;
@@ -85,11 +85,15 @@ namespace AXE.Game.Screens
             finished = false;
 
             // Get game results
-            treausures = Tools.random.Next(10000);
-            kills = Tools.random.Next(10000);
-            score = Tools.random.Next(25000000);
-            souls = Tools.random.Next(100);
-            coins = Tools.random.Next(300);
+            treasures = kills = score = souls = coins = 0;
+            foreach(PlayerData playerData in GameData.get().playerData)
+            {
+                treasures += playerData.treausures;
+                kills += playerData.kills;
+                score += playerData.score;
+                souls += playerData.souls;
+                coins += playerData.collectedCoins;
+            }
 
             // Treat them
             score = score / 1000; // 185100 = 185k
@@ -101,7 +105,7 @@ namespace AXE.Game.Screens
             }
 
             // Calculate coins
-            cTreausures = treausures / 100;
+            cTreausures = treasures / 100;
             cKills = kills / 20;
             cScore = score / 10 * (scoreUnits == "M" ? 25 : 1);
             cSouls = souls;
@@ -131,7 +135,7 @@ namespace AXE.Game.Screens
             leftTitle = ntl(72, 120, "YOU MANAGED", atd(40), new Color(161, 161, 161), (game as AxeGame).res.sfxBigBell);
             
             treausuresLabel = ntl(72, 136, "TREAUSURES", atd(40), w);
-            treausuresValue = ntl(160, 136, padString("" + treausures, 4), atd(0), w);
+            treausuresValue = ntl(160, 136, padString("" + treasures, 4), atd(0), w);
 
             killsLabel = ntl(72, 152, "DEFEATED", atd(40), w);
             killsValue = ntl(160, 152, padString("" + kills, 4), atd(0), w);

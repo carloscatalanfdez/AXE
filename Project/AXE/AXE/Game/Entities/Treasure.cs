@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using bEngine.Graphics;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
 using AXE.Game.Entities.Base;
+using bEngine.Graphics;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using bEngine;
 
 namespace AXE.Game.Entities
 {
-    class Coin : Item
+    class Treasure : Item
     {
         public int value;
 
-        public Coin(int x, int y, int value = 1)
+        public Treasure(int x, int y, int value = 1)
             : base(x, y)
         {
             this.value = value;
@@ -38,16 +38,7 @@ namespace AXE.Game.Entities
 
         public override void initParams()
         {
-            spgraphic = new bSpritemap((game as AxeGame).res.sprCoinSheet, graphicWidth(), graphicHeight());
-            spgraphic.add(new bAnim("idle", new int[] { 
-                                                        0, 0, 0, 0,
-                                                        0, 0, 0, 0,
-                                                        0, 0, 0, 0,
-                                                        0, 0, 0, 0,
-                                                        0, 0, 0, 0, 
-                                                        0, 0, 0, 0,
-                                                        1, 2, 3 }, 0.8f));
-            spgraphic.play("idle");
+            initGraphic();
 
             mask.w = 7;
             mask.h = 7;
@@ -59,9 +50,44 @@ namespace AXE.Game.Entities
             layer = 11;
         }
 
+        public void initGraphic()
+        {
+            spgraphic = new bSpritemap((game as AxeGame).res.sprCoinSheet, graphicWidth(), graphicHeight());
+            spgraphic.add(new bAnim("idle", new int[] { 
+                                                        0, 0, 0, 0,
+                                                        0, 0, 0, 0,
+                                                        0, 0, 0, 0,
+                                                        0, 0, 0, 0,
+                                                        0, 0, 0, 0, 
+                                                        0, 0, 0, 0,
+                                                        1, 2, 3 }, 0.8f));
+            spgraphic.play("idle");
+
+            if (value >= 0 && value < 10)
+            {
+                spgraphic.color = Color.Aquamarine;
+            }
+            else if (value >= 10 && value < 20)
+            {
+                spgraphic.color = Color.PeachPuff;
+            }
+            else if (value >= 20 && value < 50)
+            {
+                spgraphic.color = Color.Chocolate;
+            }
+            else if (value >= 50 && value < 100)
+            {
+                spgraphic.color = Color.Gainsboro;
+            }
+            else if (value >= 100)
+            {
+                spgraphic.color = Color.ForestGreen;
+            }
+        }
+
         public override void onCollected(Player collector)
         {
-            collector.data.collectedCoins += value;
+            collector.data.treausures += value;
 
             state = State.Taken;
             timer[0] = 10;
@@ -86,7 +112,7 @@ namespace AXE.Game.Entities
             }
         }
 
-        public override void render(GameTime dt, SpriteBatch sb)
+        public override void render(GameTime dt, Microsoft.Xna.Framework.Graphics.SpriteBatch sb)
         {
             base.render(dt, sb);
             if (bConfig.DEBUG)

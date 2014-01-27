@@ -109,5 +109,10 @@
     <TerritorialRapier id="10" x="152" y="264" flipped="False" />
     <SinefloaterSpawner id="16" x="-8" y="80" height="48" delay="120" direction="Right" critterspeed="1" angledelta="4" />
     <TreasureChest id="11" x="120" y="56" treasure="coin" />
+    <Treasure id="12" x="96" y="112" value="35" />
+    <Treasure id="13" x="248" y="168" value="45" />
+    <Treasure id="14" x="112" y="224" value="65" />
+    <Treasure id="15" x="296" y="56" value="20" />
+    <Treasure id="17" x="240" y="48" value="10" />
   </Entities>
 </level>
