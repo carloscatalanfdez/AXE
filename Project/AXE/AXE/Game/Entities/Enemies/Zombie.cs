@@ -60,9 +60,9 @@ namespace AXE.Game.Entities.Enemies
         {
             base.init();
 
-            spgraphic = new bSpritemap((game as AxeGame).res.sprZombieSheet, 30, 32);
+            spgraphic = new bSpritemap((game as AxeGame).res.sprZombieSheet, 40, 32);
             spgraphic.add(new bAnim("invisible", new int[] { 17 }));
-            spgraphic.add(new bAnim("walk", new int[] { 5, 6 }, 0.3f));
+            spgraphic.add(new bAnim("walk", new int[] { 5, 6 }, 0.15f));
             spgraphic.add(new bAnim("out", new int[] { 2, 1, 0, 1, 0 }, 0.4f, false));
             spgraphic.add(new bAnim("in", new int[] { 0, 1, 0, 1, 0, 1, 2, 3, 4, 4, 4, 4 }, 0.4f, false));
             spgraphic.add(new bAnim("jump", new int[] { 10 }));
