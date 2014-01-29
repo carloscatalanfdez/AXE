@@ -1223,6 +1223,7 @@ namespace AXE.Game.Entities
                     case DeathState.None:
                     case DeathState.Generic:
                     case DeathState.Fall:
+                    case DeathState.Fire:
                     case DeathState.ForceHit:
                         state = MovementState.Death;
 

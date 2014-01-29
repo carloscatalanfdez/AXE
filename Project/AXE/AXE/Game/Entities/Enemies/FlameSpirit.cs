@@ -23,6 +23,8 @@ namespace AXE.Game.Entities.Enemies
         const int DECISION_TIMER = 0;
         const int COOLDOWN_TIMER = 1;
 
+        const int BULLETS_PER_ATTACK = 1;
+
         public enum State { Invisible, In, Float, Attack, Out, Death };
         public State state;
 
@@ -83,6 +85,9 @@ namespace AXE.Game.Entities.Enemies
             fgraphic = new bSpritemap((game as AxeGame).res.sprFlameSheet, 32, 32);
             fgraphic.add(new bAnim("idle", new int[] { 0, 1, 2, 3 }, 0.3f));
             fgraphic.add(new bAnim("gone", new int[] { 4 }));
+
+            smgraphic.color *= 0.8f;
+            fgraphic.color *= 0.8f;
 
             initParameters();
 
@@ -164,7 +169,7 @@ namespace AXE.Game.Entities.Enemies
                             }
                         break;
                         case State.Attack:
-                            if (attacks++ < 3)
+                        if (attacks++ < BULLETS_PER_ATTACK)
                             {
                                 // Spawn bullet
                                 FlameSpiritBullet bullet = 
@@ -390,7 +395,7 @@ namespace AXE.Game.Entities.Enemies
             {
                 if (type == "player")
                 {
-                    (other as Player).onCollision("hazard", this);
+                    // disappear maybe?
                 }
             }
         }

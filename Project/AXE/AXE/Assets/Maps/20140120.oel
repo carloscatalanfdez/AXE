@@ -117,5 +117,6 @@
     <SinefloaterSpawner id="25" x="0" y="96" height="24" delay="60" direction="Right" critterspeed="3" angledelta="10" />
     <Zombie id="26" x="88" y="208" />
     <ZombieSpawner id="27" x="184" y="208" spawnableZombies="1" />
+    <FlameSpirit id="23" x="224" y="152" />
   </Entities>
 </level>
