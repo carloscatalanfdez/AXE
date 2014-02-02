@@ -110,6 +110,10 @@ namespace AXE.Game.Entities
                 flyingMask.game = game;
             }
 
+            /**
+             * Find the width of the flying axe: it has to be as big as the current hspeed, except if the axe
+             * hasn't covered said distance yet
+             */ 
             int flyingWidth = (int)Math.Min(Math.Abs(current_hspeed), xTraveledFlightDistance);
             flyingWidth = Math.Max(1, flyingWidth);
             if (current_hspeed < 0)
@@ -128,6 +132,10 @@ namespace AXE.Game.Entities
                 flyingMask.offsetx = idleMask.offsetx;
             }
 
+            /**
+             * Find the height of the flying axe: it has to be as big as the current vspeed, except if the axe
+             * hasn't covered said distance yet
+             */ 
             int flyingHeight = (int)Math.Min(Math.Abs(current_vspeed), yTraveledFlightDistance);
             flyingHeight = Math.Max(1, flyingHeight);
             if (current_vspeed < 0)
@@ -585,6 +593,11 @@ namespace AXE.Game.Entities
         }
     }
 
+    /**
+     * Class that determines the behavior of an axe after a hit
+     * This is the base behavior in which the axe just keeps on flying
+     * after hitting anything
+     */ 
     class AxeHitResponse
     {
         public AxeHitResponse()
@@ -595,6 +608,9 @@ namespace AXE.Game.Entities
         {
         }
 
+        /**
+         * Returns the excepted axe behavior after hitting a random solid/entity
+         */
         public static AxeHitResponse generateDefaultResponse(Axe axe, bEntity target)
         {
             if (axe is NormalAxe)
@@ -607,15 +623,24 @@ namespace AXE.Game.Entities
             }
         }
 
+        /**
+         * Returns the excepted axe behavior after hitting a general Entity
+         */
         public static AxeHitResponse generateDefaultEntityResponse(Axe axe, bEntity target)
         {
             return generateDefaultResponse(axe, target);
         }
 
+        /**
+         * Returns the excepted axe behavior after hitting an Enemy
+         * Usually we want it to bounce if it's a tomahawk, or keep on flying (until a certain limit)
+         * if it's a powered-up axe
+         */
         public static AxeHitResponse generateDefaultEnemyResponse(Axe axe, bEntity target)
         {
             if (axe is NormalAxe)
             {
+                // Todo: implement limit on this ones?
                 return new AxeHitResponse(); // Keep on rocking in the free world
             }
             else
@@ -624,16 +649,25 @@ namespace AXE.Game.Entities
             }
         }
 
+        /**
+         * Returns a stuck-on-entity/solid behavior
+         */
         public static AxeHitResponse generateStuckResponse(bEntity stuckTo)
         {
             return new AxeHitResponseStuck(stuckTo);
         }
 
+        /**
+         * Returns a bounce behavior
+         */
         public static AxeHitResponse generateBounceResponse()
         {
             return new AxeHitResponseBounce();
         }
 
+        /**
+         * Returns a redirect behavior, new direction is defined in polar coordinates
+         */
         public static AxeHitResponse generateRedirectResponseWithAngle(float angle, float force)
         {
             AxeHitResponseRedirect hitResponse = new AxeHitResponseRedirect();
@@ -641,6 +675,9 @@ namespace AXE.Game.Entities
             return hitResponse;
         }
 
+        /**
+         * Returns a redirect behavior, new direction is defined in cartesia ncoordinates
+         */
         public static AxeHitResponse generateRedirectResponseWithSpeed(float hspeed, float vspeed)
         {
             AxeHitResponseRedirect hitResponse = new AxeHitResponseRedirect();
@@ -649,6 +686,9 @@ namespace AXE.Game.Entities
         }
     }
 
+    /**
+     * Class that determines the behavior of an stuck axe
+     */
     class AxeHitResponseStuck : AxeHitResponse
     {
         public bEntity stuckTo;
@@ -664,6 +704,9 @@ namespace AXE.Game.Entities
         }
     }
 
+    /**
+     * Class that determines the behavior of an axe that bounces after a hit
+     */
     class AxeHitResponseBounce : AxeHitResponse
     {
         public override void applyChangesOnAxe(Axe axe)
@@ -672,6 +715,9 @@ namespace AXE.Game.Entities
         }
     }
 
+    /**
+     * Class that continues changes its direction after bouncing
+     */
     class AxeHitResponseRedirect : AxeHitResponse
     {
         public float hspeed;
