@@ -119,6 +119,12 @@ namespace AXE.Game.Entities.Base
             return false;
         }
 
+        public override AxeHitResponse onAxeHit(Axe other)
+        {
+            onHit(other);
+            return AxeHitResponse.generateDefaultEnemyResponse(other, this);
+        }
+
         /**
          * ICONTRAPTION METHODS
          */

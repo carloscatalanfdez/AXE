@@ -558,25 +558,31 @@ namespace AXE.Game.Entities.Enemies
             return false;
         }
 
-        public override void onCollision(string type, bEntity other)
+        public override AxeHitResponse onAxeHit(Axe other)
         {
             if (state != State.Dead && state != State.Falling)
             {
-                if (type == "hazard" && other is Axe)
+                if (other is NormalAxe)
                 {
-                    Axe axe = other as Axe;
-                    if (!(axe is NormalAxe) && axe.state == Axe.MovementState.Flying)
+                    onHit(other);
+                }
+                else
+                {
+                    int midPos = _mask.x + _mask.w / 2;
+                    int axePos = other.getRelativeXPos(midPos);
+                    if ((facing == Dir.Left && axePos < midPos) || (facing == Dir.Right && axePos > midPos))
                     {
-                        int midPos = _mask.x + _mask.w / 2;
-                        int axePos = axe.getRelativeXPos(midPos);
-                        if ((facing == Dir.Left && axePos < midPos) || (facing == Dir.Right && axePos > midPos))
-                        {
-                            (other as Axe).onBounce();
-                            changeState(State.Deflecting);
-                        }
+                        (other as Axe).onBounce();
+                        changeState(State.Deflecting);
+                    }
+                    else
+                    {
+                        onHit(other);
                     }
                 }
             }
+
+            return AxeHitResponse.generateDefaultEnemyResponse(other, this);
         }
 
         /**

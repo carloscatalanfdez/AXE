@@ -628,7 +628,7 @@ namespace AXE.Game.Entities
 
         public virtual AxeHitResponse onAxeHit(Axe other)
         {
-            return AxeHitResponse.generateDefaultResponse(other, this);
+            return AxeHitResponse.generateDefaultEntityResponse(other, this);
         }
 
         public virtual void onClick()

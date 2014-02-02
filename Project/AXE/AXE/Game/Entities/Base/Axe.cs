@@ -607,6 +607,23 @@ namespace AXE.Game.Entities
             }
         }
 
+        public static AxeHitResponse generateDefaultEntityResponse(Axe axe, bEntity target)
+        {
+            return generateDefaultResponse(axe, target);
+        }
+
+        public static AxeHitResponse generateDefaultEnemyResponse(Axe axe, bEntity target)
+        {
+            if (axe is NormalAxe)
+            {
+                return new AxeHitResponse(); // Keep on rocking in the free world
+            }
+            else
+            {
+                return new AxeHitResponseBounce();
+            }
+        }
+
         public static AxeHitResponse generateStuckResponse(bEntity stuckTo)
         {
             return new AxeHitResponseStuck(stuckTo);
