@@ -68,29 +68,5 @@ namespace AXE.Game.Entities.Axes
         {
             return new Vector2(8, 10);
         }
-
-        public override void onHitSolid(bEntity entity)
-        {
-            if (justLaunched && entity is Player)
-                return;
-
-            if (entity != null && (entity is Entity))
-            {
-                if ((entity as Entity).onHit(this))
-                {
-                    onHit(entity as Entity);
-                    // onBounce(false);
-                }
-                else
-                {
-                    onStuck(entity);
-                }
-            }
-            else
-            {
-                // Stuck on others
-                onStuck(entity);
-            }
-        }
     }
 }

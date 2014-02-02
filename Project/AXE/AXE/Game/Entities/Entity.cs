@@ -626,6 +626,11 @@ namespace AXE.Game.Entities
             return false;
         }
 
+        public virtual AxeHitResponse onAxeHit(Axe other)
+        {
+            return AxeHitResponse.generateDefaultResponse(other, this);
+        }
+
         public virtual void onClick()
         {
             // This entity was clicked by the left mouse button

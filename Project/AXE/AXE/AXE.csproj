@@ -113,6 +113,7 @@
     <Compile Include="Game\Entities\Axes\SmallAxe.cs" />
     <Compile Include="Game\Entities\Axes\NormalAxe.cs" />
     <Compile Include="Game\Entities\Base\Axe.cs" />
+    <Compile Include="Game\Entities\Base\AxeBouncer.cs" />
     <Compile Include="Game\Entities\Base\Enemy.cs" />
     <Compile Include="Game\Entities\Base\IPlatformUser.cs" />
     <Compile Include="Game\Entities\Bosses\Boss.cs" />

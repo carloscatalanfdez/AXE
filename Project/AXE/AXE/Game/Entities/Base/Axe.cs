@@ -14,6 +14,7 @@ using AXE.Game.Screens;
 using AXE.Game.Entities;
 using AXE.Game.Entities.Base;
 using AXE.Game.Control;
+using AXE.Game.Entities.Axes;
 
 namespace AXE.Game.Entities
 {
@@ -59,7 +60,8 @@ namespace AXE.Game.Entities
         public SoundEffect sfxGrab;
         public SoundEffect sfxHurt;
 
-        public int traveledFlightDistance; // How long has the axe been flying
+        public int xTraveledFlightDistance; // How far on the x axis has the axe been flying
+        public int yTraveledFlightDistance; // How far on the y axis has the axe been flying
 
         public Axe(int x, int y, IWeaponHolder holder) : base(x, y)
         {
@@ -108,21 +110,40 @@ namespace AXE.Game.Entities
                 flyingMask.game = game;
             }
 
-            int flyingWidth = (int)Math.Min(Math.Abs(current_hspeed), traveledFlightDistance);
+            int flyingWidth = (int)Math.Min(Math.Abs(current_hspeed), xTraveledFlightDistance);
             flyingWidth = Math.Max(1, flyingWidth);
-            if (facing == Player.Dir.Left)
+            if (current_hspeed < 0)
             {
                 flyingMask.w = flyingWidth;
-                flyingMask.h = idleMask.h;
                 flyingMask.offsetx = idleMask.offsetx;
-                flyingMask.offsety = idleMask.offsety;
+            }
+            else if (current_hspeed > 0)
+            {
+                flyingMask.w = flyingWidth;
+                flyingMask.offsetx = idleMask.offsetx + idleMask.w - flyingWidth;
             }
             else
             {
-                flyingMask.w = flyingWidth;
+                flyingMask.w = idleMask.w;
+                flyingMask.offsetx = idleMask.offsetx;
+            }
+
+            int flyingHeight = (int)Math.Min(Math.Abs(current_vspeed), yTraveledFlightDistance);
+            flyingHeight = Math.Max(1, flyingHeight);
+            if (current_vspeed < 0)
+            {
+                flyingMask.h = flyingHeight;
+                flyingMask.offsety = idleMask.offsety;
+            }
+            else if (current_vspeed > 0)
+            {
+                flyingMask.h = flyingHeight;
+                flyingMask.offsety = idleMask.offsety + idleMask.h - flyingHeight;
+            }
+            else
+            {
                 flyingMask.h = idleMask.h;
-                flyingMask.offsetx = idleMask.offsetx + idleMask.w - flyingWidth;
-                flyingMask.offsety = 0;
+                flyingMask.offsety = idleMask.offsety;
             }
 
             _mask = flyingMask;
@@ -135,9 +156,7 @@ namespace AXE.Game.Entities
             current_hspeed = current_vspeed = 0;
             gravity = 0.5f;
 
-            wrapCount = 0;
-            traveledFlightDistance = 0;
-            wrapLimit = 1;
+            resetAxeFlight();
 
             type = PlayerData.Weapons.Stick;
 
@@ -197,7 +216,7 @@ namespace AXE.Game.Entities
             // Do nothing if the previous owner just threw it
             if ((other is IWeaponHolder) 
                 && ((other as IWeaponHolder) == thrower) 
-                && (traveledFlightDistance < (other as Entity).graphicWidth()))
+                && (xTraveledFlightDistance < (other as Entity).graphicWidth()))
             {
                 return;
             } 
@@ -239,9 +258,7 @@ namespace AXE.Game.Entities
             switch (state)
             {
                 case MovementState.Grabbed:
-                    wrapCount = 0;
-                    traveledFlightDistance = 0;
-                    wrappable = true;
+                    resetAxeFlight();
 
                     pos = holder.getHandPosition() - getGrabPosition();
                     break;
@@ -255,7 +272,8 @@ namespace AXE.Game.Entities
                         moveTo.X += current_hspeed;
                         moveTo.Y += current_vspeed;
 
-                        traveledFlightDistance += (int)Math.Abs(pos.X - moveTo.X);
+                        xTraveledFlightDistance += (int)Math.Abs(pos.X - moveTo.X);
+                        yTraveledFlightDistance += (int)Math.Abs(pos.Y - moveTo.Y);
 
                         Vector2 remnant;
                         remnant = moveToContact(moveTo, "solid");
@@ -271,12 +289,10 @@ namespace AXE.Game.Entities
                         break;
                     }
                 case MovementState.Bouncing:
-                    {
-                        Vector2 remnant;
+                    {   
+                        resetAxeFlight();
 
-                        wrapCount = 0;
-                        traveledFlightDistance = 0;
-                        wrappable = true;
+                        Vector2 remnant;
 
                         current_vspeed += gravity;
 
@@ -313,9 +329,8 @@ namespace AXE.Game.Entities
                         break;
                     }
                 case MovementState.Stuck:
-                    wrapCount = 0;
-                    traveledFlightDistance = 0;
-                    wrappable = true;
+                    resetAxeFlight();
+
                     if (stuckTo != null)
                     {
                         if (stuckToSide == stuckTo.facing)
@@ -416,6 +431,13 @@ namespace AXE.Game.Entities
             spgraphic.update();
         }
 
+        public void resetAxeFlight()
+        {
+            wrapCount = 0;
+            xTraveledFlightDistance = yTraveledFlightDistance = 0;
+            wrappable = true;
+        }
+
         override public void render(GameTime dt, SpriteBatch sb)
         {
             base.render(dt, sb);
@@ -442,15 +464,45 @@ namespace AXE.Game.Entities
 
         public virtual void onThrow(int force, Player.Dir dir, Vector2 handPosition)
         {
+            if (dir == Dir.Left)
+            {
+                onThrow((float) -force, 0.0f, handPosition);
+            }
+            else
+            {
+                onThrow((float) force, 0.0f, handPosition);
+            }
+        }
+
+        public virtual void onThrow(float hspeed, float vspeed, Vector2 handPosition)
+        {
+            resetAxeFlight();
+
             // Holder is stored during flight
             pos = handPosition - getGrabPosition();
             thrower = holder;
             justLaunched = true;
-            wrapCount = 0;
             sfxThrow.Play();
             state = MovementState.Flying;
-            current_hspeed = force * holder.getDirectionAsSign(dir);
-            holder.removeWeapon();
+            current_hspeed = hspeed;
+            current_vspeed = vspeed;
+            if (holder != null)
+            {
+                holder.removeWeapon();
+            }
+            if (current_hspeed > 0)
+            {
+                facing = Dir.Right;
+            }
+            else if (current_hspeed < 0)
+            {
+                facing = Dir.Left;
+            }
+            else
+            {
+                facing = Dir.None;
+            }
+
             holder = null;
         }
 
@@ -480,11 +532,18 @@ namespace AXE.Game.Entities
                 return;
 
             // notify other entity
+            AxeHitResponse hitResponse = null;
             if (entity != null && (entity is Entity))
             {
-                (entity as Entity).onHit(this);
+                hitResponse = (entity as Entity).onAxeHit(this);
             }
-            onBounce();
+
+            if (hitResponse == null)
+            {
+                hitResponse = AxeHitResponse.generateDefaultResponse(this, entity);
+            }
+
+            hitResponse.applyChangesOnAxe(this);
         }
 
         public virtual void onStuck(bEntity entity)
@@ -523,6 +582,103 @@ namespace AXE.Game.Entities
             }
 
             return killer;
+        }
+    }
+
+    class AxeHitResponse
+    {
+        public AxeHitResponse()
+        {
+        }
+
+        public virtual void applyChangesOnAxe(Axe axe)
+        {
+        }
+
+        public static AxeHitResponse generateDefaultResponse(Axe axe, bEntity target)
+        {
+            if (axe is NormalAxe)
+            {
+                return new AxeHitResponseStuck(target);
+            }
+            else
+            {
+                return new AxeHitResponseBounce();
+            }
+        }
+
+        public static AxeHitResponse generateStuckResponse(bEntity stuckTo)
+        {
+            return new AxeHitResponseStuck(stuckTo);
+        }
+
+        public static AxeHitResponse generateBounceResponse()
+        {
+            return new AxeHitResponseBounce();
+        }
+
+        public static AxeHitResponse generateRedirectResponseWithAngle(float angle, float force)
+        {
+            AxeHitResponseRedirect hitResponse = new AxeHitResponseRedirect();
+            hitResponse.setAngleForce(angle, force);
+            return hitResponse;
+        }
+
+        public static AxeHitResponse generateRedirectResponseWithSpeed(float hspeed, float vspeed)
+        {
+            AxeHitResponseRedirect hitResponse = new AxeHitResponseRedirect();
+            hitResponse.setSpeed(hspeed, vspeed);
+            return hitResponse;
+        }
+    }
+
+    class AxeHitResponseStuck : AxeHitResponse
+    {
+        public bEntity stuckTo;
+
+        public AxeHitResponseStuck(bEntity stuckTo)
+        {
+            this.stuckTo = stuckTo;
+        }
+
+        public override void applyChangesOnAxe(Axe axe)
+        {
+            axe.onStuck(stuckTo);
+        }
+    }
+
+    class AxeHitResponseBounce : AxeHitResponse
+    {
+        public override void applyChangesOnAxe(Axe axe)
+        {
+            axe.onBounce();
+        }
+    }
+
+    class AxeHitResponseRedirect : AxeHitResponse
+    {
+        public float hspeed;
+        public float vspeed;
+
+        /**
+         * Not tested!
+         */
+        public void setAngleForce(float angle, float force)
+        {
+            this.hspeed = (float) (force * Math.Acos(angle));
+            this.vspeed = (float) (force * Math.Asin(angle));
+        }
+
+        public void setSpeed(float hspeed, float vspeed)
+        {
+            this.hspeed = hspeed;
+            this.vspeed = vspeed;
+        }
+
+        public override void applyChangesOnAxe(Axe axe)
+        {
+            axe.holder = axe.thrower;
+            axe.onThrow(hspeed, vspeed, axe.pos + axe.getGrabPosition() /* hac to keep the axe in place */);
         }
     }
 }
