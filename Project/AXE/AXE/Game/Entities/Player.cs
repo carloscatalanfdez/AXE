@@ -490,30 +490,7 @@ namespace AXE.Game.Entities
                     // the player is moving through a one way platform
                     else if (vspeed >= 0)
                     {
-                        bool dead = false;
-                        if (fallingToDeath)
-                        {
-                            // Has fall-safe powerup?
-                            if ((powerUps & PowerUpPickable.HIGHFALLGUARD_EFFECT) != 0)
-                            {
-                                // Consume powerup
-                                powerUps &= ~PowerUpPickable.HIGHFALLGUARD_EFFECT;
-                            }
-                            else
-                            {
-                                dead = true;
-                            }
-                        }
-
-                        if (dead)
-                        {
-                            vspeed = 0;
-                            onDeath(DeathState.Fall);
-                        }
-                        else
-                        {
-                            state = MovementState.Idle;
-                        }
+                        handleLanding();
                     }
                     else // going up but not on air, wtf dude?
                     {
@@ -669,11 +646,40 @@ namespace AXE.Game.Entities
                 {
                     // Landed
                     isLanding = true;
+
                     sfxSteps[0].Play();
                     sfxSteps[1].Play();
                 }
             }
 
+        }
+
+        private void handleLanding()
+        {
+            bool dead = false;
+            if (fallingToDeath)
+            {
+                // Has fall-safe powerup?
+                if ((powerUps & PowerUpPickable.HIGHFALLGUARD_EFFECT) != 0)
+                {
+                    // Consume powerup
+                    powerUps &= ~PowerUpPickable.HIGHFALLGUARD_EFFECT;
+                }
+                else
+                {
+                    dead = true;
+                }
+            }
+
+            if (dead)
+            {
+                vspeed = 0;
+                onDeath(DeathState.Fall);
+            }
+            else
+            {
+                state = MovementState.Idle;
+            }
         }
 
         public void standUp()
@@ -1448,8 +1454,8 @@ namespace AXE.Game.Entities
             if (state != MovementState.Jump || (state == MovementState.Jump && vspeed > 0))
             {
                 currentPlatformDelta = delta;
-                base.onPlatformMovedWithDelta(delta, platform);
-            }    
+                base.onPlatformMovedWithDelta(delta, platform); 
+            }
         }
     }
 }

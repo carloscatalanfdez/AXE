@@ -711,10 +711,13 @@ namespace AXE.Game.Entities
         /* IPlatformUser implementation */
         virtual public void onPlatformMovedWithDelta(Vector2 delta, Entity platform)
         {
-            if (Math.Abs(mask.rect.Bottom - platform.y) <= Math.Abs(delta.Y))
+            // Only move if we are on top of it
+            if (_mask.y + _mask.h <= platform._mask.y)
             {
                 previousPosition += delta;
-                pos += delta;
+                pos.X += delta.X;
+                // Always make sure the entity is always on top
+                pos.Y = platform.y - _mask.h - _mask.offsety;
             }
         }
 

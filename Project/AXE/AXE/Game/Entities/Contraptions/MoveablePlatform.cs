@@ -59,6 +59,9 @@ namespace AXE.Game.Entities.Contraptions
         {
             base.onUpdate();
 
+            // Compute cargo before moving (important)
+            List<bEntity> cargo = instancesPlace(x, y - 1, new String[] { "player", "enemy", "contraptions", "items", "axe" }, null, platformUserCondition);
+
             Vector2 oldPosition = pos;
 
             if (nextNode != currentNode)
@@ -114,7 +117,6 @@ namespace AXE.Game.Entities.Contraptions
             }
 
             // Notify people up there!
-            List<bEntity> cargo = instancesPlace(x, y - 1, new String[] { "player", "enemy", "contraptions", "items", "axe" }, null, platformUserCondition);
             foreach (bEntity entity in cargo)
             {
                 if (entity != null && entity is IPlatformUser && entity != this)

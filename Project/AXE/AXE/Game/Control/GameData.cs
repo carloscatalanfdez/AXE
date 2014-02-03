@@ -71,7 +71,7 @@ namespace AXE.Game.Control
         public void initPlayData()
         {
             levels = new List<string>(new string[] {
-                "131201","20140111", "20140120"
+                "131201","20140111", "20140120", "20140202"
             });
             level = 0;
         }
