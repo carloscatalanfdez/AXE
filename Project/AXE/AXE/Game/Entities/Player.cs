@@ -505,8 +505,8 @@ namespace AXE.Game.Entities
                         if (data.alive)
                         {
                             vspeed = 0;
-                            mask.w = 0;
-                            mask.h = 0;
+                            //mask.w = 0;
+                            //mask.h = 0;
                             bool deathAnimationFinished = spgraphic.currentAnim.finished; // TODO
                             if (deathAnimationFinished && data.alive)
                             {
